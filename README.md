@@ -18,3 +18,5 @@
 ```
 λ stack run day1
 ```
+
+Test framework & some parsing from: [glguy/advent2019](https://github.com/glguy/advent2019)
