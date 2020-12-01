@@ -5,6 +5,7 @@
 module Main (main) where
 
 import Advent
+import Data.List
 
 main :: IO ()
 main = do
@@ -17,11 +18,11 @@ main = do
 -- >>> expenseReport [1721, 979, 366, 299, 675, 1456]
 -- 514579
 expenseReport :: [Integer] -> Integer
-expenseReport ns = head [ x * y | x <- ns, y <- ns, let k = x + y, k == 2020]
+expenseReport ns = head [ x * y | (x:ys) <- tails ns, y <- ys, let k = x + y, k == 2020]
 
 -- | Find three numbers in list that sum to 2020, then multiply the answers
 --
 -- >>> expenseReport3 [1721, 979, 366, 299, 675, 1456]
 -- 241861950
 expenseReport3 :: [Integer] -> Integer
-expenseReport3 ns = head [ x * y * z | x <- ns, y <- ns, z <- ns, let k = x + y + z, k == 2020]
+expenseReport3 ns = head [ x * y * z | (x:ys) <- tails ns, (y:zs) <- tails ys, z <- zs, let k = x + y + z, k == 2020]
