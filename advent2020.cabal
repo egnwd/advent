@@ -1,0 +1,71 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 091921efe68d3e940c4bbb3cd089ace1454eb20d9494c34408e6df8693606e00
+
+name:           advent2020
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/egnwd/advent2020#readme>
+homepage:       https://github.com/egnwd/advent2020#readme
+bug-reports:    https://github.com/egnwd/advent2020/issues
+author:         Elliot Greenwood
+maintainer:     hello@elliotgreenwood.co.uk
+copyright:      2020 Elliot Greenwood
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/egnwd/advent2020
+
+library
+  exposed-modules:
+      Advent
+  other-modules:
+      Paths_advent2020
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , directory >=1.3 && <1.4
+    , doctest >=0.17 && <0.18
+    , filepath >=1.4 && <1.5
+  default-language: Haskell2010
+
+executable day1
+  main-is: Day01.hs
+  other-modules:
+      Paths_advent2020
+  hs-source-dirs:
+      execs
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      advent2020
+    , base >=4.7 && <5
+    , directory >=1.3 && <1.4
+    , doctest >=0.17 && <0.18
+    , filepath >=1.4 && <1.5
+  default-language: Haskell2010
+
+test-suite advent2020-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_advent2020
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      advent2020
+    , base >=4.7 && <5
+    , directory
+    , doctest
+    , filepath
+  default-language: Haskell2010
