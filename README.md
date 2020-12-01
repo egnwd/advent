@@ -19,4 +19,13 @@
 λ stack run day1
 ```
 
+### Local
+
+For automatic tests on save
+```
+λ ghcid -T=':!stack test'
+```
+
+### Attributions
+
 Test framework & some parsing from: [glguy/advent2019](https://github.com/glguy/advent2019)

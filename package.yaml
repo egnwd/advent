@@ -8,15 +8,7 @@ copyright:           "2020 Elliot Greenwood"
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            fun
-
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
 description:         Please see the README on GitHub at <https://github.com/egnwd/advent2020#readme>
 
 dependencies:
@@ -27,28 +19,30 @@ dependencies:
 - megaparsec ^>= 9.0
 - text
 
+_exe-ghc-options: &exe-ghc-options
+  - -threaded
+  - -rtsopts
+  - -with-rtsopts=-N
+
+_default-exe: &day-exe
+  source-dirs:  execs
+  ghc-options:  *exe-ghc-options
+  dependencies:
+  - advent2020
+
 library:
   source-dirs: src
 
 executables:
   day1:
-    main:                Day01.hs
-    source-dirs:         execs
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - advent2020
+    <<:   *day-exe
+    main: Day01.hs
 
 tests:
   advent2020-test:
     main:                Spec.hs
     source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+    ghc-options:         *exe-ghc-options
     dependencies:
     - advent2020
     - doctest

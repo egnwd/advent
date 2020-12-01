@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 17fd023738c59ee2d4ee08b918b8004b6b21ee16941c99055fefe9327401a6bb
+-- hash: 8e330028636a943efd498b6e14d416bf5ff6ec893abb17efb12ab17f23e66b61
 
 name:           advent2020
 version:        0.1.0.0
@@ -19,7 +19,6 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
