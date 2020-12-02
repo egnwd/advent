@@ -18,11 +18,32 @@ dependencies:
 - filepath  ^>= 1.4
 - megaparsec ^>= 9.0
 - text
+- containers
+- mtl
+- vector
+- pointedlist
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
   - -rtsopts
   - -with-rtsopts=-N
+
+_language_extensions: &lang-ext
+  - EmptyCase
+  - FlexibleContexts
+  - FlexibleInstances
+  - InstanceSigs
+  - MultiParamTypeClasses
+  - LambdaCase
+  - MultiWayIf
+  - RecordWildCards
+  - TupleSections
+  - OverloadedStrings
+  - ScopedTypeVariables
+  - GADTs
+  - NumericUnderscores
+  - DeriveFunctor
+  - DeriveFoldable
 
 _default-exe: &day-exe
   source-dirs:  execs
@@ -30,9 +51,11 @@ _default-exe: &day-exe
   dependencies:
   - advent2020
   other-modules: []
+  default-extensions: *lang-ext
 
 library:
   source-dirs: src
+  default-extensions: *lang-ext
 
 executables:
   day1:
