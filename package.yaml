@@ -29,6 +29,7 @@ _default-exe: &day-exe
   ghc-options:  *exe-ghc-options
   dependencies:
   - advent2020
+  other-modules: []
 
 library:
   source-dirs: src
@@ -37,6 +38,9 @@ executables:
   day1:
     <<:   *day-exe
     main: Day01.hs
+  day2:
+    <<:   *day-exe
+    main: Day02.hs
 
 tests:
   advent2020-test:

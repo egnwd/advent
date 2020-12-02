@@ -1,8 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Advent
-    ( getParsedLines
+    ( getRawInput
+    , getParsedInput
+    , getParsedLines
+    , parseLines
     , Parser (..)
     , number
+    , symbol
     ) where
 
 import Prelude hiding (readFile)
@@ -19,6 +23,13 @@ type Parser = Parsec Void Text
 getRawInput :: Int -> IO Text
 getRawInput i = readFile ("inputs" </> "input" <> show i <.> "txt")
 
+getParsedInput :: Int -> Parser a -> IO a
+getParsedInput i p = do
+  input <- getRawInput i
+  case parse p "input" input of
+    Left e -> fail (errorBundlePretty e)
+    Right a -> return a
+
 getParsedLines :: Int -> Parser a -> IO [a]
 getParsedLines i p = do
   input <- getRawInput i
@@ -33,5 +44,7 @@ parseLines p input =
 sc      = L.space hspace1 empty empty
 lexeme :: Parser a -> Parser a
 lexeme  = L.lexeme sc
+
+symbol  = L.symbol sc
 integer = lexeme L.decimal
 number  = L.signed sc integer
