@@ -22,4 +22,9 @@ if [[ $1 < 1 || $1 > 25 ]]; then
 fi
 
 DAY=$(echo "$1" | sed "s/0//g")
-curl --cookie "session=${SESSION}" https://adventofcode.com/${YEAR}/day/${DAY}/input > inputs/input${DAY}.txt 2>/dev/null
+
+if [[ ! -f "inputs/input${DAY}.txt" ]]; then
+  curl --cookie "session=${SESSION}" https://adventofcode.com/${YEAR}/day/${DAY}/input > inputs/input${DAY}.txt 2>/dev/null
+else
+  echo "Input file exists, humbly declining to fetch"
+fi
