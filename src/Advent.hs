@@ -8,7 +8,7 @@ module Advent
     , symbol
     ) where
 
-import Prelude hiding (readFile)
+import Prelude hiding (readFile, lines)
 import Data.Text hiding (empty)
 import Data.Text.IO (readFile)
 import System.FilePath
@@ -36,9 +36,10 @@ getParsedLines i p = do
 
 parseLines :: Parser a -> Text -> Either String [a]
 parseLines p input =
-  case parse ((p `sepBy` newline) <* eof) "input" input of
+  case parse (traverse parse' $ lines input) "input" input of
     Left  e -> Left (errorBundlePretty e)
     Right a -> Right a
+  where parse' x = setInput x *> p <* eof <* setInput "\n" <* newline
 
 sc      = L.space hspace1 empty empty
 lexeme :: Parser a -> Parser a

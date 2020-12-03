@@ -22,6 +22,7 @@ dependencies:
 - mtl
 - vector
 - pointedlist
+- lens
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
@@ -64,6 +65,9 @@ executables:
   day2:
     <<:   *day-exe
     main: Day02.hs
+  day3:
+    <<:   *day-exe
+    main: Day03.hs
 
 tests:
   advent2020-test:

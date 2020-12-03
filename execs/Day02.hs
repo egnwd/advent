@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-|
    Name: Corrupt Passwords
    Url: <https://adventofcode.com/2020/day/2>
