@@ -16,7 +16,7 @@ if [[ -z $1 ]]; then
   exit 1
 fi
 
-if [[ $1 < 1 || $1 > 25 ]]; then
+if [[ $1 -lt 1 || $1 -gt 25 ]]; then
   echo -e "${RED}Please enter a day between 1-25.${NC}"
   exit 1
 fi
