@@ -23,13 +23,18 @@ dependencies:
 - vector
 - pointedlist
 - lens
+- barbies
+- refined
+- finite-typelits
+- one-liner-instances
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
   - -rtsopts
   - -with-rtsopts=-N
 
-_language_extensions: &lang-ext
+default-extensions:
+  - DataKinds
   - EmptyCase
   - FlexibleContexts
   - FlexibleInstances
@@ -39,6 +44,7 @@ _language_extensions: &lang-ext
   - MultiWayIf
   - RecordWildCards
   - TupleSections
+  - TypeOperators
   - OverloadedStrings
   - ScopedTypeVariables
   - GADTs
@@ -52,11 +58,9 @@ _default-exe: &day-exe
   dependencies:
   - advent2020
   other-modules: []
-  default-extensions: *lang-ext
 
 library:
   source-dirs: src
-  default-extensions: *lang-ext
 
 executables:
   day1:
@@ -77,7 +81,6 @@ tests:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:         *exe-ghc-options
-    default-extensions: *lang-ext
     dependencies:
     - advent2020
     - doctest

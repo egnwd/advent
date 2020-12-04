@@ -36,7 +36,7 @@ getParsedLines i p = do
   input <- getRawInput i
   either fail return (parseLines p input)
 
-getParsedDoubleLines :: Int -> Parser a -> IO [a]
+getParsedDoubleLines :: (Show a) => Int -> Parser a -> IO [a]
 getParsedDoubleLines i p = do
   input <- getRawInput i
   either fail return (parseDoubleLines p input)
@@ -48,9 +48,9 @@ parseLines p input =
     Right a -> Right a
   where parse' x = setInput x *> p <* eof <* setInput "\n" <* newline
 
-parseDoubleLines :: Parser a -> Text -> Either String [a]
+parseDoubleLines :: (Show a) => Parser a -> Text -> Either String [a]
 parseDoubleLines p input =
-  case parse ((p `sepEndBy` (newline <* newline)) <* eof) "input" input of
+  case parse (p `sepBy` (newline >> newline) <* eof) "input" input of
     Left  e -> Left (errorBundlePretty e)
     Right a -> Right a
 

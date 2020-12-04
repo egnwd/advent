@@ -18,6 +18,27 @@ packages:
       sha256: 26c1c24e343cfa6b2c55715fff4b8608e527a6b6ad3d510e328e0a228f979a7d
   original:
     hackage: megaparsec-9.0.0@sha256:920d1e469056c746b532333a078c2a9a195fab5e860e0c9734ee92a28c2bfb65
+- completed:
+    hackage: barbies-2.0.2.0@sha256:fa6656b45c40f7d4ab1764d078c6878f37d37fab7f7135c061e9a5baa67943c0,4407
+    pantry-tree:
+      size: 4426
+      sha256: 5aa3ff178fe56b21250543384e8482de13f35ef57a06943178382b0f2e3eca24
+  original:
+    hackage: barbies-2.0.2.0@sha256:fa6656b45c40f7d4ab1764d078c6878f37d37fab7f7135c061e9a5baa67943c0
+- completed:
+    hackage: refined-0.6.1@sha256:d5d713f0a2ad79d1c049d2d132fd8c2078b883b5ea3db876087eaec102843e57,2748
+    pantry-tree:
+      size: 562
+      sha256: 3b530f23657d5c8425b9512593417b2c65085719afa30e0d9d2bd72d4e4f7bd5
+  original:
+    hackage: refined-0.6.1@sha256:d5d713f0a2ad79d1c049d2d132fd8c2078b883b5ea3db876087eaec102843e57
+- completed:
+    hackage: these-skinny-0.7.4@sha256:e29336a1a70a497e09d8266f8438efb30a807bafaa6b00f5a136f7493efb3160,1239
+    pantry-tree:
+      size: 262
+      sha256: 77f01554e40d8e910d00f95c35dde86df4f691e2955d9afdc16508114c4d1af2
+  original:
+    hackage: these-skinny-0.7.4@sha256:e29336a1a70a497e09d8266f8438efb30a807bafaa6b00f5a136f7493efb3160
 snapshots:
 - completed:
     size: 532835

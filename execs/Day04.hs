@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, GADTs #-}
+{-# LANGUAGE OverloadedStrings, GADTs, DeriveGeneric, DerivingVia, StandaloneDeriving, UndecidableInstances, TemplateHaskell, DeriveAnyClass, RankNTypes #-}
 {-|
    Name: Passport Processing
    Url: <https://adventofcode.com/2020/day/4>
@@ -9,180 +9,79 @@ module Main
   ) where
 
 import Advent
-import Prelude hiding (unlines)
+
+import Control.Lens
+import Data.Finite
+import Data.Foldable
 import Data.Maybe
+import Data.Monoid.OneLiner (GMonoid(..))
+import Data.Semigroup (Option(..))
+import GHC.Generics
+import Prelude hiding (unlines)
+import Refined
 import Text.Megaparsec  hiding (count, between)
 import Text.Megaparsec.Char hiding (count)
-import qualified Text.Megaparsec.Char.Lexer as L
-import qualified Text.Megaparsec as MP
-import Data.Map hiding (filter, drop, map)
 
+import qualified Barbies as B
 import qualified Data.Text as T
+import qualified Text.Megaparsec as MP
+import qualified Text.Megaparsec.Char.Lexer as L
 
--- $setup
--- >>> let parse = Data.Either.fromRight undefined . Advent.parseLines parseInput
--- >>> :set -XOverloadedStrings
+type a <-> b = Refined (FromTo a b) Int
+type n ** i  = Refined (SizeEqualTo n) [i]
+
+data Eye    = AMB | BLU | BRN | GRY | GRN | HZL | OTH deriving (Show)
+data Height = HCm (150 <-> 193) | HIn (59 <-> 76) deriving (Show)
+
+data Passport f =
+  Passport { _byr ::  f (1920 <-> 2002)
+           , _iyr ::  f (2010 <-> 2020)
+           , _eyr ::  f (2020 <-> 2030)
+           , _hgt ::  f Height
+           , _hcl ::  f (6 ** Finite 16)
+           , _ecl ::  f Eye
+           , _pid ::  f (9 ** Finite 10)
+        -- , _cid :: Country Code
+           } deriving (Generic, B.FunctorB, B.ApplicativeB, B.TraversableB, B.ConstraintsB)
+makeLenses ''Passport
+
+deriving instance B.AllBF Show f Passport => Show (Passport f)
+deriving via GMonoid (Passport f) instance B.AllBF Semigroup f Passport => Semigroup (Passport f)
+deriving via GMonoid (Passport f) instance B.AllBF Monoid f Passport => Monoid (Passport f)
+
+type UnvalidatedPassport = Passport UnvalidatedField
+type UnvalidatedField = Const (Option T.Text)
+type UnvalidatedSetter a = Setter UnvalidatedPassport UnvalidatedPassport (UnvalidatedField a) (UnvalidatedField a)
 
 main :: IO ()
 main = do
   input <- getParsedDoubleLines 4 parseInput
-  print $ validatePassports isValid input
-  print $ validatePassports isValid' input
-
-type Input    = [Passport]
-type Passport = Map T.Text (Maybe T.Text)
-data Passport' =
-  Passport' { _byr :: Int
-           , _iyr :: Int
-           , _eyr :: Int
-           , _hgt :: String
-           , _hcl :: String
-           , _ecl :: String
-           , _pid :: String
-           , _cid :: Maybe Int
-           }
-data Unit = CM | IN
-
-instance Show Unit where
-  show CM = "cm"
-  show IN = "in"
-
-type Output = Int
-
-showt :: Show a => a -> T.Text
-showt = T.pack . show
+  print $ validatePassports part1 input
+  print $ validatePassports part2 input
 
 -- | Parsing
-parseInput :: Parser Passport
-parseInput = fromList <$> parseField `sepBy` (try $ spaceChar <* notFollowedBy spaceChar)
-
-parseField :: Parser (T.Text, Maybe T.Text)
-parseField = choice [parseBirthYear, parseIssueYear, parseExpiryYear, parseHeight, parseHairColour, parseEyeColour, parsePassportId, parseCountryId]
-
-parseKey :: T.Text -> Parser T.Text
 parseKey k = try (string k) <* char ':'
+ident = T.pack <$> many (char '#' <|> alphaNumChar)
 
--- | parseBirthYear
--- >>> parseTest parseBirthYear "byr:2002"
--- ("byr",Just "2002")
---
--- >>> parseTest parseBirthYear "byr:2003"
--- ("byr",Nothing)
-parseBirthYear = do
-  key <- parseKey "byr"
-  value <- L.decimal
-  if between 1920 value 2002
-     then return $ (key, Just $ showt value)
-     else return $ (key, Nothing)
+parseField :: Parser UnvalidatedPassport
+parseField = parseField' "byr" byr
+         <|> parseField' "iyr" iyr
+         <|> parseField' "eyr" eyr
+         <|> parseField' "hgt" hgt
+         <|> parseField' "hcl" hcl
+         <|> parseField' "ecl" ecl
+         <|> parseField' "pid" pid
+         <|> mempty <$ (parseKey "cid" *> ident)
+           where
+             parseField' :: T.Text -> UnvalidatedSetter a -> Parser UnvalidatedPassport
+             parseField' k s = parseKey k *> ident >>= setValue s
+             setValue s = return . flip (set s) mempty . Const . pure
 
--- | parseIssueYear
--- >>> parseTest parseIssueYear "iyr:2012"
--- ("iyr",Just "2012")
---
--- >>> parseTest parseIssueYear "iyr:2050"
--- ("iyr",Nothing)
-parseIssueYear = do
-  key <- parseKey "iyr"
-  value <- L.decimal
-  if between 2010 value 2020
-     then return $ (key, Just $ showt value)
-     else return $ (key, Nothing)
+parseInput :: Parser (Maybe (Passport (Const T.Text)))
+parseInput = merge <$> parseField `sepEndBy` try (spaceChar >> notFollowedBy spaceChar)
+  where merge = B.btraverse ((Const <$>) . getOption . getConst) . fold
 
--- | parseExpiryYear
--- >>> parseTest parseExpiryYear "eyr:2022"
--- ("eyr",Just "2022")
---
--- >>> parseTest parseExpiryYear "eyr:2018"
--- ("eyr",Nothing)
-parseExpiryYear = do
-  key <- parseKey "eyr"
-  value <- L.decimal
-  if between 2020 value 2030
-     then return $ (key, Just $ showt value)
-     else return $ (key, Nothing)
+validatePassports = (length .) . mapMaybe
 
-parseHeight = do
-  key <- parseKey "hgt"
-  value <- L.decimal
-  unit <- optional $ CM <$ string "cm" <|> IN <$ string "in"
-  let validRange CM = if between 150 value 193
-                         then Just . T.pack $ show value ++ "cm"
-                         else Nothing
-      validRange IN = if between 59 value 76
-                         then Just . T.pack $ show value ++ "in"
-                         else Nothing
-
-  case unit of
-    Just u -> return (key, validRange u)
-    Nothing -> return (key, Nothing)
-
-parseHairColour :: Parser (T.Text, Maybe T.Text)
-parseHairColour = do
-  key <- parseKey "hcl"
-  value <- consume $ char '#' *> MP.count 6 hexDigitChar
-
-  return $ (key, T.pack . ('#' :) . show <$> value)
-
-parseEyeColour :: Parser (T.Text, Maybe T.Text)
-parseEyeColour = do
-  key <- parseKey "ecl"
-  value <- consume $ choice (map (try . string) ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"])
-
-  return $ (key, showt <$> value)
-
-parsePassportId :: Parser (T.Text, Maybe T.Text)
-parsePassportId = do
-  key <- parseKey "pid"
-  value <- consume $ try (MP.count 9 digitChar <* notFollowedBy digitChar)
-
-  return $ (key, showt <$> value)
-
-parseCountryId = do
-  key <- parseKey "cid"
-  value <- T.pack <$> many alphaNumChar
-
-  return $ (key, Just $ showt value)
-
-consume p = (Just <$> p) <|> (Nothing <$ many (char '#' <|> alphaNumChar))
-
---
--- >>> :{
---  let ps = parse $ "\
---  \ecl:gry pid:860033327 eyr:2020 hcl:#fffffd\
---  \byr:1937 iyr:2017 cid:147 hgt:183cm\
---  \\
---  \iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884\
---  \hcl:#cfa07d byr:1929\
---  \\
---  \hcl:#ae17e1 iyr:2013\
---  \eyr:2024\
---  \ecl:brn pid:760753108 byr:1931\
---  \hgt:179cm\
---  \\
---  \hcl:#cfa07d eyr:2025 pid:166559648\
---  \iyr:2011 ecl:brn hgt:59in"
--- :}
--- >>> validatePassports ps
--- 2
-validatePassports :: (Passport -> Bool) -> Input -> Output
-validatePassports v = count v
-
--- | isValid passport with optional country code
--- >>> isValid $ fromList [("byr","1927"),("cid","154"),("ecl","grn"),("eyr","2027"),("hcl","#623a2f"),("hgt","177cm"),("iyr","2010"),("pid","725111435")]
--- True
---
--- >>> isValid $ fromList [("byr","1935"),("ecl","brn"),("eyr","2030"),("hcl","#888785"),("hgt","182cm"),("iyr","2013"),("pid","307171649")]
--- True
---
--- >>> isValid $ fromList [("byr","1938"),("ecl","amb"),("eyr","2028"),("hcl","#efcc98"),("hgt","178cm"),("iyr","2019"),("pid","568504071")]
--- True
---
--- >>> isValid $ fromList [("byr","1938"),("ecl","amb"),("eyr","2028"),("hcl","#efcc98"),("hgt","178cm"),("iyr","2019"),("cid","147")]
--- False
-isValid ppt = all (flip member ppt) ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
-
-isValid' ppt = isValid ppt && all isJust ppt
-
-count = (length .) . filter
-
-between x y z = x <= y && y <= z
+part1 = id
+part2 = id

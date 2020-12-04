@@ -1066,4 +1066,3 @@ hgt:170cm
 
 hgt:60in eyr:2026 byr:1922 hcl:#18171d iyr:2016
 pid:921038878
-
