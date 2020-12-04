@@ -68,12 +68,16 @@ executables:
   day3:
     <<:   *day-exe
     main: Day03.hs
+  day4:
+    <<:   *day-exe
+    main: Day04.hs
 
 tests:
   advent2020-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:         *exe-ghc-options
+    default-extensions: *lang-ext
     dependencies:
     - advent2020
     - doctest

@@ -2,7 +2,9 @@ module Advent
     ( getRawInput
     , getParsedInput
     , getParsedLines
+    , getParsedDoubleLines
     , parseLines
+    , parseDoubleLines
     , Parser (..)
     , number
     , symbol
@@ -34,12 +36,23 @@ getParsedLines i p = do
   input <- getRawInput i
   either fail return (parseLines p input)
 
+getParsedDoubleLines :: Int -> Parser a -> IO [a]
+getParsedDoubleLines i p = do
+  input <- getRawInput i
+  either fail return (parseDoubleLines p input)
+
 parseLines :: Parser a -> Text -> Either String [a]
 parseLines p input =
   case parse (traverse parse' $ lines input) "input" input of
     Left  e -> Left (errorBundlePretty e)
     Right a -> Right a
   where parse' x = setInput x *> p <* eof <* setInput "\n" <* newline
+
+parseDoubleLines :: Parser a -> Text -> Either String [a]
+parseDoubleLines p input =
+  case parse ((p `sepEndBy` (newline <* newline)) <* eof) "input" input of
+    Left  e -> Left (errorBundlePretty e)
+    Right a -> Right a
 
 sc      = L.space hspace1 empty empty
 lexeme :: Parser a -> Parser a
