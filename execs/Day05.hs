@@ -11,8 +11,10 @@ import Advent
 import Prelude hiding (unlines)
 
 import Data.Semigroup
-import Data.Finite
+import Data.List
 import Data.Word
+
+import Debug.Trace
 
 import Control.Monad.State
 
@@ -24,7 +26,7 @@ main :: IO ()
 main = do
   input <- getParsedLines 5 parseInput
   print $ part1 input
-  print $ 2
+  print $ part2 input
 
 type Input  = [String]
 type Output = Int
@@ -36,7 +38,12 @@ parseInput :: Parser String
 parseInput = T.unpack <$> MP.takeWhileP Nothing (`S.member` letters)
 
 part1 :: Input -> Output
-part1 input = getMax $ foldMap (Max . seatId) input
+part1 = getMax . foldMap (Max . seatId)
+
+part2 :: Input -> Output
+part2 input = let x    = sort . map (seatId) $ input
+                  diff = zipWith (-) (drop 1 x) x
+               in (+1) . snd . head $ filter ((2 ==) . fst) $ zip diff x
 
 seatId :: String -> Output
 seatId s = let (s', (r, _r)) = runState  (getRow s)  (0, 127)
