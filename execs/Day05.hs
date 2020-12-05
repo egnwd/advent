@@ -47,6 +47,6 @@ part1 :: Input -> Output
 part1 = getMax . foldMap (Max)
 
 part2 :: Input -> Output
-part2 input = let x    = sort $ input
-                  diff = zipWith (-) (drop 1 x) x
-               in (+1) . snd . head $ filter ((2 ==) . fst) $ zip diff x
+part2 input = let (mx, mn, sm) = foldl' (\(u,l,s) x -> (max u x, min l x, s+x)) (0, 1000000, 0) input
+                  total = (mx*(mx+1)-mn*(mn-1)) `div` 2
+               in total - sm
