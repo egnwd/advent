@@ -13,6 +13,7 @@ import Advent
 import Control.Lens
 import Data.Finite
 import Data.Foldable
+import Data.Char
 import Data.Maybe
 import Data.Monoid.OneLiner (GMonoid(..))
 import Data.Semigroup (Option(..))
@@ -24,8 +25,6 @@ import Text.Megaparsec.Char hiding (count)
 
 import qualified Barbies as B
 import qualified Data.Text as T
-import qualified Text.Megaparsec as MP
-import qualified Text.Megaparsec.Char.Lexer as L
 
 type a <-> b = Refined (FromTo a b) Int
 type n ** i  = Refined (SizeEqualTo n) [i]
@@ -51,7 +50,8 @@ deriving via GMonoid (Passport f) instance B.AllBF Monoid f Passport => Monoid (
 
 type UnvalidatedPassport = Passport UnvalidatedField
 type UnvalidatedField = Const (Option T.Text)
-type UnvalidatedSetter a = Setter UnvalidatedPassport UnvalidatedPassport (UnvalidatedField a) (UnvalidatedField a)
+type UnvalidatedSetter a = Setter' UnvalidatedPassport (UnvalidatedField a)
+type ValidatedPassport = Passport Identity
 
 main :: IO ()
 main = do
@@ -77,11 +77,50 @@ parseField = parseField' "byr" byr
              parseField' k s = parseKey k *> ident >>= setValue s
              setValue s = return . flip (set s) mempty . Const . pure
 
+parsers :: Passport Parser
+parsers = Passport
+  { _byr = fromIntegral <$> number >>= refineFail
+  , _iyr = fromIntegral <$> number >>= refineFail
+  , _eyr = fromIntegral <$> number >>= refineFail
+  , _hgt = parseHeight
+  , _hcl = parseHair
+  , _ecl = parseEyeColor
+  , _pid = parsePid
+  }
+
+parseEyeColor :: Parser Eye
+parseEyeColor =
+      AMB <$ p "amb"
+  <|> BLU <$ p "blu"
+  <|> BRN <$ p "brn"
+  <|> GRY <$ p "gry"
+  <|> GRN <$ p "grn"
+  <|> HZL <$ p "hzl"
+  <|> OTH <$ p "oth"
+    where p = try . string
+
+parseHeight :: Parser Height
+parseHeight = (HIn <$> try parseIn) <|> (HCm <$> parseCm)
+  where
+    parseIn = fromIntegral <$> number <* string "in" >>= refineFail
+    parseCm = fromIntegral <$> number <* string "cm" >>= refineFail
+
 parseInput :: Parser (Maybe (Passport (Const T.Text)))
-parseInput = merge <$> parseField `sepEndBy` try (spaceChar >> notFollowedBy spaceChar)
-  where merge = B.btraverse ((Const <$>) . getOption . getConst) . fold
+parseInput = merge <$> parseField `sepEndBy` singleSpace
+  where merge = B.btraverse (fmap Const . getOption . getConst) . fold
+
+parseHair :: Parser (6 ** Finite 16)
+parseHair = (map (finite . fromIntegral . digitToInt)) . T.unpack <$> (char '#' *> takeWhileP Nothing isHexDigit) >>= refineFail
+
+parsePid :: Parser (9 ** Finite 10)
+parsePid = (map (finite . fromIntegral . digitToInt)) . T.unpack <$> takeWhileP Nothing isDigit >>= refineFail
+
+singleSpace = try (spaceChar >> notFollowedBy spaceChar)
 
 validatePassports = (length .) . mapMaybe
 
+part1 :: Maybe (Passport (Const T.Text)) -> Maybe (Passport (Const T.Text))
 part1 = id
-part2 = id
+
+part2 :: Maybe (Passport (Const T.Text)) -> Maybe ValidatedPassport
+part2 x = (B.bzipWith (\p (Const t) -> Option $ parseMaybe p t) parsers) <$> x >>= B.btraverse (fmap Identity . getOption)
