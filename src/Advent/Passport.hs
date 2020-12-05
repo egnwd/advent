@@ -25,9 +25,6 @@ import Refined
 
 import qualified Barbies as B
 import qualified Data.Text as T
-import Text.Megaparsec  hiding (count, between)
-import Text.Megaparsec.Char hiding (count)
-import Data.Void
 
 type a <-> b = Refined (FromTo a b) Int
 type n ** i  = Refined (SizeEqualTo n) [i]

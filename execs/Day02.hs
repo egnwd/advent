@@ -4,9 +4,7 @@
    Url: <https://adventofcode.com/2020/day/2>
 -}
 
-module Main
-  ( main
-  ) where
+module Day02 where
 
 import Prelude hiding (unlines)
 import Advent

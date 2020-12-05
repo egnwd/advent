@@ -3,9 +3,7 @@
    Url: <https://adventofcode.com/2020/day/3>
 -}
 
-module Main
-  ( main
-  ) where
+module Day03 where
 
 import Advent
 import Prelude hiding (unlines)
@@ -50,7 +48,7 @@ sled :: (Int, Int) -> Input -> Output
 sled (d,a) hill = evalState (go a (takeEvery0 d hill)) (0, 0)
 
 go :: Int -> Input -> State (Int, Output) Output
-go a []     = gets snd
+go _ []     = gets snd
 go a (r:rs) = do
   let w = length r
   c <- _1 <<%= nextCoord a w
@@ -58,7 +56,7 @@ go a (r:rs) = do
     Open -> go a rs
     Tree -> _2 += 1 >> go a rs
 
-takeEvery0 n [] = []
+takeEvery0 _ [] = []
 takeEvery0 n (x:xs) = x : takeEvery n xs
 takeEvery n xs =
   case drop (n-1) xs of

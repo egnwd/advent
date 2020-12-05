@@ -3,9 +3,7 @@
    Url: <https://adventofcode.com/2020/day/4>
 -}
 
-module Main
-  ( main
-  ) where
+module Day04 where
 
 import Advent
 import Advent.Passport
