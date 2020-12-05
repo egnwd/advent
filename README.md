@@ -9,20 +9,20 @@
 
 ### Tests
 
-```
+```sh
 λ stack test
 ```
 
 ### Specific Day
 
-```
+```sh
 λ stack run day1
 ```
 
 ### Local
 
 For automatic tests on save
-```
+```sh
 λ ghcid -T=':!stack test'
 ```
 
