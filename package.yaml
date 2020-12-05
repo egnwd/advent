@@ -75,6 +75,9 @@ executables:
   day4:
     <<:   *day-exe
     main: Day04.hs
+  day5:
+    <<:   *day-exe
+    main: Day05.hs
 
 tests:
   advent2020-test:
