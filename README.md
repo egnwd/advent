@@ -9,6 +9,7 @@
 |   3  |  ⭐⭐  | [execs/Day03.hs](https://github.com/egnwd/advent/blob/main/execs/Day03.hs) |
 |   4  |  ⭐⭐  | [execs/Day04.hs](https://github.com/egnwd/advent/blob/main/execs/Day04.hs) |
 |   5  |  ⭐⭐  | [execs/Day05.hs](https://github.com/egnwd/advent/blob/main/execs/Day05.hs) |
+|   6  |  ⭐⭐  | [execs/Day06.hs](https://github.com/egnwd/advent/blob/main/execs/Day06.hs) |
 
 ## Requirements
 
