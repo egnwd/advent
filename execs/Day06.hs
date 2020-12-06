@@ -7,6 +7,8 @@ module Day06 (main) where
 
 import Advent
 
+import Control.Arrow ((***))
+import Data.Foldable
 import Data.Char
 import Text.Megaparsec (sepEndBy, takeWhileP)
 
@@ -15,8 +17,7 @@ import qualified Data.Text as T
 
 main :: IO ()
 main = do
-  input <- getParsedDoubleLines 6 (parseInput S.unions)
-  input2 <- getParsedDoubleLines 6 (parseInput (foldl1 S.intersection))
+  (input, input2) <- unzip <$> getParsedDoubleLines 6 parseInput
   print $ part input
   print $ part input2
 
@@ -25,9 +26,11 @@ type Letter = Char
 type Input  = [S.Set Letter]
 type Output = Int
 
+allLetters = S.fromList "abcdefghijklmnopqrstuvwxyz"
+
 -- | Parsing
-parseInput :: ([S.Set Letter] -> S.Set Letter) -> Parser (S.Set Letter)
-parseInput agg = agg <$> parsePerson `sepEndBy` singleSpace
+parseInput :: Parser (S.Set Letter, S.Set Letter)
+parseInput = foldl' (flip $ \p -> S.union p *** S.intersection p) (mempty, allLetters) <$> parsePerson `sepEndBy` singleSpace
 
 parsePerson :: Parser (S.Set Letter)
 parsePerson = S.fromList . T.unpack <$> takeWhileP Nothing isAlphaNum
