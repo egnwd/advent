@@ -33,7 +33,7 @@ parseInput :: Parser (S.Set Letter, S.Set Letter)
 parseInput = foldl' (flip $ \p -> S.union p *** S.intersection p) (mempty, allLetters) <$> parsePerson `sepEndBy` singleSpace
 
 parsePerson :: Parser (S.Set Letter)
-parsePerson = S.fromList . T.unpack <$> takeWhileP Nothing isAlphaNum
+parsePerson = S.fromList . T.unpack <$> takeWhileP Nothing isAlpha
 
 part :: Input -> Output
 part = sum . map S.size
