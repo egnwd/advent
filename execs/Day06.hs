@@ -1,5 +1,5 @@
 {-|
-   Name:
+   Name: Custom Customs
    Url:  <https://adventofcode.com/2020/day/6>
 -}
 
