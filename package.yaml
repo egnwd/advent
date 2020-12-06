@@ -54,7 +54,6 @@ default-extensions:
 
 _default-exe: &day-exe
   source-dirs:  execs
-  ghc-options:  *exe-ghc-options
   dependencies:
   - advent2020
   other-modules: []
@@ -66,18 +65,51 @@ executables:
   day1:
     <<:   *day-exe
     main: Day01.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day01
   day2:
     <<:   *day-exe
     main: Day02.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day02
   day3:
     <<:   *day-exe
     main: Day03.hs
+    ghc-options: !flatten
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day03
   day4:
     <<:   *day-exe
     main: Day04.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day04
   day5:
     <<:   *day-exe
     main: Day05.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day05
+  day6:
+    <<:   *day-exe
+    main: Day06.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day06
 
 tests:
   advent2020-test:

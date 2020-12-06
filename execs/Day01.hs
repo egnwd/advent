@@ -2,7 +2,7 @@
    Name: Expense Reports
    Url: <https://adventofcode.com/2020/day/1>
 -}
-module Day01 where
+module Day01 (main) where
 
 import Advent
 import Data.List
