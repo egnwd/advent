@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0ddc51bd32a1fbf2b70effcbdd7adb7bdc736072a340956af5aee686cebe4fca
+-- hash: 58413d8e95c2aacd766fcdce9cc4477b84b5bbfecc24af2335449398416956f9
 
 name:           advent2020
 version:        0.1.0.0
@@ -39,6 +39,7 @@ library
     , containers
     , directory >=1.3 && <1.4
     , doctest >=0.17 && <0.18
+    , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
     , lens
@@ -64,6 +65,7 @@ executable day1
     , containers
     , directory >=1.3 && <1.4
     , doctest >=0.17 && <0.18
+    , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
     , lens
@@ -89,6 +91,7 @@ executable day2
     , containers
     , directory >=1.3 && <1.4
     , doctest >=0.17 && <0.18
+    , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
     , lens
@@ -114,6 +117,7 @@ executable day3
     , containers
     , directory >=1.3 && <1.4
     , doctest >=0.17 && <0.18
+    , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
     , lens
@@ -139,6 +143,7 @@ executable day4
     , containers
     , directory >=1.3 && <1.4
     , doctest >=0.17 && <0.18
+    , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
     , lens
@@ -164,6 +169,7 @@ executable day5
     , containers
     , directory >=1.3 && <1.4
     , doctest >=0.17 && <0.18
+    , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
     , lens
@@ -189,6 +195,7 @@ executable day6
     , containers
     , directory >=1.3 && <1.4
     , doctest >=0.17 && <0.18
+    , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
     , lens
@@ -214,6 +221,7 @@ executable day7
     , containers
     , directory >=1.3 && <1.4
     , doctest >=0.17 && <0.18
+    , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
     , lens
@@ -242,6 +250,7 @@ test-suite advent2020-test
     , containers
     , directory
     , doctest
+    , fgl
     , filepath
     , finite-typelits
     , lens

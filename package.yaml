@@ -27,6 +27,7 @@ dependencies:
 - refined
 - finite-typelits
 - one-liner-instances
+- fgl
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
