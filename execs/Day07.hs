@@ -23,8 +23,8 @@ import qualified Data.Set as S
 main :: IO ()
 main = do
   input <- getParsedLines 7 parseInput
-  let graph = grev $ buildGraph input
-  print $ part1 graph
+  let graph = buildGraph input
+  print $ part1 (grev graph)
   print $ part2 graph
 
 type Color = T.Text
@@ -76,4 +76,8 @@ fix f x
   where fx = f x
 
 part2 :: Input -> Output
-part2 = const 0
+part2 g = let start    = fromJust $ ufold (\ctx s -> s <|> (if lab' ctx == "shiny gold" then Just $ node' ctx else Nothing)) Nothing g
+              children = countBags (lsuc g) (start, 1)
+           in children - 1
+
+countBags f (b, c) = c + sum (map ((c *) . countBags f) (f b))
