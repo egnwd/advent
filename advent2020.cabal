@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 58413d8e95c2aacd766fcdce9cc4477b84b5bbfecc24af2335449398416956f9
+-- hash: 374d8be7840e9f12009c69bf22976c268be9c9426d0f0c1468114e3d235d873c
 
 name:           advent2020
 version:        0.1.0.0
@@ -34,7 +34,8 @@ library
       src
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   build-depends:
-      barbies
+      ListZipper
+    , barbies
     , base >=4.7 && <5
     , containers
     , directory >=1.3 && <1.4
@@ -49,6 +50,7 @@ library
     , pointedlist
     , refined
     , text
+    , utility-ht
     , vector
   default-language: Haskell2010
 
@@ -59,7 +61,8 @@ executable day1
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day01
   build-depends:
-      advent2020
+      ListZipper
+    , advent2020
     , barbies
     , base >=4.7 && <5
     , containers
@@ -75,6 +78,7 @@ executable day1
     , pointedlist
     , refined
     , text
+    , utility-ht
     , vector
   default-language: Haskell2010
 
@@ -85,7 +89,8 @@ executable day2
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day02
   build-depends:
-      advent2020
+      ListZipper
+    , advent2020
     , barbies
     , base >=4.7 && <5
     , containers
@@ -101,6 +106,7 @@ executable day2
     , pointedlist
     , refined
     , text
+    , utility-ht
     , vector
   default-language: Haskell2010
 
@@ -111,7 +117,8 @@ executable day3
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day03
   build-depends:
-      advent2020
+      ListZipper
+    , advent2020
     , barbies
     , base >=4.7 && <5
     , containers
@@ -127,6 +134,7 @@ executable day3
     , pointedlist
     , refined
     , text
+    , utility-ht
     , vector
   default-language: Haskell2010
 
@@ -137,7 +145,8 @@ executable day4
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day04
   build-depends:
-      advent2020
+      ListZipper
+    , advent2020
     , barbies
     , base >=4.7 && <5
     , containers
@@ -153,6 +162,7 @@ executable day4
     , pointedlist
     , refined
     , text
+    , utility-ht
     , vector
   default-language: Haskell2010
 
@@ -163,7 +173,8 @@ executable day5
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day05
   build-depends:
-      advent2020
+      ListZipper
+    , advent2020
     , barbies
     , base >=4.7 && <5
     , containers
@@ -179,6 +190,7 @@ executable day5
     , pointedlist
     , refined
     , text
+    , utility-ht
     , vector
   default-language: Haskell2010
 
@@ -189,7 +201,8 @@ executable day6
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day06
   build-depends:
-      advent2020
+      ListZipper
+    , advent2020
     , barbies
     , base >=4.7 && <5
     , containers
@@ -205,6 +218,7 @@ executable day6
     , pointedlist
     , refined
     , text
+    , utility-ht
     , vector
   default-language: Haskell2010
 
@@ -215,7 +229,8 @@ executable day7
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day07
   build-depends:
-      advent2020
+      ListZipper
+    , advent2020
     , barbies
     , base >=4.7 && <5
     , containers
@@ -231,6 +246,35 @@ executable day7
     , pointedlist
     , refined
     , text
+    , utility-ht
+    , vector
+  default-language: Haskell2010
+
+executable day8
+  main-is: Day08.hs
+  hs-source-dirs:
+      execs
+  default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day08
+  build-depends:
+      ListZipper
+    , advent2020
+    , barbies
+    , base >=4.7 && <5
+    , containers
+    , directory >=1.3 && <1.4
+    , doctest >=0.17 && <0.18
+    , fgl
+    , filepath >=1.4 && <1.5
+    , finite-typelits
+    , lens
+    , megaparsec >=9.0 && <9.1
+    , mtl
+    , one-liner-instances
+    , pointedlist
+    , refined
+    , text
+    , utility-ht
     , vector
   default-language: Haskell2010
 
@@ -244,7 +288,8 @@ test-suite advent2020-test
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      advent2020
+      ListZipper
+    , advent2020
     , barbies
     , base >=4.7 && <5
     , containers
@@ -260,5 +305,6 @@ test-suite advent2020-test
     , pointedlist
     , refined
     , text
+    , utility-ht
     , vector
   default-language: Haskell2010

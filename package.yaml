@@ -28,6 +28,8 @@ dependencies:
 - finite-typelits
 - one-liner-instances
 - fgl
+- utility-ht
+- ListZipper
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
@@ -119,6 +121,14 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
       - -main-is Day07
+  day8:
+    <<:   *day-exe
+    main: Day08.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day08
 
 tests:
   advent2020-test:

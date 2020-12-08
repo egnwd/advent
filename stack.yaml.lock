@@ -39,6 +39,13 @@ packages:
       sha256: 77f01554e40d8e910d00f95c35dde86df4f691e2955d9afdc16508114c4d1af2
   original:
     hackage: these-skinny-0.7.4@sha256:e29336a1a70a497e09d8266f8438efb30a807bafaa6b00f5a136f7493efb3160
+- completed:
+    hackage: ListZipper-1.2.0.2@sha256:5bbb5a4cc7f1cae962310407f711b874c087b48a0ba39b9fcce84cdb0ff5244c,639
+    pantry-tree:
+      size: 213
+      sha256: 9343dd4659ff06f5dd59147aca3f8eb4550293a477ca149e9fba8d58f1e3ec38
+  original:
+    hackage: ListZipper-1.2.0.2@sha256:5bbb5a4cc7f1cae962310407f711b874c087b48a0ba39b9fcce84cdb0ff5244c
 snapshots:
 - completed:
     size: 532835
