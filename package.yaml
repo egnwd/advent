@@ -30,6 +30,7 @@ dependencies:
 - fgl
 - utility-ht
 - ListZipper
+- control-bool
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded

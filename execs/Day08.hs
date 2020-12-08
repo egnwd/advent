@@ -1,3 +1,4 @@
+{-# LANGUAGE TemplateHaskell #-}
 {-|
    Name: Handheld Halting
    Url: <https://adventofcode.com/2020/day/8>
@@ -10,18 +11,16 @@ import Control.Monad.State
 import Advent
 import Prelude hiding (unlines)
 
+import Control.Bool
+import Control.Lens
+import Control.Applicative
 import Data.Maybe
 import Data.List.Zipper
 import Data.Function.HT
 import qualified Data.Set as S
 
-import Text.Megaparsec (choice)
-
-main :: IO ()
-main = do
-  input <- getParsedLines 8 parseInput
-  print $ part1 input
-  print $ part2 input
+data InstrState = S { _sAcc :: Int, _sSeen :: S.Set Int, _sFinished :: Bool }
+$(makeLenses ''InstrState)
 
 data Instr = Jmp !Int | Acc !Int | Nop !Int deriving (Show, Eq)
 type Tape = Zipper (Int, Instr)
@@ -29,45 +28,44 @@ type Eval a = State InstrState a
 type Input  = [Instr]
 type Output = Int
 
-data InstrState = S { sAcc :: Int, sSeen :: S.Set Int, sFinished :: Bool }
+main :: IO ()
+main = do
+  input <- getParsedLines 8 parseInput
+  print $ part1 input
+  print $ part2 input
 
 initialState = S 0 mempty False
 
 -- | Parsing
 parseInput :: Parser Instr
-parseInput = choice
-         [ Jmp . fromIntegral <$> (symbol "jmp" *> number)
-         , Acc . fromIntegral <$> (symbol "acc" *> number)
-         , Nop . fromIntegral <$> (symbol "nop" *> number)
-         ]
+parseInput = Jmp <$> (parseNumber "jmp") <|> Acc <$> (parseNumber "acc") <|> Nop <$> (parseNumber "nop")
+  where parseNumber name = fromIntegral <$> (symbol name *> number)
 
 part1 :: Input -> Output
-part1 input = sAcc $ execState (eval . mkTape $ input) initialState
+part1 input = execState (eval . mkTape $ input) initialState ^. sAcc
 
 part2 :: Input -> Output
 part2 input = fromJust . findTape . makeOptions $ input
 
 findTape [] = Nothing
 findTape (is:iss) = let s = execState (eval . mkTape $ is) initialState
-                     in if sFinished s then Just (sAcc s) else findTape iss
+                     in if s ^. sFinished then Just (s ^. sAcc) else findTape iss
 
 mkTape = fromList . zip [0..]
 
 eval :: Tape -> Eval Tape
-eval z = do
-  let c = safeCursor z
-  case c of
-    Nothing -> modify (\s -> s { sFinished = True }) >> return z
-    Just (i, instr) -> do
-      seen <- gets $ S.member i . sSeen
-      if seen
-         then return z
-         else do
-           modify (\s -> s { sSeen = S.insert i (sSeen s) })
-           case instr of
-             Jmp n -> return (jump n z) >>= eval
-             Acc n -> modify (\s -> s { sAcc = (sAcc s) + n }) >> return (right z) >>= eval
-             Nop _ -> return (right z) >>= eval
+eval z =
+  case safeCursor z of
+    Nothing -> sFinished .= True >> return z
+    Just (i, instr) ->
+      ifThenElseM
+        ((S.member i) <$> use sSeen)
+        (return z)
+        (sSeen %= S.insert i >> exec z instr >>= eval)
+
+exec z (Jmp n) = return $ jump n z
+exec z (Acc n) = sAcc += n >> return (right z)
+exec z (Nop _) = return (right z)
 
 jump :: Int -> Tape -> Tape
 jump n z
