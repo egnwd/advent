@@ -1,5 +1,5 @@
 {-|
-   Name: 
+   Name: Handheld Halting
    Url: <https://adventofcode.com/2020/day/8>
 -}
 
