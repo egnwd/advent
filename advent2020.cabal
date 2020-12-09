@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9dd62a24b91eeedfc3efec16c9497c5a5d80498d8371ac786c2d91a6a2981322
+-- hash: 71622514c845c105ec0a63b08ef1560598c77dfcc467e4c4c99a960bebfbd5b9
 
 name:           advent2020
 version:        0.1.0.0
@@ -264,6 +264,35 @@ executable day8
       execs
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day08
+  build-depends:
+      ListZipper
+    , advent2020
+    , barbies
+    , base >=4.7 && <5
+    , containers
+    , control-bool
+    , directory >=1.3 && <1.4
+    , doctest >=0.17 && <0.18
+    , fgl
+    , filepath >=1.4 && <1.5
+    , finite-typelits
+    , lens
+    , megaparsec >=9.0 && <9.1
+    , mtl
+    , one-liner-instances
+    , pointedlist
+    , refined
+    , text
+    , utility-ht
+    , vector
+  default-language: Haskell2010
+
+executable day9
+  main-is: Day09.hs
+  hs-source-dirs:
+      execs
+  default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day09
   build-depends:
       ListZipper
     , advent2020
