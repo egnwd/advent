@@ -21,7 +21,7 @@ if [[ $1 -lt 1 || $1 -gt 25 ]]; then
   exit 1
 fi
 
-DAY=$(echo "$1" | sed "s/0//g")
+DAY=$(echo "$1" | sed "s/^0//g")
 
 if [[ ! -f "inputs/input${DAY}.txt" ]]; then
   curl --cookie "session=${SESSION}" https://adventofcode.com/${YEAR}/day/${DAY}/input > inputs/input${DAY}.txt 2>/dev/null

@@ -2,17 +2,18 @@
 
 ## Stars
 
-| Day | Stars | Code |
-|-----:|:-------:|------|
-|   1  |  ⭐⭐  | [execs/Day01.hs](https://github.com/egnwd/advent/blob/main/execs/Day01.hs) |
-|   2  |  ⭐⭐  | [execs/Day02.hs](https://github.com/egnwd/advent/blob/main/execs/Day02.hs) |
-|   3  |  ⭐⭐  | [execs/Day03.hs](https://github.com/egnwd/advent/blob/main/execs/Day03.hs) |
-|   4  |  ⭐⭐  | [execs/Day04.hs](https://github.com/egnwd/advent/blob/main/execs/Day04.hs) |
-|   5  |  ⭐⭐  | [execs/Day05.hs](https://github.com/egnwd/advent/blob/main/execs/Day05.hs) |
-|   6  |  ⭐⭐  | [execs/Day06.hs](https://github.com/egnwd/advent/blob/main/execs/Day06.hs) |
-|   7  |  ⭐⭐  | [execs/Day07.hs](https://github.com/egnwd/advent/blob/main/execs/Day07.hs) |
-|   8  |  ⭐⭐  | [execs/Day08.hs](https://github.com/egnwd/advent/blob/main/execs/Day08.hs) |
-|   9  |  ⭐⭐  | [execs/Day09.hs](https://github.com/egnwd/advent/blob/main/execs/Day09.hs) |
+| Day   | Stars   | Code |
+|------:|:-------:|------|
+|   1   |  ⭐⭐   | [execs/Day01.hs](https://github.com/egnwd/advent/blob/main/execs/Day01.hs) |
+|   2   |  ⭐⭐   | [execs/Day02.hs](https://github.com/egnwd/advent/blob/main/execs/Day02.hs) |
+|   3   |  ⭐⭐   | [execs/Day03.hs](https://github.com/egnwd/advent/blob/main/execs/Day03.hs) |
+|   4   |  ⭐⭐   | [execs/Day04.hs](https://github.com/egnwd/advent/blob/main/execs/Day04.hs) |
+|   5   |  ⭐⭐   | [execs/Day05.hs](https://github.com/egnwd/advent/blob/main/execs/Day05.hs) |
+|   6   |  ⭐⭐   | [execs/Day06.hs](https://github.com/egnwd/advent/blob/main/execs/Day06.hs) |
+|   7   |  ⭐⭐   | [execs/Day07.hs](https://github.com/egnwd/advent/blob/main/execs/Day07.hs) |
+|   8   |  ⭐⭐   | [execs/Day08.hs](https://github.com/egnwd/advent/blob/main/execs/Day08.hs) |
+|   9   |  ⭐⭐   | [execs/Day09.hs](https://github.com/egnwd/advent/blob/main/execs/Day09.hs) |
+|   10  |  ⭐⭐   | [execs/Day10.hs](https://github.com/egnwd/advent/blob/main/execs/Day10.hs) |
 
 ## Requirements
 

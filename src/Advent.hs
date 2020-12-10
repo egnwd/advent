@@ -12,6 +12,7 @@ module Advent
     , passportParsers
     , parsePassportField
     , singleSpace
+    , fix
     ) where
 
 import Advent.Passport
@@ -119,3 +120,10 @@ parsePid = (map (finite . fromIntegral . digitToInt)) . unpack <$> takeWhileP No
 
 singleSpace :: Parser ()
 singleSpace = try (spaceChar >> notFollowedBy spaceChar)
+
+-- Utilities
+fix f x
+  | x == fx = fx
+  | otherwise = fix f fx
+  where fx = f x
+

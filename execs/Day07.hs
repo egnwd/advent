@@ -70,11 +70,6 @@ part1 g = let start   = fromJust $ ufold (\ctx s -> s <|> (if lab' ctx == "shiny
               parents = fix (S.unions . S.map (\x -> S.fromList $ x : suc g x)) (S.singleton start)
            in (length parents) - 1
 
-fix f x
-  | x == fx = fx
-  | otherwise = fix f fx
-  where fx = f x
-
 part2 :: Input -> Output
 part2 g = let start    = fromJust $ ufold (\ctx s -> s <|> (if lab' ctx == "shiny gold" then Just $ node' ctx else Nothing)) Nothing g
               children = countBags (lsuc g) (start, 1)
