@@ -44,4 +44,3 @@ choose 0 k = 0
 choose n k = choose (n-1) (k-1) * n `div` k
 
 combinations a = map (choose a . (a-)) [0, 1, 2]
-

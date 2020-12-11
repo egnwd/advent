@@ -32,6 +32,7 @@ dependencies:
 - ListZipper
 - control-bool
 - split
+- array
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
@@ -147,6 +148,14 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
       - -main-is Day10
+  day11:
+    <<:   *day-exe
+    main: Day11.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day11
 
 tests:
   advent2020-test:
