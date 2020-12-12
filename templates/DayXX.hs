@@ -7,14 +7,12 @@ module DayXX (main) where
 
 import Advent
 import Prelude hiding (unlines)
+import Control.Arrow ((&&&))
 
 import qualified Data.Text as T
 
 main :: IO ()
-main = do
-  input <- getParsedLines X parseInput
-  print $ part1 input
-  print $ part2 input
+main = print . (part1 &&& part2) =<< getParsedLines X parseInput
 
 type Input  = [T.Text]
 type Output = Int
