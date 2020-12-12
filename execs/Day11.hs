@@ -44,7 +44,6 @@ width = 99
 height = 95
 
 part1 :: Input -> Output
--- part1 input = V.length . V.filter (==Occupied) . fix (runSeats 100) $ input
 part1 input = V.length . V.filter (==Occupied) . fix (runSeats newSeat applyDiff) $ input
 
 part2 :: Input -> Output

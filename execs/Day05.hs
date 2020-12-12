@@ -8,6 +8,7 @@ module Day05 (main) where
 import Advent
 import Prelude hiding (unlines)
 
+import Control.Arrow ((&&&))
 import Data.Semigroup
 import Data.List
 
@@ -26,10 +27,7 @@ readBinary = bitsToInt
     toBin acc i = 2*acc+(bin i)
 
 main :: IO ()
-main = do
-  input <- getParsedLines 5 parseInput
-  print $ part1 input
-  print $ part2 input
+main = print . (part1 &&& part2) =<< getParsedLines 5 parseInput
 
 type Input  = [Int]
 type Output = Int
@@ -45,6 +43,8 @@ part1 :: Input -> Output
 part1 = getMax . foldMap (Max)
 
 part2 :: Input -> Output
-part2 input = let (mx, mn, sm) = foldl' (\(u,l,s) x -> (max u x, min l x, s+x)) (0, 1000000, 0) input
+part2 input = let (mx, mn, sm) = ap3 (getMax, getMin, getSum) $ foldMap (\x -> (Max x, Min x, Sum x)) input
                   total = (mx*(mx+1)-mn*(mn-1)) `div` 2
                in total - sm
+
+ap3 (f, g, h) (a, b, c) = (f a, g b, h c)

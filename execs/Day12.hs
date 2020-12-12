@@ -17,7 +17,7 @@ import Text.Megaparsec hiding (State)
 import Text.Megaparsec.Char (char)
 import Data.Group
 
-data Instruction = Move Point | Turn Cardinality | Forward Int
+data Instruction = Move Point | Turn Cardinality | Forward Int deriving Show
 type Input  = [Instruction]
 type Output = Int
 
