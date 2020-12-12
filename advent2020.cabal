@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 26dcfc3e48ad8bcb4cac3ff82ac779cf10147694ff491a0c4fbf68f5a7043fc0
+-- hash: 2d83d96fc5dac8f9f34cdad30dc4e14e18913850949b4087d9c6ac0e0fc681f0
 
 name:           advent2020
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 library
   exposed-modules:
       Advent
+      Advent.Compass
       Advent.Passport
   other-modules:
       Paths_advent2020
@@ -45,6 +46,7 @@ library
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -77,6 +79,7 @@ executable day1
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -109,6 +112,7 @@ executable day10
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -141,6 +145,7 @@ executable day11
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -173,6 +178,7 @@ executable day12
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -205,6 +211,7 @@ executable day2
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -237,6 +244,7 @@ executable day3
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -269,6 +277,7 @@ executable day4
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -301,6 +310,7 @@ executable day5
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -333,6 +343,7 @@ executable day6
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -365,6 +376,7 @@ executable day7
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -397,6 +409,7 @@ executable day8
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -429,6 +442,7 @@ executable day9
     , fgl
     , filepath >=1.4 && <1.5
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
@@ -464,6 +478,7 @@ test-suite advent2020-test
     , fgl
     , filepath
     , finite-typelits
+    , groups
     , lens
     , linear
     , megaparsec >=9.0 && <9.1
