@@ -14,10 +14,8 @@ import Control.Monad
 
 import Text.Megaparsec ((<|>), many)
 import Text.Megaparsec.Char (char)
-import Data.Vector (Vector(..), fromList, toList, (!?), imap)
+import Data.Vector (Vector(..), fromList, (!?), imap)
 import qualified Data.Vector as V
-import Data.List
-import Data.List.Split
 
 main :: IO ()
 main = print . (part1 &&& part2) =<< return . toArray =<< getParsedLines 11 parseInput
@@ -31,9 +29,6 @@ instance Show Seat where
   show Floor = "."
   show Occupied = "#"
   show EmptySeat = "L"
-
-prettyPrint :: Input -> String
-prettyPrint v = intercalate "\n" $ map (concatMap show) $ chunksOf width (toList v)
 
 -- | Parsing
 parseInput :: Parser [Seat]

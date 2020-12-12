@@ -15,6 +15,7 @@
 |   9   |  ⭐⭐   | [execs/Day09.hs](https://github.com/egnwd/advent/blob/main/execs/Day09.hs) |
 |   10  |  ⭐⭐   | [execs/Day10.hs](https://github.com/egnwd/advent/blob/main/execs/Day10.hs) |
 |   11  |  ⭐⭐   | [execs/Day11.hs](https://github.com/egnwd/advent/blob/main/execs/Day11.hs) |
+|   12  |  ⭐⭐   | [execs/Day12.hs](https://github.com/egnwd/advent/blob/main/execs/Day12.hs) |
 
 ## Requirements
 
