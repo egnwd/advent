@@ -12,6 +12,7 @@ import Control.Applicative
 import Data.Maybe
 import Text.Megaparsec
 import Text.Megaparsec.Char
+import Data.Foldable
 
 main :: IO ()
 main = do
@@ -45,18 +46,16 @@ part1 (now, freqs) = fetch $ zipWith (mod *** (ans now)) currTimes buses
     buses = cycle freqs
 
 part2 :: Input2 -> Output
-part2 input = search (pairs input) [s, s+j..]
-  where
-    s = search (topN input) [0..]
-    j = jump . map fst . topN $ input
-    topN = take 5 . pairs
+part2 input = fst . foldl' step (0, 1) $ pairs input
 
 fetch = snd . head . filter ((==0) . fst)
-isOffset t bus off = (t+off) `mod` bus
 pairs xs = mapMaybe id $ zipWith (liftA2 (,)) xs (map Just [0..])
-jump = foldr lcm 1
-check xs t = sum $ map (uncurry $ isOffset t) xs
-search xs ts = fetch $ map (\t -> (check xs t, t)) ts
+
+check (b, o) t = (t+o) `mod` b
+search x ts = fetch $ map (\t -> (check x t, t)) ts
+
+step (bAcc, oAcc) (b, o) = let bAcc' = search (b, o) [bAcc,bAcc+oAcc..]
+                            in (bAcc', oAcc * b)
 
 --- Note this is slightly different to Control.Arrow.(***)
 (***) :: (Time -> Time -> a) -> (Time -> Time -> b) -> Time -> Time -> (a, b)
