@@ -36,7 +36,7 @@ getRawInput i = readFile ("inputs" </> "input" <> show i <.> "txt")
 
 getParsedInput :: Int -> Parser a -> IO a
 getParsedInput i p = do
-  input <- getRawInput i
+  input <- stripEnd <$> getRawInput i
   case parse p "input" input of
     Left e -> fail (errorBundlePretty e)
     Right a -> return a
