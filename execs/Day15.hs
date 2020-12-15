@@ -7,12 +7,12 @@ module Day15 (main) where
 
 import Advent
 import Prelude hiding (unlines)
+import Control.Monad (foldM)
 import Control.Arrow ((&&&))
-import Control.Lens
-import Data.Foldable
+import Control.Monad.ST (runST)
+import Data.Functor (($>))
 
-import Data.IntMap.Strict ((!))
-import qualified Data.IntMap.Strict as M
+import qualified Data.Vector.Unboxed.Mutable as V
 
 import Text.Megaparsec (sepBy)
 import Text.Megaparsec.Char (char)
@@ -22,8 +22,6 @@ main = print . (part1 &&& part2) =<< getParsedInput 15 parseInput
 
 type Input  = [Int]
 type Output = Int
-
-data Acc = Acc { lastSeenN :: !Int, lastSeen :: M.IntMap Int } deriving Show
 
 -- | Parsing
 parseInput :: Parser [Int]
@@ -35,17 +33,17 @@ part1 = solve 2020
 part2 :: Input -> Output
 part2 = solve 30000000
 
-solve target input = lastSeenN $ foldl' go (Acc l startMap) [length fs..target-2]
-  where
-    (l:fs) = reverse input
-    startMap = mkMap (reverse fs)
+solve target input = runST $
+  do
+    v <- V.new target
+    let l = last input
 
-mkMap x = M.fromList $ zip x [0..]
+    sequence_ $ zipWith (V.write v) input [1..]
 
-go a@Acc{..} i = a { lastSeenN = x, lastSeen = lastSeen' }
-  where
-    x = if M.member lastSeenN lastSeen
-           then i - (lastSeen ! lastSeenN)
-           else 0
-    lastSeen' = lastSeen & at lastSeenN ?~ i
+    let f acc i =
+          do
+            j <- V.read v acc
+            let acc' = if j == 0 then 0 else i - j
+            V.write v acc i $> acc'
 
+    foldM f l [length input..target-1]
