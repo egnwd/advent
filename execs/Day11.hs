@@ -18,7 +18,7 @@ import Data.Vector (Vector(..), fromList, (!?), imap)
 import qualified Data.Vector as V
 
 main :: IO ()
-main = print . (part1 &&& part2) =<< return . toArray =<< getParsedLines 11 parseInput
+main = (print . (part1 &&& part2)) . toArray =<< getParsedLines 11 parseInput
 
 data Seat = Floor | Occupied | EmptySeat deriving (Eq)
 type ParserOutput = [[Seat]]
@@ -44,10 +44,10 @@ width = 99
 height = 95
 
 part1 :: Input -> Output
-part1 input = V.length . V.filter (==Occupied) . fix (runSeats newSeat applyDiff) $ input
+part1 = V.length . V.filter (==Occupied) . fix (runSeats newSeat applyDiff)
 
 part2 :: Input -> Output
-part2 input = V.length . V.filter (==Occupied) . fix (runSeats newSeat' applyDiff') $ input
+part2 = V.length . V.filter (==Occupied) . fix (runSeats newSeat' applyDiff')
 
 runSeats new check ss = imap (runSeat new check ss) ss
 
@@ -77,13 +77,13 @@ adjSeats f ix ss = let (i,j) = fromIx ix
 getNeighbours f ix ss = [f ix ds ss | ds <- [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1,-1), (1,0), (1,1)]]
 
 applyDiff (i,j) (di,dj) ss = let (i',j') = (i+di, j+dj)
-                                 s = ss !? (toIx (i',j'))
+                                 s = ss !? toIx (i',j')
                               in case s of
                                    Just Occupied -> 1
                                    _ -> 0
 
 applyDiff' (i,j) ds@(di,dj) ss = let (i',j') = (i+di, j+dj)
-                                     s = ss !? (toIx (i',j'))
+                                     s = ss !? toIx (i',j')
                                   in case s of
                                       Nothing -> 0
                                       Just Floor -> applyDiff (i',j') ds ss

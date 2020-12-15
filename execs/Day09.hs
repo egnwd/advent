@@ -31,14 +31,13 @@ findHole s@(_:ls) (i:is) = case twosum s i of
                              Just _ -> let s' = snoc i ls in findHole s' is
                              Nothing -> Just i
 
-snoc a [] = [a]
-snoc a (x:xs) = x : snoc a xs
+snoc a = foldr (:) [a]
 
 twosum ns t = listToMaybe [ x | (x:ys) <- tails ns, y <- ys, let k = x + y, k == t]
 
 part2 :: Input -> Output
 part2 input = let badNum = traceShowId $ part1 input
-                  range = fromJust . listToMaybe . filter (not . null) $ [solvePart2 badNum ts | ts <- tails input]
+                  range = fromJust . find (not . null) $ [solvePart2 badNum ts | ts <- tails input]
                   (fst, lst) = (minimum range, maximum range)
                in fst+lst
 

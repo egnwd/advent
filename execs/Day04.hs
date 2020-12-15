@@ -30,7 +30,7 @@ part1 :: Maybe (Passport (Const T.Text)) -> Maybe (Passport (Const T.Text))
 part1 = id
 
 part2 :: Maybe (Passport (Const T.Text)) -> Maybe ValidatedPassport
-part2 x = (B.bzipWith (\p (Const t) -> Option $ parseMaybe p t) passportParsers) <$> x >>= B.btraverse (fmap Identity . getOption)
+part2 x = x >>= B.btraverse (fmap Identity . getOption) . B.bzipWith (\p (Const t) -> Option $ parseMaybe p t) passportParsers
 
 parsePassport = merge <$> parsePassportField `sepEndBy` singleSpace
   where merge = B.btraverse (fmap Const . getOption . getConst) . fold

@@ -37,9 +37,7 @@ parseInput = parseData `sepBy` newline <* eof
 parseData :: Parser DockingData
 parseData = do
   tmpMask <- symbol "mask = " *> parseTmpMask <* newline
-  mem <- parseMemory
-
-  return $ Dock tmpMask mem
+  Dock tmpMask <$> parseMemory
 
 parseTmpMask :: Parser [Maybe Int]
 parseTmpMask = many p
@@ -53,11 +51,11 @@ parseMemory' v = do
   i <- fromIntegral <$> (symbol "mem" *> between "[" "]" number <* symbol " = ")
   num <- fromIntegral <$> number
   let v' = (i,num) : v
-  (try (newline *> parseMemory' v')) <|> return v'
+  try (newline *> parseMemory' v') <|> return v'
 
-andMask bits = ifoldl (updateAnd) initialAnd (reverse bits)
+andMask bits = ifoldl updateAnd initialAnd (reverse bits)
   where
-    initialAnd = foldr' (\i x -> setBit x i) zeroBits [0..length bits] :: Int
+    initialAnd = foldr' (flip setBit) zeroBits [0..length bits] :: Int
     updateAnd _ m Nothing  = m
     updateAnd _ m (Just 1) = m
     updateAnd i m (Just 0) = clearBit m i
@@ -70,7 +68,7 @@ orMask bits = ifoldl updateOr initialOr (reverse bits)
     updateOr i m (Just 1) = setBit m i
 
 part1 :: Input -> Output
-part1 ds = gather . map updateMemory $ ds
+part1 = gather . map updateMemory
   where
     updateMemory :: DockingData -> Memory
     updateMemory dock = M.fromList $ fmap (\(i,x) -> (i, (x .&. and dock) .|. or dock)) (mem dock)
@@ -78,7 +76,7 @@ part1 ds = gather . map updateMemory $ ds
     or  = orMask . tmpMask
 
 part2 :: Input -> Output
-part2 ds = gather . map updateMemory $ ds
+part2 = gather . map updateMemory
 
 updateMemory :: DockingData -> Memory
 updateMemory dock = foldl f M.empty memory
@@ -93,12 +91,12 @@ makeMasks addr = addressSpace . addressMask addr
 addressSpace :: Mask -> [Int]
 addressSpace = ifoldl createAddresses [zeroBits] . reverse
   where
-    createAddresses i as (Just 1) = map (flip setBit i) as
-    createAddresses i as (Just 0) = map (flip clearBit i) as
+    createAddresses i as (Just 1) = map (`setBit` i) as
+    createAddresses i as (Just 0) = map (`clearBit` i) as
     createAddresses i as Nothing  = concatMap (\x -> [setBit x i, clearBit x i]) as
 
 addressMask :: Int -> Mask -> Mask
-addressMask addr = reverse . imap (\i -> fmap (updateMask i)) . reverse
+addressMask addr = reverse . imap (fmap . updateMask) . reverse
   where
     updateMask idx 0 = if testBit addr idx then 1 else 0
     updateMask _ 1 = 1

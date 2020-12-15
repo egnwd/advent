@@ -38,14 +38,14 @@ initialState = S 0 mempty False
 
 -- | Parsing
 parseInput :: Parser Instr
-parseInput = Jmp <$> (parseNumber "jmp") <|> Acc <$> (parseNumber "acc") <|> Nop <$> (parseNumber "nop")
+parseInput = Jmp <$> parseNumber "jmp" <|> Acc <$> parseNumber "acc" <|> Nop <$> parseNumber "nop"
   where parseNumber name = fromIntegral <$> (symbol name *> number)
 
 part1 :: Input -> Output
 part1 input = execState (eval . mkTape $ input) initialState ^. sAcc
 
 part2 :: Input -> Output
-part2 input = fromJust . findTape . makeOptions $ input
+part2 = fromJust . findTape . makeOptions
 
 findTape [] = Nothing
 findTape (is:iss) = let s = execState (eval . mkTape $ is) initialState
@@ -59,7 +59,7 @@ eval z =
     Nothing -> sFinished .= True >> return z
     Just (i, instr) ->
       ifThenElseM
-        ((S.member i) <$> use sSeen)
+        (S.member i <$> use sSeen)
         (return z)
         (sSeen %= S.insert i >> exec z instr >>= eval)
 
@@ -73,8 +73,8 @@ jump n z
   | otherwise = nest n right z
 
 makeOptions [] = []
-makeOptions (x:xs) = (fixInstr x : xs) : (map (x :) (makeOptions xs))
+makeOptions (x:xs) = (fixInstr x : xs) : map (x :) (makeOptions xs)
 
-fixInstr (Jmp n) = (Nop n)
-fixInstr (Acc n) = (Acc n)
-fixInstr (Nop n) = (Jmp n)
+fixInstr (Jmp n) = Nop n
+fixInstr (Acc n) = Acc n
+fixInstr (Nop n) = Jmp n

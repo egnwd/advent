@@ -35,17 +35,17 @@ type RawInput = [(Color, [(Color, Count)])]
 type Input  = Gr Color Count
 type Output = Int
 
-ident = T.pack <$> manyTill (L.charLiteral) (try parseBag)
+ident = T.pack <$> manyTill L.charLiteral (try parseBag)
 
-parseBag = (try (symbol " bags") <|> symbol " bag")
+parseBag = try (symbol " bags") <|> symbol " bag"
 
 -- | Parsing
 parseInput :: Parser (Color, [(Color, Count)])
 parseInput = do
   color <- ident
   symbol "contain"
-  holds <- catMaybes <$> ((Nothing <$ symbol "no other bags") <|> (Just <$> parseHolds)) `sepBy` (symbol ",") <* char '.'
-  let es = (uncurry (,)) <$> holds
+  holds <- catMaybes <$> ((Nothing <$ symbol "no other bags") <|> (Just <$> parseHolds)) `sepBy` symbol "," <* char '.'
+  let es = uncurry (,) <$> holds
 
   return (color, es)
 
@@ -69,7 +69,7 @@ buildGraph adj = let (es, (_, g)) = run empty (go adj) in mkGraph (labNodes g) e
 part1 :: Input -> Color -> Output
 part1 g target = let start   = fromJust . getAlt $ ufoldm (isTarget target) g
                      parents = fix (S.unions . S.map (\x -> S.fromList $ x : suc g x)) (S.singleton start)
-                  in (length parents) - 1
+                  in length parents - 1
 
 part2 :: Input -> Color -> Output
 part2 g target = let start    = fromJust . getAlt $ ufoldm (isTarget target) g
@@ -83,4 +83,4 @@ isTarget target ctx
   | lab' ctx == target = Alt . Just . node' $ ctx
   | otherwise = Alt Nothing
 
-countBags f (b, c) = getSum $ (Sum c) <> (foldMap (Sum . (c *) . countBags f) (f b))
+countBags f (b, c) = getSum $ Sum c <> foldMap (Sum . (c *) . countBags f) (f b)

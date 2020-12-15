@@ -7,7 +7,7 @@ module Day15 (main) where
 
 import Advent
 import Prelude hiding (unlines)
-import Control.Monad (foldM)
+import Control.Monad (foldM, zipWithM_)
 import Control.Arrow ((&&&))
 import Control.Monad.ST (runST)
 import Data.Functor (($>))
@@ -38,7 +38,7 @@ solve target input = runST $
     v <- V.new target
     let l = last input
 
-    sequence_ $ zipWith (V.write v) input [1..]
+    zipWithM_ (V.write v) input [1..]
 
     let f acc i =
           do

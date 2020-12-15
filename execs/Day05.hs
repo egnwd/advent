@@ -24,7 +24,7 @@ readBinary = bitsToInt
     bin 'R' = 1
     bin 'F' = 0
     bin 'B' = 1
-    toBin acc i = 2*acc+(bin i)
+    toBin acc i = 2*acc+bin i
 
 main :: IO ()
 main = print . (part1 &&& part2) =<< getParsedLines 5 parseInput
@@ -32,7 +32,7 @@ main = print . (part1 &&& part2) =<< getParsedLines 5 parseInput
 type Input  = [Int]
 type Output = Int
 
-letters = S.fromList $ [ 'L', 'R', 'F', 'B' ]
+letters = S.fromList [ 'L', 'R', 'F', 'B' ]
 
 -- | Parsing
 parseInput :: Parser Int
@@ -40,7 +40,7 @@ parseInput = readBinary . T.unpack <$> MP.takeWhileP Nothing (`S.member` letters
 
 
 part1 :: Input -> Output
-part1 = getMax . foldMap (Max)
+part1 = getMax . foldMap Max
 
 part2 :: Input -> Output
 part2 input = let (mx, mn, sm) = ap3 (getMax, getMin, getSum) $ foldMap (\x -> (Max x, Min x, Sum x)) input

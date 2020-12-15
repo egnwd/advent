@@ -22,7 +22,7 @@ main :: IO ()
 main = do
   input <- getParsedLines 3 parseInput
   print $ sled (1,3) input
-  print $ product (map (flip sled input) [(1,1), (1,3), (1,5), (1,7), (2,1)])
+  print $ product (map (`sled` input) [(1,1), (1,3), (1,5), (1,7), (2,1)])
 
 data Terrain = Open | Tree deriving Show
 type Input   = [Vector Terrain]

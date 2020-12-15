@@ -32,7 +32,7 @@ parseInput :: Parser Instruction
 parseInput = (Forward <$> (char 'F' *> parseAmount)) <|> (Turn <$> (parseDirection <*> parseAmount)) <|> (Move <$> (parseMovement <*> parseAmount))
   where
     parseAmount = fromIntegral <$> number
-    parseMovement = (flip (*^) . toVec) <$> parseCardinality
+    parseMovement = flip (*^) . toVec <$> parseCardinality
     parseDirection = (pow West . (`div` 90) <$ char 'L') <|> (pow East . (`div` 90) <$ char 'R')
 
 part1 :: Input -> Output

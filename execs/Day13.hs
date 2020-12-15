@@ -18,7 +18,7 @@ main :: IO ()
 main = do
   input1 <- getParsedInput 13 parseInput1
   input2 <- getParsedInput 13 parseInput2
-  print $ (part1 input1, part2 input2)
+  print (part1 input1, part2 input2)
 
 type Time = Int
 type Freq = Int
@@ -39,7 +39,7 @@ parseInput2 = do
   (Just . fromIntegral <$> number <|> Nothing <$ char 'x') `sepBy` char ','
 
 part1 :: Input1 -> Output
-part1 (now, freqs) = fetch $ zipWith (mod *** (ans now)) currTimes buses
+part1 (now, freqs) = fetch $ zipWith (mod *** ans now) currTimes buses
   where
     ans now x y = (x-now) * y
     currTimes = concatMap (replicate (length freqs)) [now..]
@@ -49,7 +49,7 @@ part2 :: Input2 -> Output
 part2 input = fst . foldl' step (0, 1) $ pairs input
 
 fetch = snd . head . filter ((==0) . fst)
-pairs xs = mapMaybe id $ zipWith (liftA2 (,)) xs (map Just [0..])
+pairs xs = catMaybes $ zipWith (liftA2 (,)) xs (map Just [0..])
 
 check (b, o) t = (t+o) `mod` b
 search x ts = fetch $ map (\t -> (check x t, t)) ts
