@@ -25,7 +25,7 @@ type Output = Int
 
 -- | Parsing
 parseInput :: Parser [Int]
-parseInput = (fromIntegral <$> number) `sepBy` char ','
+parseInput = number `sepBy` char ','
 
 part1 :: Input -> Output
 part1 = solve 2020

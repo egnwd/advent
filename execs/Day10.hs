@@ -17,14 +17,10 @@ import Data.List.Split
 import qualified Data.Map as M hiding ((!))
 
 main :: IO ()
-main = print . (part1 &&& part2) =<< getParsedLines 10 parseInput
+main = print . (part1 &&& part2) =<< getParsedLines 10 number
 
 type Input  = [Int]
 type Output = Int
-
--- | Parsing
-parseInput :: Parser Int
-parseInput = fromIntegral <$> number
 
 part1 :: Input -> Output
 part1 input = let diffs = joltDiffs input
@@ -40,7 +36,7 @@ joltDiffs input = let plugs = sort $ (maximum input + 3) : input
                    in zipWith (-) plugs (0:plugs)
 
 choose n 0 = 1
-choose 0 k = 0
+choose 0 _ = 0
 choose n k = choose (n-1) (k-1) * n `div` k
 
 combinations a = map (choose a . (a-)) [0, 1, 2]

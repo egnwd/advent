@@ -6,19 +6,18 @@
 module Day16 (main) where
 
 import Advent
-import Prelude hiding (unlines)
 import Control.Arrow ((&&&))
+import Control.Monad
 import Data.Foldable
-
+import Data.Ix (inRange)
+import Data.List
+import Data.Maybe
 import Data.Monoid
-
-import qualified Data.Text as T
+import Prelude hiding (unlines)
 import Text.Megaparsec (eof, sepBy, manyTill)
 import Text.Megaparsec.Char (char, newline, printChar)
-import Data.Maybe
-import Data.List
 import qualified Data.Set as S
-
+import qualified Data.Text as T
 
 type Name = T.Text
 data TicketRule = TR { ruleName :: Name, rulePredicate :: Int -> Bool }
@@ -54,16 +53,10 @@ parseTicketRules = parseTicketRule `sepBy` singleSpace
 parseTicketRule :: Parser TicketRule
 parseTicketRule = do
   name <- T.pack <$> manyTill printChar (symbol ": ")
-  range1 <- (,) <$> (fromIntegral <$> number) <* char '-' <*> (fromIntegral <$> number)
-  symbol "or"
-  range2 <- (,) <$> (fromIntegral <$> number) <* char '-' <*> (fromIntegral <$> number)
-  return $ TR name (mkRule range1 range2)
-
-
-mkRule :: (Int, Int) -> (Int, Int) -> Int -> Bool
-mkRule (l1,u1) (l2,u2) n = between l1 u1 n || between l2 u2 n
-
-between a b n = a <= n && n <= b
+  (TR name .) . mkRule <$> parseRange <* symbol "or" <*> parseRange
+    where
+      parseRange = (,) <$> number <* char '-' <*> number
+      mkRule a b n = a `inRange` n || b `inRange` n
 
 parseYourTicket :: Parser Ticket
 parseYourTicket = symbol "your ticket:" *> newline *> parseTicket <* newline
@@ -91,26 +84,13 @@ matchFields :: Notes -> NamedTicket
 matchFields notes = namedTicket
   where
     namedTicket = zip (allocateFields (rules notes) groups) (yourTicket notes)
-    validTickets = filter (all (validate notes)) (nearbyTickets notes)
-    groups = transpose validTickets
+    groups = transpose . filter (all (validate notes)) $ nearbyTickets notes
 
 allocateFields :: [TicketRule] -> [[Int]] -> [Name]
 allocateFields rs gs = actualNames
   where
-    ruleNames = S.fromList . map ruleName $ rs
-    possibleNames = sortOn (length . snd) . zip [0..] . map (namesForField rs) $ gs
-    actualNames = map snd . sortOn fst . snd . mapAccumL pickName ruleNames $ possibleNames
-
-pickName rs (i, ns) = (rs', (i, n))
-  where
-    rs' = S.delete n rs
-    n   = head . filter (`S.member` rs) $ ns
-
-namesForField :: [TicketRule] -> [Int] -> [Name]
-namesForField rs g = mapMaybe (acceptableRule g) rs
-
-acceptableRule :: [Int] -> TicketRule -> Maybe Name
-acceptableRule group ticketRule
-  | all (rulePredicate ticketRule) group = pure $ ruleName ticketRule
-  | otherwise = Nothing
-
+    actualNames         = map snd . sortOn fst . snd . mapAccumL pickName ruleNames $ possibleNames
+    possibleNames       = sortOn (length . snd) . zip [0..] . map (namesForField rs) $ gs
+    ruleNames           = S.fromList . map ruleName $ rs
+    pickName rs (i, ns) = let rs' = S.delete n rs; n = head . filter (`S.member` rs) $ ns in (rs', (i, n))
+    namesForField rs g  = mapMaybe (\r -> guard (all (rulePredicate r) g) *> Just (ruleName r)) rs

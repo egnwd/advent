@@ -37,7 +37,7 @@ rotate West  (V2 x y) = V2 y (-x)
 rotateCardinality North = id
 rotateCardinality East  = goEast
 rotateCardinality South = goEast . goEast
-rotateCardinality West  = goWest
+rotateCardinality West  = goEast . goEast . goEast
 
 toVec :: Cardinality -> Point
 toVec North = V2 1 0
@@ -53,9 +53,6 @@ instance Monoid Cardinality where
 
 instance Group Cardinality where
   invert = goEast . goEast
-
-goWest North = West
-goWest c = pred c
 
 goEast West = North
 goEast c = succ c

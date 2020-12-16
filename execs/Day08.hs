@@ -11,6 +11,7 @@ import Control.Monad.State
 import Advent
 import Prelude hiding (unlines)
 
+import Control.Arrow ((&&&))
 import Control.Bool
 import Control.Lens
 import Control.Applicative
@@ -29,17 +30,14 @@ type Input  = [Instr]
 type Output = Int
 
 main :: IO ()
-main = do
-  input <- getParsedLines 8 parseInput
-  print $ part1 input
-  print $ part2 input
+main = print . (part1 &&& part2) =<< getParsedLines 8 parseInput
 
 initialState = S 0 mempty False
 
 -- | Parsing
 parseInput :: Parser Instr
 parseInput = Jmp <$> parseNumber "jmp" <|> Acc <$> parseNumber "acc" <|> Nop <$> parseNumber "nop"
-  where parseNumber name = fromIntegral <$> (symbol name *> number)
+  where parseNumber name = symbol name *> number
 
 part1 :: Input -> Output
 part1 input = execState (eval . mkTape $ input) initialState ^. sAcc

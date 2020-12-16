@@ -29,14 +29,14 @@ type Output = Int
 -- | Parsing
 parseInput1 :: Parser (Time, [Freq])
 parseInput1 = do
-  time <- fromIntegral <$> number <* newline
-  freqs <- mapMaybe (fmap fromIntegral) <$> (Just <$> number <|> Nothing <$ char 'x') `sepBy` char ','
+  time <- number <* newline
+  freqs <- catMaybes <$> (Just <$> number <|> Nothing <$ char 'x') `sepBy` char ','
   return (time, freqs)
 
 parseInput2 :: Parser [Maybe Freq]
 parseInput2 = do
   number <* newline
-  (Just . fromIntegral <$> number <|> Nothing <$ char 'x') `sepBy` char ','
+  (Just <$> number <|> Nothing <$ char 'x') `sepBy` char ','
 
 part1 :: Input1 -> Output
 part1 (now, freqs) = fetch $ zipWith (mod *** ans now) currTimes buses

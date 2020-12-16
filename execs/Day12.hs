@@ -29,9 +29,8 @@ main = print . (part1 &&& part2) =<< getParsedLines 12 parseInput
 
 -- | Parsing
 parseInput :: Parser Instruction
-parseInput = (Forward <$> (char 'F' *> parseAmount)) <|> (Turn <$> (parseDirection <*> parseAmount)) <|> (Move <$> (parseMovement <*> parseAmount))
+parseInput = (Forward <$> (char 'F' *> number)) <|> (Turn <$> (parseDirection <*> number)) <|> (Move <$> (parseMovement <*> number))
   where
-    parseAmount = fromIntegral <$> number
     parseMovement = flip (*^) . toVec <$> parseCardinality
     parseDirection = (pow West . (`div` 90) <$ char 'L') <|> (pow East . (`div` 90) <$ char 'R')
 

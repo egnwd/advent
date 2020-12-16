@@ -17,12 +17,12 @@ main = do
 --
 -- >>> expenseReport [1721, 979, 366, 299, 675, 1456]
 -- 514579
-expenseReport :: [Integer] -> Integer
+expenseReport :: [Int] -> Int
 expenseReport ns = head [ x * y | (x:ys) <- tails ns, y <- ys, let k = x + y, k == 2020]
 
 -- | Find three numbers in list that sum to 2020, then multiply the answers
 --
 -- >>> expenseReport3 [1721, 979, 366, 299, 675, 1456]
 -- 241861950
-expenseReport3 :: [Integer] -> Integer
+expenseReport3 :: [Int] -> Int
 expenseReport3 ns = head [ x * y * z | (x:ys) <- tails ns, (y:zs) <- tails ys, z <- zs, let k = x + y + z, k == 2020]

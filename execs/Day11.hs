@@ -18,10 +18,9 @@ import Data.Vector (Vector(..), fromList, (!?), imap)
 import qualified Data.Vector as V
 
 main :: IO ()
-main = (print . (part1 &&& part2)) . toArray =<< getParsedLines 11 parseInput
+main = (print . (part1 &&& part2)) . fromList . join =<< getParsedLines 11 parseInput
 
 data Seat = Floor | Occupied | EmptySeat deriving (Eq)
-type ParserOutput = [[Seat]]
 type Input   = Vector Seat
 type Output  = Int
 
@@ -37,20 +36,18 @@ parseInput = many parseTerrain
 parseTerrain :: Parser Seat
 parseTerrain = Floor <$ char '.' <|> Occupied <$ char '#' <|> EmptySeat <$ char 'L'
 
-toArray :: ParserOutput -> Input
-toArray = fromList . join
-
 width = 99
 height = 95
 
 part1 :: Input -> Output
-part1 = V.length . V.filter (==Occupied) . fix (runSeats newSeat applyDiff)
+part1 = countOccupied . fix (runSeats newSeat applyDiff)
 
 part2 :: Input -> Output
-part2 = V.length . V.filter (==Occupied) . fix (runSeats newSeat' applyDiff')
+part2 = countOccupied . fix (runSeats newSeat' applyDiff')
+
+countOccupied = V.length . V.filter (==Occupied)
 
 runSeats new check ss = imap (runSeat new check ss) ss
-
 runSeat new check ss ix s = new s (adjSeats check ix ss)
 
 newSeat EmptySeat 0 = Occupied
@@ -67,7 +64,7 @@ newSeat' s _ = s
 
 toIx (i,j)
   | i < 0 || j < 0 || i >= height || j >= width = -1
-  | otherwise      = i*width+j
+  | otherwise = i*width+j
 
 fromIx ix = ix `divMod` width
 

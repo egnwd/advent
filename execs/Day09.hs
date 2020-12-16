@@ -6,6 +6,7 @@
 module Day09 (main) where
 
 import Advent
+import Control.Arrow ((&&&))
 import Prelude hiding (unlines)
 import Data.List
 import Data.Maybe
@@ -13,10 +14,7 @@ import Data.Maybe
 import Debug.Trace
 
 main :: IO ()
-main = do
-  input <- getParsedLines 9 (fromIntegral <$> number)
-  print $ part1 input
-  print $ part2 input
+main = print . (part1 &&& part2) =<< getParsedLines 9 number
 
 type Input  = [Int]
 type Output = Int

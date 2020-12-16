@@ -52,5 +52,3 @@ type UnvalidatedPassport = Passport UnvalidatedField
 type UnvalidatedField = Const (Option T.Text)
 type UnvalidatedSetter a = Setter' UnvalidatedPassport (UnvalidatedField a)
 type ValidatedPassport = Passport Identity
-
-

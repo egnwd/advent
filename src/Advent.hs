@@ -69,7 +69,9 @@ lexeme :: Parser a -> Parser a
 lexeme  = L.lexeme sc
 
 symbol  = L.symbol sc
+integer :: (Num a) => Parser a
 integer = lexeme L.decimal
+number :: (Num a) => Parser a
 number  = L.signed sc integer
 
 -- Passport Parsing
@@ -86,14 +88,14 @@ parsePassportField = parseField' "byr" byr
          <|> parseField' "pid" pid
          <|> mempty <$ (parseKey "cid" *> ident)
            where
-             parseField' :: Text -> UnvalidatedSetter a -> (Parser UnvalidatedPassport)
+             parseField' :: Text -> UnvalidatedSetter a -> Parser UnvalidatedPassport
              parseField' k s = parseKey k *> ident >>= setValue s
              setValue s = return . flip (set s) mempty . Const . pure
 
 passportParsers = Passport
-  { _byr = fromIntegral <$> number >>= refineFail
-  , _iyr = fromIntegral <$> number >>= refineFail
-  , _eyr = fromIntegral <$> number >>= refineFail
+  { _byr = number >>= refineFail . fromIntegral
+  , _iyr = number >>= refineFail . fromIntegral
+  , _eyr = number >>= refineFail . fromIntegral
   , _hgt = parseHeight
   , _hcl = parseHair
   , _ecl = parseEyeColor
@@ -115,8 +117,8 @@ parseHeight = (HIn <$> try parseIn) <|> (HCm <$> parseCm)
     parseIn = fromIntegral <$> number <* string "in" >>= refineFail
     parseCm = fromIntegral <$> number <* string "cm" >>= refineFail
 
-parseHair = (map (finite . fromIntegral . digitToInt)) . unpack <$> (char '#' *> takeWhileP Nothing isHexDigit) >>= refineFail
-parsePid = (map (finite . fromIntegral . digitToInt)) . unpack <$> takeWhileP Nothing isDigit >>= refineFail
+parseHair = (char '#' *> takeWhileP Nothing isHexDigit) >>= refineFail . map (finite . fromIntegral . digitToInt) . unpack
+parsePid = takeWhileP Nothing isDigit >>= refineFail .map (finite . fromIntegral . digitToInt) . unpack
 
 singleSpace :: Parser ()
 singleSpace = try (spaceChar >> notFollowedBy spaceChar)

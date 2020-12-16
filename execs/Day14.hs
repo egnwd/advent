@@ -48,8 +48,8 @@ parseMemory = reverse <$> parseMemory' mempty
 
 parseMemory' :: SetInstr -> Parser SetInstr
 parseMemory' v = do
-  i <- fromIntegral <$> (symbol "mem" *> between "[" "]" number <* symbol " = ")
-  num <- fromIntegral <$> number
+  i <- symbol "mem" *> between "[" "]" number <* symbol " = "
+  num <- number
   let v' = (i,num) : v
   try (newline *> parseMemory' v') <|> return v'
 

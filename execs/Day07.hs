@@ -50,10 +50,7 @@ parseInput = do
   return (color, es)
 
 parseHolds :: Parser (Color, Count)
-parseHolds = do
-  ct <- fromIntegral <$> number
-  cl <- ident
-  return (cl, ct)
+parseHolds = flip (,) <$> number <*> ident
 
 buildGraph :: RawInput -> Input
 buildGraph adj = let (es, (_, g)) = run empty (go adj) in mkGraph (labNodes g) es
