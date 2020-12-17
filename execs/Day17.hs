@@ -18,15 +18,17 @@ main :: IO ()
 main = print . (part mkCube &&& part mkTessaract) =<< getParsedInput 17 parseInput
 
 parseInput :: Parser (S.Set (V2 Int))
-parseInput = S.fromList . map fst . filter snd . concat . zipWith (\i xs -> zipWith (\j x -> (V2 j i, x)) [0..] xs) [0..]
-  <$> ((`sepBy` newline) . many $ (True <$ char '#' <|> False <$ char '.'))
+parseInput =
+      S.fromList . map fst . filter snd . concat                            -- Take the alive cells and turn into set
+    . zipWith (\i -> zipWith (\j -> (V2 j i,)) [0..]) [0..]                 -- Add an index to all the cells
+  <$> ((`sepBy` newline) . many $ (True <$ char '#' <|> False <$ char '.')) -- Parse '#' as Alive and '.' as Not Alive in a grid
 
 part f = length . (!! 6) . iterate step . S.map f
 
 step wld =
-    M.keysSet . M.filterWithKey (rule . (`S.member` wld))
-  . M.unionsWith (+)
-  . S.map (M.fromSet (const 1) . S.fromList . neighbours)
+    M.keysSet . M.filterWithKey (rule . (`S.member` wld))  -- Filter to those that live to the next generation
+  . M.unionsWith (+)                                       -- Group and count number of times that neighbour is "seen"
+  . S.map (M.fromSet (const 1) . S.fromList . neighbours)  -- Get the neighbours of each cell
   $ wld
 
 rule True  n = n == 2 || n == 3
