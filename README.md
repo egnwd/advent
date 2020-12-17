@@ -20,6 +20,7 @@
 |   14  |  ⭐⭐   | [execs/Day14.hs](https://github.com/egnwd/advent/blob/main/execs/Day14.hs) |
 |   15  |  ⭐⭐   | [execs/Day15.hs](https://github.com/egnwd/advent/blob/main/execs/Day15.hs) |
 |   16  |  ⭐⭐   | [execs/Day16.hs](https://github.com/egnwd/advent/blob/main/execs/Day16.hs) |
+|   17  |  ⭐⭐   | [execs/Day17.hs](https://github.com/egnwd/advent/blob/main/execs/Day17.hs) |
 
 ## Requirements
 

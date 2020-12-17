@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 68808524e6cd5c0d92b540ba8c362c8bd8a8b5af48ec21dfabe3877f9e57efb1
+-- hash: c94c1685672fd1c39440b0fc29963c9cb985a2955a58fea277a0a69edddde4bb
 
 name:           advent2020
 version:        0.1.0.0
@@ -36,12 +36,15 @@ library
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   build-depends:
       ListZipper
+    , adjunctions
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -68,13 +71,16 @@ executable day1
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day01
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -101,13 +107,16 @@ executable day10
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day10
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -134,13 +143,16 @@ executable day11
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day11
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -167,13 +179,16 @@ executable day12
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day12
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -200,13 +215,16 @@ executable day13
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day13
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -233,13 +251,16 @@ executable day14
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day14
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -266,13 +287,16 @@ executable day15
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day15
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -299,13 +323,52 @@ executable day16
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day16
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
+    , doctest >=0.17 && <0.18
+    , fgl
+    , filepath >=1.4 && <1.5
+    , finite-typelits
+    , groups
+    , lens
+    , linear
+    , megaparsec >=9.0 && <9.1
+    , mtl
+    , one-liner-instances
+    , pointedlist
+    , refined
+    , split
+    , text
+    , utility-ht
+    , vector
+  default-language: Haskell2010
+
+executable day17
+  main-is: Day17.hs
+  hs-source-dirs:
+      execs
+  default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day17
+  build-depends:
+      ListZipper
+    , adjunctions
+    , advent2020
+    , array
+    , barbies
+    , base >=4.7 && <5
+    , comonad
+    , containers
+    , control-bool
+    , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -332,13 +395,16 @@ executable day2
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day02
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -365,13 +431,16 @@ executable day3
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day03
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -398,13 +467,16 @@ executable day4
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day04
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -431,13 +503,16 @@ executable day5
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day05
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -464,13 +539,16 @@ executable day6
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day06
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -497,13 +575,16 @@ executable day7
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day07
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -530,13 +611,16 @@ executable day8
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day08
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -563,13 +647,16 @@ executable day9
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day09
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory >=1.3 && <1.4
+    , distributive
     , doctest >=0.17 && <0.18
     , fgl
     , filepath >=1.4 && <1.5
@@ -599,13 +686,16 @@ test-suite advent2020-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       ListZipper
+    , adjunctions
     , advent2020
     , array
     , barbies
     , base >=4.7 && <5
+    , comonad
     , containers
     , control-bool
     , directory
+    , distributive
     , doctest
     , fgl
     , filepath
