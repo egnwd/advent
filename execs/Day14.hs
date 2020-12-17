@@ -101,11 +101,4 @@ addressMask addr = reverse . imap (fmap . updateMask) . reverse
     updateMask idx 0 = if testBit addr idx then 1 else 0
     updateMask _ 1 = 1
 
-showMask :: Mask -> String
-showMask = map f
-  where
-    f (Just 1) = '1'
-    f (Just 0) = '0'
-    f Nothing  = 'X'
-
 gather = sum . M.unions . reverse
