@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c94c1685672fd1c39440b0fc29963c9cb985a2955a58fea277a0a69edddde4bb
+-- hash: dbec200850222661f5241d39b4ea4e69a722be46398241b0567373bfee2c4eac
 
 name:           advent2020
 version:        0.1.0.0
@@ -55,6 +55,7 @@ library
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -91,6 +92,7 @@ executable day1
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -127,6 +129,7 @@ executable day10
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -163,6 +166,7 @@ executable day11
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -199,6 +203,7 @@ executable day12
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -235,6 +240,7 @@ executable day13
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -271,6 +277,7 @@ executable day14
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -307,6 +314,7 @@ executable day15
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -343,6 +351,7 @@ executable day16
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -379,6 +388,44 @@ executable day17
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
+    , pointedlist
+    , refined
+    , split
+    , text
+    , utility-ht
+    , vector
+  default-language: Haskell2010
+
+executable day18
+  main-is: Day18.hs
+  hs-source-dirs:
+      execs
+  default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day18
+  build-depends:
+      ListZipper
+    , adjunctions
+    , advent2020
+    , array
+    , barbies
+    , base >=4.7 && <5
+    , comonad
+    , containers
+    , control-bool
+    , directory >=1.3 && <1.4
+    , distributive
+    , doctest >=0.17 && <0.18
+    , fgl
+    , filepath >=1.4 && <1.5
+    , finite-typelits
+    , groups
+    , lens
+    , linear
+    , megaparsec >=9.0 && <9.1
+    , mtl
+    , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -415,6 +462,7 @@ executable day2
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -451,6 +499,7 @@ executable day3
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -487,6 +536,7 @@ executable day4
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -523,6 +573,7 @@ executable day5
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -559,6 +610,7 @@ executable day6
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -595,6 +647,7 @@ executable day7
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -631,6 +684,7 @@ executable day8
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -667,6 +721,7 @@ executable day9
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split
@@ -706,6 +761,7 @@ test-suite advent2020-test
     , megaparsec >=9.0 && <9.1
     , mtl
     , one-liner-instances
+    , parser-combinators
     , pointedlist
     , refined
     , split

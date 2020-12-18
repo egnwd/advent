@@ -9,6 +9,7 @@ module Advent
     , Parser (..)
     , number
     , symbol
+    , parens
     , passportParsers
     , parsePassportField
     , singleSpace
@@ -73,6 +74,9 @@ integer :: (Num a) => Parser a
 integer = lexeme L.decimal
 number :: (Num a) => Parser a
 number  = L.signed sc integer
+
+parens :: Parser a -> Parser a
+parens = between (symbol "(") (symbol ")")
 
 -- Passport Parsing
 parseKey k = try (string k) <* char ':'

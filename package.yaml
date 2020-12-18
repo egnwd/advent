@@ -38,6 +38,7 @@ dependencies:
 - comonad
 - adjunctions
 - distributive
+- parser-combinators
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
@@ -209,6 +210,14 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
       - -main-is Day17
+  day18:
+    <<:   *day-exe
+    main: Day18.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day18
 
 tests:
   advent2020-test:
