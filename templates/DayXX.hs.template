@@ -6,19 +6,16 @@
 module Day{{XX}} (main) where
 
 import Advent
-import Prelude hiding (unlines)
 import Control.Arrow ((&&&))
-
-import qualified Data.Text as T
 
 main :: IO ()
 main = print . (part1 &&& part2) =<< getParsedLines {{XX}} parseInput
 
-type Input  = [T.Text]
+type Input  = [Int]
 type Output = Int
 
 -- | Parsing
-parseInput :: Parser T.Text
+parseInput :: Parser Int
 parseInput = undefined
 
 part1 :: Input -> Output
