@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dbec200850222661f5241d39b4ea4e69a722be46398241b0567373bfee2c4eac
+-- hash: 7ad5887f5efc08506c994348c1ebb179ebf02e0a35185a091d84ed816837750e
 
 name:           advent2020
 version:        0.1.0.0
@@ -403,6 +403,43 @@ executable day18
       execs
   default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day18
+  build-depends:
+      ListZipper
+    , adjunctions
+    , advent2020
+    , array
+    , barbies
+    , base >=4.7 && <5
+    , comonad
+    , containers
+    , control-bool
+    , directory >=1.3 && <1.4
+    , distributive
+    , doctest >=0.17 && <0.18
+    , fgl
+    , filepath >=1.4 && <1.5
+    , finite-typelits
+    , groups
+    , lens
+    , linear
+    , megaparsec >=9.0 && <9.1
+    , mtl
+    , one-liner-instances
+    , parser-combinators
+    , pointedlist
+    , refined
+    , split
+    , text
+    , utility-ht
+    , vector
+  default-language: Haskell2010
+
+executable day19
+  main-is: Day19.hs
+  hs-source-dirs:
+      execs
+  default-extensions: DataKinds EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections TypeOperators OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Day19
   build-depends:
       ListZipper
     , adjunctions
