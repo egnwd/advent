@@ -47,6 +47,7 @@ extra-deps:
  - refined-0.6.1@sha256:d5d713f0a2ad79d1c049d2d132fd8c2078b883b5ea3db876087eaec102843e57
  - these-skinny-0.7.4@sha256:e29336a1a70a497e09d8266f8438efb30a807bafaa6b00f5a136f7493efb3160
  - ListZipper-1.2.0.2@sha256:5bbb5a4cc7f1cae962310407f711b874c087b48a0ba39b9fcce84cdb0ff5244c
+ - grids-0.5.0.1@sha256:1230e0e2249ce74ad092329410b1a87c5bcbeb88aa148f0131bdc43385ba3362
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
