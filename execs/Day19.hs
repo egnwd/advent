@@ -7,11 +7,12 @@ module Day19 (main) where
 
 import Advent
 import Control.Arrow ((&&&))
-import Control.Applicative
+import Control.Applicative ((<|>))
 import Control.Monad
-import Control.Monad.Reader
+import Control.Monad.Combinators.Expr
 import Data.Char
-import Text.Megaparsec (takeWhile1P, try, choice, sepBy)
+import Data.Maybe
+import Text.Megaparsec (takeWhile1P, try, sepBy, parseMaybe, eof, some)
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import Data.IntMap ((!))
@@ -23,52 +24,33 @@ main = print . (part1 &&& part2) =<< getParsedInput 19 parseInput
 
 data Rule = C !Char | Then Rule Rule | Or Rule Rule | Val !Int
 type Rules  = M.IntMap Rule
-type Messages = [String]
+type Messages = [T.Text]
 type Input  = (Rules, Messages)
 
 parseInput :: Parser Input
 parseInput = (,) <$> parseRules <* (newline <* newline) <*> parseMessages
+  where parseMessages = takeWhile1P Nothing isAlpha `sepBy` newline
 
 parseRules :: Parser Rules
 parseRules = M.unions <$> parseRule `sepBy` singleSpace
   where
-    parseRule = M.singleton <$> number <* symbol ":" <*> parseSubRule
+    parseRule = M.singleton <$> number <* symbol ":" <*> expr
+    expr = makeExprParser term table
+    table = [[InfixL (Then <$ hspace)], [InfixL (Or <$ (char '|' >> hspace))]]
+    term = (Val <$> L.decimal <|> C <$> (char '"' *> letterChar <* char '"')) <* hspace
 
-parseSubRule = choice [C <$> parseChar, parseTop]
-parseChar = try (char '"' *> letterChar <* char '"')
-
-parseTop = do
-  left <- parseMiddle
-  go left
-    where
-      go acc = (" | " >> parseMiddle >>= go . Or acc) <|> return acc
-
-parseMiddle = do
-    left <- parseBottom
-    go left
+part1 (rules, messages) = match (eval rules (rules ! 0)) messages
+part2 (rules, messages) = match p messages
   where
-    go acc = try (" " >> parseBottom >>= go . Then acc) <|> return acc
+    p = do
+        n <- some (try $ eval rules (rules ! 42))
+        m <- some (eval rules (rules ! 31))
+        if length n > length m then return () else fail "bad message"
 
-parseBottom = Val <$> L.decimal
+match p = length . mapMaybe (parseMaybe (p <* eof))
 
-parseMessages = map T.unpack <$> takeWhile1P Nothing isAlpha `sepBy` newline
-
-part1 (rules, messages) = match rules messages
-part2 (rules, messages) = let rules' = sandwich 11 . repeat1 8 $ rules
-                           in match rules' messages
-
-repeat1 = M.updateWithKey (\k r -> Just $ r `Or` (r `Then` Val k))
-sandwich = M.updateWithKey (\k t@(Then l r) -> Just $ t `Or` ((l `Then` Val k) `Then` r))
-
-match rs = length . filter (any null . flip runReader rs . eval (rs ! 0))
-
-eval :: Rule -> String -> Reader (M.IntMap Rule) Messages
-eval (Then l r) = (fmap concat . traverse (eval r)) <=< eval l
-eval (Or l r)   = \s -> eval l s +++ eval r s
-eval (Val i)    = (asks (!i) >>=) . flip eval
-eval (C c)      = \case
-                      (c':s') | c == c' -> return [s']
-                      _ -> return []
-
-(+++) :: (Applicative f) => f [a] -> f [a] -> f [a]
-(+++) = liftA2 (++)
+eval :: Rules -> Rule -> Parser ()
+eval rules (Then l r) = eval rules l >> eval rules r
+eval rules (Or l r)   = try (eval rules l) <|> eval rules r
+eval rules (Val i)    = eval rules (rules ! i)
+eval _     (C c)      = void $ char c
