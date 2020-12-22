@@ -242,6 +242,14 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
       - -main-is Day21
+  day22:
+    <<:   *day-exe
+    main: Day22.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day22
 
 tests:
   advent2020-test:
