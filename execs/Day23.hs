@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-|
    Name: Crab Cups
    Url: <https://adventofcode.com/2020/day/23>
@@ -8,6 +9,7 @@ module Day23 (main) where
 import Control.Arrow ((&&&))
 import Control.Monad
 import Control.Monad.ST
+import Data.Foldable
 import Data.Array.ST
 import Data.Array.Unboxed
 
@@ -44,6 +46,7 @@ move arr i = do
   writeArray arr i i'
 
   return i'
+{-# INLINE move #-}
 
 mkNumber :: UArray Int Int -> (Int, Int) -> (Int, Int)
 mkNumber arr (i, acc) = let j = arr ! i in (j, acc * 10 + j)
@@ -55,12 +58,12 @@ part1 input = runST $ do
   foldM_ (const . move cups) (head input) [1..100]
   cups' <- freeze cups
   let (mn, mx) = bounds cups'
-      (_, n) = foldl (const . mkNumber cups') (1, 0) [mn .. mx-1]
+      (_, n) = foldl' (const . mkNumber cups') (1, 0) [mn .. mx-1]
   return n
 
 part2 :: Input -> Output
 part2 input = runST $ do
-  cups <- mkArray (input ++ [10..1000000])
+  !cups <- mkArray (input ++ [10..1000000])
   foldM_ (const . move cups) (head input) [1..10000000]
   a <- readArray cups 1
   b <- readArray cups a
