@@ -17,28 +17,28 @@ dependencies:
 - directory ^>= 1.3
 - filepath  ^>= 1.4
 - megaparsec ^>= 9.0
-- text
-- containers
-- mtl
-- vector
-- pointedlist
-- lens
-- barbies
-- refined
-- finite-typelits
-- one-liner-instances
-- fgl
-- utility-ht
-- ListZipper
-- control-bool
-- split
-- linear
-- array
-- groups
-- comonad
 - adjunctions
+- array
+- barbies
+- comonad
+- containers
+- control-bool
 - distributive
+- fgl
+- finite-typelits
+- groups
+- lens
+- linear
+- ListZipper
+- mtl
+- one-liner-instances
 - parser-combinators
+- pointedlist
+- refined
+- split
+- text
+- utility-ht
+- vector
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
@@ -250,6 +250,14 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
       - -main-is Day22
+  day23:
+    <<:   *day-exe
+    main: Day23.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -main-is Day23
 
 tests:
   advent2020-test:
