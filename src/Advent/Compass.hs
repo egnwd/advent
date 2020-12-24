@@ -8,22 +8,21 @@ module Advent.Compass
   ) where
 
 
+import Advent.Parsing
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Data.Void
-import Data.Text
 import Linear.V2 hiding (rotate)
 import Data.Group
 
 type Point = V2 Int
 data Cardinality = North | East | South | West deriving (Show, Enum, Bounded)
 
-parseCardinality :: Parsec Void Text Cardinality
+parseCardinality :: Parser Cardinality
 parseCardinality = choice
   [ North <$ char 'N'
-  , East <$ char 'E'
+  , East  <$ char 'E'
   , South <$ char 'S'
-  , West <$ char 'W'
+  , West  <$ char 'W'
   ]
 
 origin :: Point

@@ -8,16 +8,15 @@ module Advent.Hex
   ) where
 
 
-import Text.Megaparsec
-import Data.Void
-import qualified Data.Text as T
+import Advent.Parsing
 import Linear.V2 hiding (rotate)
+import Text.Megaparsec
 import qualified Data.Set as S
 
 type Point = V2 Int
 data Cardinality = East | SouthEast | SouthWest | West | NorthWest | NorthEast deriving (Show, Enum, Bounded)
 
-parseCardinality :: Parsec Void T.Text Cardinality
+parseCardinality :: Parser Cardinality
 parseCardinality = choice
   [ East <$ "e"
   , SouthEast <$ try "se"

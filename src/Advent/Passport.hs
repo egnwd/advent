@@ -13,15 +13,20 @@ module Advent.Passport
   , ecl
   , hcl
   , pid
+  , parsePassportField
+  , passportParsers
   ) where
 
+import Advent.Parsing
 import Control.Lens
+import Data.Char
 import Data.Finite
 import Data.Monoid.OneLiner (GMonoid(..))
 import Data.Semigroup (Option(..))
 import GHC.Generics
-import Prelude hiding (unlines)
 import Refined
+import Text.Megaparsec
+import Text.Megaparsec.Char
 
 import qualified Barbies as B
 import qualified Data.Text as T
@@ -49,6 +54,52 @@ deriving via GMonoid (Passport f) instance B.AllBF Semigroup f Passport => Semig
 deriving via GMonoid (Passport f) instance B.AllBF Monoid f Passport => Monoid (Passport f)
 
 type UnvalidatedPassport = Passport UnvalidatedField
-type UnvalidatedField = Const (Option T.Text)
+type UnvalidatedField    = Const (Option T.Text)
 type UnvalidatedSetter a = Setter' UnvalidatedPassport (UnvalidatedField a)
-type ValidatedPassport = Passport Identity
+type ValidatedPassport   = Passport Identity
+
+-- Passport Parsing
+parseKey k = try (string k) <* char ':'
+ident = T.pack <$> many (char '#' <|> alphaNumChar)
+
+parsePassportField :: Parser UnvalidatedPassport
+parsePassportField = parseField' "byr" byr
+         <|> parseField' "iyr" iyr
+         <|> parseField' "eyr" eyr
+         <|> parseField' "hgt" hgt
+         <|> parseField' "hcl" hcl
+         <|> parseField' "ecl" ecl
+         <|> parseField' "pid" pid
+         <|> mempty <$ (parseKey "cid" *> ident)
+           where
+             parseField' :: T.Text -> UnvalidatedSetter a -> Parser UnvalidatedPassport
+             parseField' k s = parseKey k *> ident >>= setValue s
+             setValue s = return . flip (set s) mempty . Const . pure
+
+passportParsers = Passport
+  { _byr = number >>= refineFail . fromIntegral
+  , _iyr = number >>= refineFail . fromIntegral
+  , _eyr = number >>= refineFail . fromIntegral
+  , _hgt = parseHeight
+  , _hcl = parseHair
+  , _ecl = parseEyeColor
+  , _pid = parsePid
+  }
+
+parseEyeColor =
+      AMB <$ p "amb"
+  <|> BLU <$ p "blu"
+  <|> BRN <$ p "brn"
+  <|> GRY <$ p "gry"
+  <|> GRN <$ p "grn"
+  <|> HZL <$ p "hzl"
+  <|> OTH <$ p "oth"
+    where p = try . string
+
+parseHeight = (HIn <$> try parseIn) <|> (HCm <$> parseCm)
+  where
+    parseIn = fromIntegral <$> number <* string "in" >>= refineFail
+    parseCm = fromIntegral <$> number <* string "cm" >>= refineFail
+
+parseHair = (char '#' *> takeWhileP Nothing isHexDigit) >>= refineFail . map (finite . fromIntegral . digitToInt) . T.unpack
+parsePid = takeWhileP Nothing isDigit >>= refineFail .map (finite . fromIntegral . digitToInt) . T.unpack

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ef1b5ca2b8c94a199c0a6d0e672db41415e7ad5090019263805f407d436af7fe
+-- hash: 9504b15f7e7824b358a9ad0bf7687def7e14fb185e9908e76a51c2ee115c148c
 
 name:           advent2020
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
       Advent
       Advent.Compass
       Advent.Hex
+      Advent.Parsing
       Advent.Passport
   other-modules:
       Paths_advent2020
