@@ -6,7 +6,6 @@
 module Day04 (main) where
 
 import Advent
-import Advent.Passport
 
 import Control.Lens
 import Data.Foldable
