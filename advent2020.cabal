@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3085fc00cc68c4aefb2b1fdac26558965eda679cad50efe704a7152f01f4a0c7
+-- hash: eaff32742194e80b135c25e85b20a66a62dfd1160316eff36aa37ad6ee279867
 
 name:           advent2020
 version:        0.1.0.0
@@ -39,6 +39,7 @@ library
   build-depends:
       ListZipper
     , adjunctions
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -76,6 +77,7 @@ executable day1
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -113,6 +115,7 @@ executable day10
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -150,6 +153,7 @@ executable day11
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -187,6 +191,7 @@ executable day12
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -224,6 +229,7 @@ executable day13
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -261,6 +267,7 @@ executable day14
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -298,6 +305,7 @@ executable day15
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -335,6 +343,7 @@ executable day16
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -372,6 +381,7 @@ executable day17
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -409,6 +419,7 @@ executable day18
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -446,6 +457,7 @@ executable day19
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -483,6 +495,7 @@ executable day2
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -520,6 +533,7 @@ executable day20
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -557,6 +571,7 @@ executable day21
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -594,6 +609,7 @@ executable day22
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -631,6 +647,7 @@ executable day23
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -668,6 +685,7 @@ executable day24
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -705,6 +723,7 @@ executable day25
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -742,6 +761,7 @@ executable day3
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -779,6 +799,7 @@ executable day4
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -816,6 +837,7 @@ executable day5
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -853,6 +875,7 @@ executable day6
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -890,6 +913,7 @@ executable day7
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -927,6 +951,7 @@ executable day8
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -964,6 +989,7 @@ executable day9
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5
@@ -1004,6 +1030,7 @@ test-suite advent2020-test
       ListZipper
     , adjunctions
     , advent2020
+    , arithmoi
     , array
     , barbies
     , base >=4.7 && <5

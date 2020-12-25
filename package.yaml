@@ -39,6 +39,7 @@ dependencies:
 - text
 - utility-ht
 - vector
+- arithmoi
 
 _exe-ghc-options: &exe-ghc-options
   - -threaded
