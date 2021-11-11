@@ -1,0 +1,141 @@
+name:                aoc2021
+version:             0.1.0.0
+github:              "egnwd/advent"
+license:             BSD3
+author:              "Elliot Greenwood"
+maintainer:          "hello@elliotgreenwood.co.uk"
+copyright:           "(c) Elliot Greenwood 2021"
+
+extra-source-files:
+- README.md
+
+synopsis:            "Development environment for Advent of Code challenges"
+category:            Web
+
+description: |
+  Scaffolding for an integrated development environment for Advent of Code
+  challenges.  Includes auto-runner, prompt displays and countdowns, and
+  integrated submissions.
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Wno-partial-type-signatures
+- -Wredundant-constraints
+
+default-extensions:
+- AllowAmbiguousTypes
+- ApplicativeDo
+- BangPatterns
+- BlockArguments
+- DataKinds
+- DeriveFoldable
+- DeriveFunctor
+- DeriveGeneric
+- DeriveTraversable
+- EmptyCase
+- FlexibleContexts
+- FlexibleInstances
+- FunctionalDependencies
+- GADTs
+- GeneralizedNewtypeDeriving
+- ImplicitParams
+- KindSignatures
+- LambdaCase
+- MonadComprehensions
+- MultiParamTypeClasses
+- MultiWayIf
+- NumDecimals
+- OverloadedLabels
+- PartialTypeSignatures
+- PatternGuards
+- PatternSynonyms
+- PolyKinds
+- RankNTypes
+- RecordWildCards
+- ScopedTypeVariables
+- StandaloneDeriving
+- TemplateHaskell
+- TupleSections
+- TypeApplications
+- TypeInType
+- TypeOperators
+- UndecidableInstances
+- ViewPatterns
+
+dependencies:
+- base >= 4.7 && < 5
+- mtl
+
+library:
+  source-dirs: src
+  dependencies:
+  - advent-of-code-api >= 0.2.7
+  - aeson
+  - ansi-terminal
+  - barbies
+  - bytestring
+  - containers
+  - criterion
+  - data-default-class
+  - deepseq
+  - directory
+  - filepath
+  - finite-typelits
+  - haskeline
+  - haskell-names
+  - haskell-src-exts
+  - hpack
+  - megaparsec
+  - microlens-th
+  - mtl
+  - pandoc
+  - parser-combinators
+  - profunctors
+  - template-haskell
+  - text
+  - th-abstraction
+  - time
+  - transformers
+  - yaml
+
+executables:
+  aoc2021:
+    main:                main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ansi-terminal
+    - aoc2021
+    - containers
+    - deepseq
+    - finite-typelits
+    - microlens
+    - optparse-applicative
+
+tests:
+  aoc2021-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aoc2021
+    - ansi-terminal
+
+benchmarks:
+  aoc2021-bench:
+    main: Bench.hs
+    source-dirs: bench
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -O2
+    dependencies:
+    - aoc2021
