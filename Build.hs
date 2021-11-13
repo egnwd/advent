@@ -75,11 +75,7 @@ main = shakeArgs opts $ do
           if hasRefl
             then T.pack <$> readFile' (reflOutPath d)
             else T.pack <$> readFile' (reflOutCodedPath d)
-        let yearUrls   = tUnlines' . flip foldMap otherYears $ \oy ->
-              T.pack
-                (printf "[%04d]: https://github.com/%s/advent/tree/%04d/reflections.md" oy github oy)
-                    <$ guard (oy /= year)
-            toc = flip map (M.toList days) $ \(d, hasRefl) ->
+        let toc = flip map (M.toList days) $ \(d, hasRefl) ->
               if hasRefl
                 then printf "* [Day %d](#day-%d)" d d
                 else printf "* [Day %d](#day-%d) *(no reflection yet)*" d d
@@ -87,7 +83,6 @@ main = shakeArgs opts $ do
             ctx = ctx0 <> M.fromList
               [ ("toc" , T.pack $ unlines' toc         )
               , ("body", T.intercalate "\n\n\n" bodies)
-              , ("other_links", yearUrls    )
               ]
         writeTemplate fp ctx "template/reflections.md.template"
 
