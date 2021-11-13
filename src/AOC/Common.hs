@@ -15,6 +15,7 @@ module AOC.Common (
                   , Parser(..)
                   , pSpace
                   , pWord
+                  , pDecimal
                   , parseMaybeLenient
                   , parseOrFail
                   , parseLines
@@ -29,16 +30,14 @@ import Data.Map (Map)
 import Data.Maybe
 import Data.Void
 import AOC.Util
-import qualified Data.Map             as M
-import qualified Text.Megaparsec      as P
-import qualified Text.Megaparsec.Char as P
-import qualified Data.Text            as T
+import qualified Data.Map                   as M
+import qualified Text.Megaparsec            as P
+import qualified Text.Megaparsec.Char       as P
+import qualified Text.Megaparsec.Char.Lexer as PL
+import qualified Data.Text                  as T
 
 type CharParser = P.Parsec Void String
 type Parser = P.Parsec Void T.Text
-
-pSpace :: (P.Stream s, P.Token s ~ Char, Ord e) => P.Parsec e s ()
-pSpace = P.skipMany (P.char ' ')
 
 -- | Doesn't fail if the whole imput is not consumed
 parseMaybeLenient :: P.Parsec Void s a -> s -> Maybe a
@@ -47,11 +46,17 @@ parseMaybeLenient p = eitherToMaybe . P.parse p "parseMaybeLenient"
 parseOrFail :: (P.Stream s, P.ShowErrorComponent e) => P.Parsec e s a -> s -> a
 parseOrFail p = either (error . P.errorBundlePretty) id . P.parse p "parseOrFail"
 
+pSpace :: (P.Stream s, P.Token s ~ Char, Ord e) => P.Parsec e s ()
+pSpace = P.skipMany (P.char ' ')
+
 pTok :: (P.Stream s, P.Token s ~ Char, Ord e) => P.Parsec e s a -> P.Parsec e s a
 pTok p = p <* pSpace
 
 pWord :: (P.Stream s, P.Token s ~ Char, Ord e) => P.Parsec e s String
 pWord = pTok $ P.many (P.satisfy (not . isSpace))
+
+pDecimal :: (P.Stream s, P.Token s ~ Char, Ord e, Num a) => P.Parsec e s a
+pDecimal = PL.signed P.space PL.decimal
 
 parseLines :: P.Parsec Void String a -> String -> Maybe [a]
 parseLines p = Just . mapMaybe (parseMaybeLenient p) . lines

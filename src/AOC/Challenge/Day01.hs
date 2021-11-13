@@ -22,7 +22,7 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day01 (
-    -- day01a
+    day01a
   -- , day01b
   ) where
 
