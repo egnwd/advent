@@ -3,7 +3,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 -- |
--- Module      : AOC.Interactive
+-- Module      : AOC.Run
 -- Copyright   : (c) Justin Le 2018
 -- License     : BSD3
 --
