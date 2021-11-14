@@ -11,11 +11,13 @@
 
 
 module AOC.Common (
-                    CharParser(..)
+                    (!?)
+                  , CharParser(..)
                   , Parser(..)
                   , pSpace
                   , pWord
                   , pDecimal
+                  , pTok
                   , parseMaybeLenient
                   , parseOrFail
                   , parseLines
@@ -35,6 +37,11 @@ import qualified Text.Megaparsec            as P
 import qualified Text.Megaparsec.Char       as P
 import qualified Text.Megaparsec.Char.Lexer as PL
 import qualified Data.Text                  as T
+
+(!?) :: [a] -> Int -> Maybe a
+[]     !? _ = Nothing
+(x:_ ) !? 0 = Just x
+(x:xs) !? n = x `seq` (xs !? (n - 1))
 
 type CharParser = P.Parsec Void String
 type Parser = P.Parsec Void T.Text
