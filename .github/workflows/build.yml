@@ -37,13 +37,9 @@ jobs:
       run: |
         stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
 
-    - name: Test
-      run: |
-        stack run test
-        
     - name: Update ReadMe
       run: |
-        stack ./Build.hs
+        stack --system-ghc ./Build.hs 
         
     - uses: EndBug/add-and-commit@v7
       with:
