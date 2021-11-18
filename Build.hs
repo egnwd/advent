@@ -27,11 +27,11 @@ import qualified Data.Text.Lazy                         as TL
 
 -- CONSTANTS
 year :: Integer
-year = 2021
+year = 2015
 github :: String
 github = "egnwd"
 otherYears :: S.Set Integer
-otherYears = S.fromList [2020 .. 2021]
+otherYears = S.fromList [2015]
 
 ctx0 :: M.Map Text Text
 ctx0 = M.fromList [
