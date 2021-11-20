@@ -9,13 +9,11 @@
 
 import           Control.Monad
 import           Data.Char
-import           Data.Foldable
 import           Data.List
 import           Data.Maybe
 import           Data.String.AnsiEscapeCodes.Strip.Text
 import           Data.Text                              (Text)
 import           Data.Text.Template
-import           Data.Time
 import           Development.Shake
 import           Development.Shake.FilePath
 import           Text.Printf
@@ -31,7 +29,7 @@ year = 2021
 github :: String
 github = "egnwd"
 otherYears :: S.Set Integer
-otherYears = S.fromList [2020 .. 2021]
+otherYears = S.fromList [2020..2021]
 
 ctx0 :: M.Map Text Text
 ctx0 = M.fromList [
@@ -60,14 +58,17 @@ reflOutPath :: Int -> FilePath
 reflOutPath d = "_reflections" </> printf "day%02d.md" d
 reflOutCodedPath :: Int -> FilePath
 reflOutCodedPath d = "_reflections" </> printf "day%02d-coded.md" d
-reflXmlPath :: Int -> FilePath
-reflXmlPath d = "_reflections" </> printf "day%02d.xml" d
 benchPath :: Int -> FilePath
 benchPath d = "bench-out" </> printf "day%02d.txt" d
+standaloneReflectionPath :: Int -> FilePath
+standaloneReflectionPath d = "reflections-out" </> printf "day%02d.md" d
 
 main :: IO ()
 main = shakeArgs opts $ do
-    want ["README.md", "reflections.md"]
+    action $ do
+          rd <- S.toList <$> reflectionDays
+          need $ ["README.md", "reflections.md"]
+              ++ map standaloneReflectionPath rd
 
     "reflections.md" %> \fp -> do
         days   <- getDays
@@ -86,22 +87,52 @@ main = shakeArgs opts $ do
               ]
         writeTemplate fp ctx "template/reflections.md.template"
 
+    "reflections-out/*.md" %> \fp -> do
+        rDays <- S.toList <$> reflectionDays
+        let Just d  = parseDayFp fp
+            hasRefl = not $ "coded" `isInfixOf` fp
+        refl   <- if hasRefl
+          then T.pack <$> readFile' (reflPath  d)
+          else pure "*Reflection not yet written -- please check back later!*"
+        bench  <- T.pack <$> readFile' (benchPath d)
+        let otherDays = T.intercalate " / " . flip map rDays $ \od ->
+                let linker :: String
+                    linker
+                      | od == d   = printf "%d" od
+                      | otherwise = printf "[%d][day%02d]" od od
+                in  T.pack $ printf "*%s*" linker
+            dayLinks = tUnlines' . flip mapMaybe rDays $ \od ->
+              T.pack
+                (printf "[day%02d]: https://github.com/%s/advent/blob/main/%s" od github (standaloneReflectionPath od))
+                  <$ guard (od /= d)
+            ctx = ctx0 <> M.fromList
+              [ ("daylong"   , T.pack $ printf "%02d" d)
+              , ("dayshort"  , T.pack $ printf "%d" d  )
+              , ("body"      , refl                    )
+              , ("benchmarks", bench                   )
+              , ("other_links", dayLinks               )
+              , ("other_days" , otherDays              )
+              ]
+        writeTemplate fp ctx "template/standalone-reflection.md.template"
+
     "README.md" %> \fp -> do
         days <- getDays
-        let mkRow d = case M.lookup d days of
+        let
+            mkRow :: Int -> String
+            mkRow d = case M.lookup d days of
               Just True ->
                   printf "| Day %2d    | [x][d%02dr]   | [x][d%02dg] | [x][d%02db]  |"
-                    d d d d d
+                    d d d d
               Just False ->
                   printf "| Day %2d    |             | [x][d%02dg] | [x][d%02db]  |"
-                    d d d d
+                    d d d
               Nothing    ->
                   printf "| Day %2d    |             |           |            |"
                     d
             table = unlines' $
                "| Challenge | Reflections | Code      | Benchmarks |"
              : "| --------- | ----------- | --------- | ---------- |"
-             : map mkRow [1..25]
+               : map mkRow [1..25]
             links      = unlines' . M.foldMapWithKey mkLinks $ days
             yearUrls   = tUnlines' . flip foldMap otherYears $ \oy ->
                 T.pack (printf "[%04d]: https://github.com/%s/advent/tree/%04d" oy github oy)
@@ -112,17 +143,6 @@ main = shakeArgs opts $ do
                 , ("other_links", yearUrls    )
                 ]
         writeTemplate fp ctx "template/README.md.template"
-
-    "feed.xml" %> \fp -> do
-        days <- reflectionDays
-        bodies <- forM (reverse (toList days)) $ \d ->
-          T.pack <$> readFile' (reflXmlPath d)
-        time <- utcToZonedTime (read "EST") <$> liftIO getCurrentTime
-        let ctx = ctx0 <> M.fromList
-              [ ("body", T.intercalate "\n" bodies)
-              , ("time", T.pack . formatTime defaultTimeLocale rfc822DateFormat $ time )
-              ]
-        writeTemplate fp ctx "template/feed.xml.template"
 
     "_reflections/*.md" %> \fp -> do
         let Just d  = parseDayFp fp
@@ -172,12 +192,12 @@ yearLinks  = T.intercalate " / " . flip map (S.toList otherYears) $ \oy ->
 mkLinks :: Int -> Bool -> [String]
 mkLinks d hasRef = catMaybes [
     Just $ printf "[d%02dg]: https://github.com/%s/advent/blob/main/src/AOC/Challenge/Day%02d.hs"
-      github d year d
+      d github d
   , do guard hasRef
        Just $ printf "[d%02dr]: https://github.com/%s/advent/blob/main/reflections.md#day-%d"
-         github d year d
+         d github d
   , Just $ printf "[d%02db]: https://github.com/%s/advent/blob/main/reflections.md#day-%d-benchmarks"
-      github d year d
+      d github d
   ]
 
 unlines' :: [String] -> String

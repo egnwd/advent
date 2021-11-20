@@ -1,0 +1,28 @@
+Day ${dayshort}
+===
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day${daylong}.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[all][reflections]* / ${other_days}
+
+[reflections]: https://github.com/${github}/advent/blob/main/reflections.md
+${other_links}
+
+*[Prompt][d${daylong}p]* / *[Code][d${daylong}g]*
+
+[d${daylong}p]: https://adventofcode.com/${year}/day/${dayshort}
+[d${daylong}g]: https://github.com/${github}/advent/blob/main/src/AOC/Challenge/Day${daylong}.hs
+
+${body}
+
+*[Back to all reflections for ${year}][reflections]*
+
+## Day ${dayshort} Benchmarks
+
+```
+${benchmarks}
+```
