@@ -8,36 +8,42 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 2.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 2.
 
 module AOC.Challenge.Day02 (
-    -- day02a
-  -- , day02b
+    day02a
+  , day02b
   ) where
 
-import           AOC.Prelude
+import AOC.Common
+import AOC.Solver
+import Data.Monoid
+import Text.Megaparsec.Char
+import Control.Monad.Combinators
+import Control.Lens.Fold
+import Control.Lens.Each
+import Control.Monad
+
+listTup3 :: [a] -> Maybe (a,a,a)
+listTup3 (x:y:z:_) = Just (x,y,z)
+listTup3 _         = Nothing
+
+parta (x, y, z) = let sides = [x*y, y*z, x*z] in 2 * sum sides + minimum sides
+
+partb p@(x, y, z) = let edges = [2*(x+y), 2*(y+z), 2*(z+x)] in minimum edges + productOf each p
+
+parcelParser = mapM join . sequence <$> parseLines (listTup3 <$> (pDecimal `sepBy` char 'x'))
 
 day02a :: _ :~> _
 day02a = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
-    }
+  { sParse = parcelParser
+  , sShow  = show
+  , sSolve = Just . getSum . foldMap parta
+  }
 
 day02b :: _ :~> _
 day02b = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
-    }
+  { sParse = parcelParser
+  , sShow  = show
+  , sSolve = Just . getSum . foldMap partb
+  }

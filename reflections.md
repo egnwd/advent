@@ -10,6 +10,7 @@ Table of Contents
 -----------------
 
 * [Day 1](#day-1)
+* [Day 2](#day-2) *(no reflection yet)*
 
 Day 1
 ------
@@ -63,6 +64,46 @@ time                 38.64 μs   (38.36 μs .. 38.97 μs)
                      1.000 R²   (0.999 R² .. 1.000 R²)
 mean                 38.47 μs   (38.36 μs .. 38.63 μs)
 std dev              461.1 ns   (336.7 ns .. 706.0 ns)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 2
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day02.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d02p]* / *[Code][d02g]* 
+
+[d02p]: https://adventofcode.com/2015/day/2
+[d02g]: https://github.com/egnwd/advent/blop/2015/src/AOC/Challenge/Day02.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 2 Benchmarks
+
+```
+>> Day 02a
+benchmarking...
+time                 147.9 μs   (147.7 μs .. 148.3 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 148.8 μs   (148.4 μs .. 149.3 μs)
+std dev              1.548 μs   (1.161 μs .. 1.949 μs)
+
+* parsing and formatting times excluded
+
+>> Day 02b
+benchmarking...
+time                 160.6 μs   (160.2 μs .. 160.9 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 160.4 μs   (160.2 μs .. 160.7 μs)
+std dev              838.3 ns   (651.1 ns .. 1.248 μs)
 
 * parsing and formatting times excluded
 ```
