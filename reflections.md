@@ -15,6 +15,7 @@ Table of Contents
 * [Day 4](#day-4) *(no reflection yet)*
 * [Day 5](#day-5) *(no reflection yet)*
 * [Day 6](#day-6) *(no reflection yet)*
+* [Day 7](#day-7) *(no reflection yet)*
 
 Day 1
 ------
@@ -267,5 +268,42 @@ time                 88.98 ms   (88.43 ms .. 89.60 ms)
                      1.000 R²   (1.000 R² .. 1.000 R²)
 mean                 89.88 ms   (89.54 ms .. 90.37 ms)
 std dev              647.3 μs   (412.1 μs .. 983.4 μs)
+```
+
+
+
+Day 7
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day07.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d07p]* / *[Code][d07g]* 
+
+[d07p]: https://adventofcode.com/2015/day/7
+[d07g]: https://github.com/egnwd/advent/blop/2015/src/AOC/Challenge/Day07.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 7 Benchmarks
+
+```
+>> Day 07a
+benchmarking...
+time                 5.237 ms   (5.187 ms .. 5.296 ms)
+                     0.999 R²   (0.997 R² .. 1.000 R²)
+mean                 4.959 ms   (4.878 ms .. 5.022 ms)
+std dev              209.8 μs   (155.4 μs .. 278.5 μs)
+variance introduced by outliers: 21% (moderately inflated)
+
+>> Day 07b
+benchmarking...
+time                 2.818 ms   (2.805 ms .. 2.837 ms)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 2.823 ms   (2.811 ms .. 2.848 ms)
+std dev              54.69 μs   (28.80 μs .. 108.0 μs)
 ```
 

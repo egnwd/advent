@@ -21,6 +21,7 @@ module AOC.Common (
                   , parseMaybeLenient
                   , parseOrFail
                   , parseLines
+                  , parseLinesOrError
                   , fixedPoint
                   , freqs
                   , lookupFreq
@@ -70,6 +71,9 @@ pDecimal = PL.signed P.space PL.decimal
 
 parseLines :: P.Parsec Void String a -> String -> Maybe [a]
 parseLines p = Just . mapMaybe (parseMaybeLenient p) . lines
+
+parseLinesOrError :: P.Parsec Void String a -> String -> Maybe [a]
+parseLinesOrError p = Just . map (parseOrFail p) . lines
 
 -- | Repeat a function until you get the same result twice in a row
 fixedPoint :: Eq a => (a -> a) -> a -> a

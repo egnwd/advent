@@ -1,0 +1,80 @@
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+>>>wire:d:string
+>>> 72
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+>>>wire:e:string
+>>> 507
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+>>>wire:f:string
+>>> 492
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+>>>wire:g:string
+>>> 114
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+>>>wire:h:string
+>>> 65412
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+>>>wire:i:string
+>>> 65079
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+>>>wire:x:string
+>>> 123
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+>>>wire:y:string
+>>> 456
