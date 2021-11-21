@@ -24,6 +24,8 @@ module AOC.Common (
                   , fixedPoint
                   , freqs
                   , lookupFreq
+                  , odds
+                  , evens
                   ) where
 
 import Data.Char
@@ -86,3 +88,12 @@ freqs = M.fromListWith (+) . map (,1) . toList
 -- not found
 lookupFreq :: Ord a => a -> Map a Int -> Int
 lookupFreq = M.findWithDefault 0
+
+odds :: [a] -> [a]
+odds [] = []
+odds (x:xs) = x:evens xs
+
+evens :: [a] -> [a]
+evens [] = []
+evens (x:xs) = odds xs
+
