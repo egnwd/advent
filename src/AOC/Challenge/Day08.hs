@@ -8,36 +8,58 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 8.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 8.
 
 module AOC.Challenge.Day08 (
-    -- day08a
-  -- , day08b
+    day08a
+  , day08b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver ((:~>)(..))
+import AOC.Common (CharParser, parseLines)
+import Text.Megaparsec.Char (char, hexDigitChar, string)
+import Text.Megaparsec (try, noneOf)
+import Control.Monad.Combinators (many, choice, between, (<|>))
+import Data.Functor (($>))
+import Data.Monoid (getSum)
 
-day08a :: _ :~> _
+
+quoted = between (char '"') (char '"')
+
+parseDecode :: CharParser Int
+parseDecode = sum <$> quoted (many (choice [pNormal, pEscaped, pHex]))
+
+pNormal :: CharParser Int
+pNormal = 1 <$ noneOf "\\\""
+
+pEscaped :: CharParser Int
+pEscaped = 1 <$ (try (string "\\\\") <|> try (string "\\\""))
+
+pHex :: CharParser Int
+pHex = try (string "\\x") *> hexDigitChar *> hexDigitChar $> 1
+
+size = length . concat . lines
+
+decode :: String -> Maybe Int
+decode = fmap sum . parseLines parseDecode
+
+encode :: String -> Maybe Int
+encode = Just . getSum . foldMap ((2 <>) . foldMap encode') . lines
+    where
+        encode' '"'  = 2
+        encode' '\\' = 2
+        encode' _    = 1
+
+day08a :: String :~> Int
 day08a = MkSol
     { sParse = Just
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \a -> (`subtract` size a) <$> decode a
     }
 
-day08b :: _ :~> _
+day08b :: String :~> Int
 day08b = MkSol
     { sParse = Just
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \a -> subtract (size a) <$> encode a
     }
