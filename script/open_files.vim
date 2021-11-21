@@ -19,7 +19,6 @@
 
 let s:year = 2015
 
-
 function! OpenAoC(day)
     let l:daystr  = printf("%02d",a:day)
     let l:yearstr = printf("%04d",s:year)
@@ -38,9 +37,7 @@ endfunction
 
 let s:buffday = str2nr(matchstr(expand('%:t:r'), '\d\+'))
 
-if (s:buffday == 0)
-    echo "no valid file found in buffer; use :call OpenAoC(day) to open a day"
-else
+if (s:buffday != 0)
     echo "found day" . string(s:buffday)
     call OpenAoC(s:buffday)
 endif
