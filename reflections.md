@@ -13,6 +13,7 @@ Table of Contents
 * [Day 2](#day-2) *(no reflection yet)*
 * [Day 3](#day-3) *(no reflection yet)*
 * [Day 4](#day-4) *(no reflection yet)*
+* [Day 5](#day-5) *(no reflection yet)*
 
 Day 1
 ------
@@ -186,6 +187,46 @@ time                 18.93 s    (18.67 s .. 19.28 s)
 mean                 19.01 s    (18.97 s .. 19.09 s)
 std dev              79.05 ms   (2.900 ms .. 94.63 ms)
 variance introduced by outliers: 19% (moderately inflated)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 5
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day05.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d05p]* / *[Code][d05g]* 
+
+[d05p]: https://adventofcode.com/2015/day/5
+[d05g]: https://github.com/egnwd/advent/blop/2015/src/AOC/Challenge/Day05.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 5 Benchmarks
+
+```
+>> Day 05a
+benchmarking...
+time                 1.860 ms   (1.855 ms .. 1.867 ms)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 1.866 ms   (1.859 ms .. 1.880 ms)
+std dev              32.59 μs   (19.29 μs .. 49.78 μs)
+
+* parsing and formatting times excluded
+
+>> Day 05b
+benchmarking...
+time                 766.2 μs   (764.5 μs .. 768.8 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 767.8 μs   (765.5 μs .. 771.6 μs)
+std dev              9.196 μs   (4.978 μs .. 15.17 μs)
 
 * parsing and formatting times excluded
 ```

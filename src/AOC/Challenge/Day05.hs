@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day05
 -- License     : BSD3
@@ -8,36 +5,47 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 5.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 5.
 
 module AOC.Challenge.Day05 (
-    -- day05a
-  -- , day05b
+    day05a
+  , day05b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver
+import AOC.Common
+import Data.List
 
-day05a :: _ :~> _
+nice :: String -> Bool
+nice w = noBadSets && atLeastTwoVowels && doubleLetter w
+  where
+    atLeastTwoVowels = countTrue (`elem` "aeiou") w >= 3
+    doubleLetter (x : y : _) | x == y = True
+    doubleLetter (_ : xs) = doubleLetter xs
+    doubleLetter [] = False
+    noBadSets = not . any (`isInfixOf` w) $ ["ab", "cd", "pq", "xy"]
+
+nice2 :: String -> Bool
+nice2 w = hasRepeat w && doublePair w
+  where
+    hasRepeat (x : _ : y : _) | x == y = True
+    hasRepeat (_ : xs) = hasRepeat xs
+    hasRepeat [] = False
+
+    doublePair (x : y : xs) | [x,y] `isInfixOf` xs = True
+    doublePair (_ : xs) = doublePair xs
+    doublePair [] = False
+
+day05a :: [String] :~> Int
 day05a = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
-    }
+  { sParse = parseLines pWord
+  , sShow  = show
+  , sSolve = Just . countTrue nice
+  }
 
-day05b :: _ :~> _
+day05b :: [String] :~> Int
 day05b = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
-    }
+  { sParse = parseLines pWord
+  , sShow  = show
+  , sSolve = Just . countTrue nice2
+  }

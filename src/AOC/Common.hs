@@ -26,6 +26,7 @@ module AOC.Common (
                   , lookupFreq
                   , odds
                   , evens
+                  , countTrue
                   ) where
 
 import Data.Char
@@ -97,3 +98,6 @@ evens :: [a] -> [a]
 evens [] = []
 evens (_:xs) = odds xs
 
+-- | Count the number of items in a container where the predicate is true.
+countTrue :: Foldable f => (a -> Bool) -> f a -> Int
+countTrue p = length . filter p . toList
