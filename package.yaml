@@ -87,6 +87,7 @@ library:
   - haskell-src-exts
   - hpack
   - lens
+  - linear
   - megaparsec
   - microlens-th
   - mtl
