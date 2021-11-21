@@ -12,8 +12,8 @@
 
 module AOC.Common (
                     (!?)
-                  , CharParser(..)
-                  , Parser(..)
+                  , CharParser
+                  , Parser
                   , pSpace
                   , pWord
                   , pDecimal
@@ -95,5 +95,5 @@ odds (x:xs) = x:evens xs
 
 evens :: [a] -> [a]
 evens [] = []
-evens (x:xs) = odds xs
+evens (_:xs) = odds xs
 

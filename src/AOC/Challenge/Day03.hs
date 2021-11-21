@@ -66,14 +66,14 @@ partb cs = S.size $ S.union santaGlobe roboGlobe
     santaGlobe = view visited $ execState (mapM solve (odds cs)) startGlobe
     roboGlobe  = view visited $ execState (mapM solve (evens cs)) startGlobe
 
-day03a :: _ :~> _
+day03a :: [Compass] :~> Int
 day03a = MkSol
     { sParse = parseMaybeLenient (many parseDirection)
     , sShow  = show
     , sSolve = Just . parta
     }
 
-day03b :: _ :~> _
+day03b :: [Compass] :~> Int
 day03b = MkSol
     { sParse = parseMaybeLenient (many parseDirection)
     , sShow  = show
