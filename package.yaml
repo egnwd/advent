@@ -73,6 +73,7 @@ library:
   - advent-of-code-api >= 0.2.7
   - aeson
   - ansi-terminal
+  - array
   - barbies
   - bytestring
   - containers
