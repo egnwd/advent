@@ -1,0 +1,18 @@
+1
+>>>iterations:1:int
+>>> 2
+11
+>>>iterations:1:int
+>>> 2
+21
+>>>iterations:1:int
+>>> 4
+1211
+>>>iterations:1:int
+>>> 6
+111221
+>>>iterations:1:int
+>>> 6
+1
+>>>iterations:5:int
+>>> 6
