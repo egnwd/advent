@@ -24,6 +24,7 @@ import Data.Functor (($>))
 import Data.Monoid (getSum)
 
 
+quoted :: CharParser a -> CharParser a
 quoted = between (char '"') (char '"')
 
 parseDecode :: CharParser Int
@@ -38,6 +39,7 @@ pEscaped = 1 <$ (try (string "\\\\") <|> try (string "\\\""))
 pHex :: CharParser Int
 pHex = try (string "\\x") *> hexDigitChar *> hexDigitChar $> 1
 
+size :: String -> Int
 size = length . concat . lines
 
 decode :: String -> Maybe Int

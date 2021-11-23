@@ -14,15 +14,14 @@ module AOC.Challenge.Day07 (
 
 import AOC.Solver ((:~>)(..), dyno_)
 import AOC.Common
-import AOC.Util
-import Data.Bits
-import Data.Word
-import Control.Lens
+    ( CharParser, pTok, pWord, pDecimal, parseLinesOrError )
+import Data.Bits ( Bits(complement, (.&.), (.|.), shiftL, shiftR) )
+import Data.Word ( Word16 )
 import Data.Map (Map, (!))
 import qualified Data.Map as M
-import Control.Monad.Combinators
+import Control.Monad.Combinators ( (<|>), choice )
 import Text.Megaparsec (try)
-import Text.Megaparsec.Char
+import Text.Megaparsec.Char ( string )
 
 type Wire = String
 type Signal = Word16
@@ -79,7 +78,7 @@ parse :: CharParser Instruction
 parse = choice [pSet, pBinOp, pNot]
 
 parta :: Wire -> Map Wire Command -> Maybe Signal
-parta a is = M.lookup a circuit
+parta w is = M.lookup w circuit
     where
         circuit = M.map eval is
         eval (Set src)           = evalInput src
@@ -88,12 +87,12 @@ parta a is = M.lookup a circuit
         eval (LShift srcA srcB)  = shiftL (evalInput srcA) (fromIntegral . evalInput $ srcB)
         eval (RShift srcA srcB)  = shiftR (evalInput srcA) (fromIntegral . evalInput $ srcB)
         eval (Not src)           = complement . evalInput $ src
-        evalInput (Constant w)   = w
-        evalInput (Name w)       = circuit ! w
+        evalInput (Constant w')   = w'
+        evalInput (Name w')       = circuit ! w'
         bin op a b = evalInput a `op` evalInput b
 
 partb :: Wire -> Map Wire Command -> Maybe Signal
-partb a is = (Set . Constant <$> parta a is) >>= (\a' -> parta a (M.insert "b" a' is))
+partb a is = parta a is >>= (\a' -> parta a (M.insert "b" a' is)) . Set . Constant
 
 day07a :: Map Wire Command :~> Signal
 day07a = MkSol
