@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day13
 -- License     : BSD3
@@ -8,36 +5,72 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 13.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 13.
 
 module AOC.Challenge.Day13 (
-    -- day13a
-  -- , day13b
+    day13a
+  , day13b
   ) where
 
-import           AOC.Prelude
+import AOC.Common (parseLines, pWord, pDecimal, pTok, CharParser)
+import AOC.Solver ((:~>)(..))
+import Control.Monad ((<=<))
+import Data.List (permutations)
+import Data.Map (Map)
+import Data.Maybe (fromMaybe)
+import Data.Sequence (Seq((:<|)), (<|))
+import Text.Megaparsec
+import Text.Megaparsec.Char
+import qualified Data.Map as M
+import qualified Data.Sequence as S
 
-day13a :: _ :~> _
+type Seating = Map String (Map String Int)
+
+parseHappinessRow :: CharParser (String, [(String, Int)])
+parseHappinessRow = do
+    a <- pWord
+    pTok $ string "would"
+    m <- (1 <$ pTok (string "gain")) <|> (-1 <$ pTok (string "lose"))
+    h <- pTok pDecimal
+    pTok $ string "happiness units by sitting next to"
+    b <- init <$> pWord
+    pure (a, [(b, m * h)])
+
+buildSeating :: [(String, [(String, Int)])] -> Seating
+buildSeating = M.map M.fromList . M.fromListWith (++)
+
+getHappiness :: String -> String -> Seating -> Int
+getHappiness a b = fromMaybe 0 . (M.lookup b <=< M.lookup a)
+
+happiness :: Seating -> Seq String -> Int
+happiness h (l :<| m :<| r :<| rs) = getHappiness m l h + getHappiness m r h + happiness h (m <| r <| rs)
+happiness _ _ = 0
+
+solve :: Seating -> Int
+solve s = mx
+    where
+        people = M.keys s
+        focus = head people
+        possibilities = map (S.cycleTaking (length people + 2) . S.fromList) . filter ((==focus) . head) $ permutations people
+        mx = maximum $ map (happiness s) possibilities
+
+withMe :: Seating -> Seating
+withMe s = s'
+    where
+        people = M.keys s
+        me = "Elliot"
+        s' = M.insert me (M.fromList $ zip people (repeat 0)) . M.map (M.insert me 0) $ s
+
+day13a :: Seating :~> Int
 day13a = MkSol
-    { sParse = Just
+    { sParse = fmap buildSeating . parseLines parseHappinessRow
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . solve
     }
 
-day13b :: _ :~> _
+day13b :: Seating :~> Int
 day13b = MkSol
-    { sParse = Just
+    { sParse = fmap buildSeating . parseLines parseHappinessRow
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . solve . withMe
     }
