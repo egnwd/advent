@@ -41,7 +41,7 @@ Check out the [reflections][] --- more info below!
 | Day 11    |             |           |            |
 | Day 12    |             | [x][d12g] | [x][d12b]  |
 | Day 13    |             | [x][d13g] | [x][d13b]  |
-| Day 14    |             |           |            |
+| Day 14    |             | [x][d14g] | [x][d14b]  |
 | Day 15    |             |           |            |
 | Day 16    |             |           |            |
 | Day 17    |             |           |            |
@@ -300,3 +300,5 @@ All networking features are powered by *[advent-of-code-api][]*.
 [d12b]: https://github.com/egnwd/advent/blob/main/reflections.md#day-12-benchmarks
 [d13g]: https://github.com/egnwd/advent/blob/main/src/AOC/Challenge/Day13.hs
 [d13b]: https://github.com/egnwd/advent/blob/main/reflections.md#day-13-benchmarks
+[d14g]: https://github.com/egnwd/advent/blob/main/src/AOC/Challenge/Day14.hs
+[d14b]: https://github.com/egnwd/advent/blob/main/reflections.md#day-14-benchmarks
