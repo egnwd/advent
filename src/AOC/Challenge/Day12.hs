@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day12
@@ -8,36 +7,50 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 12.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 12.
 
 module AOC.Challenge.Day12 (
-    -- day12a
-  -- , day12b
+    day12a
+  , day12b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver ((:~>)(..))
+import AOC.Common (CharParser, parseMaybeLenient, pDecimal)
+import Text.Megaparsec (many, takeRest, takeWhileP, try)
+import Data.Aeson (Value(..), decode)
+import Data.Scientific (floatingOrInteger)
+import Data.ByteString.Lazy.UTF8 as BLU (fromString)
+import Data.Either (fromRight)
+import Data.Char (isDigit)
+
+parseNumbers :: CharParser [Integer]
+parseNumbers = many (try parseNumber) <* takeRest
+    where
+        parseNumber :: CharParser Integer
+        parseNumber = takeWhileP Nothing (\c -> not $ c == '-' || isDigit c) *> pDecimal
+
+walkNonRed :: Value -> [Int]
+walkNonRed (Number n) = [fromRight 0 (floatingOrInteger n :: Either Double Int)]
+walkNonRed (Array a) = foldMap walkNonRed a
+walkNonRed (Object o)
+    | foldr hasRed False o = []
+    | otherwise = foldMap walkNonRed o
+walkNonRed _ = []
+
+hasRed :: Value -> Bool -> Bool
+hasRed (String "red") = const True
+hasRed _ = id
 
 day12a :: _ :~> _
 day12a = MkSol
-    { sParse = Just
+    { sParse = parseMaybeLenient parseNumbers
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum
     }
 
-day12b :: _ :~> _
+day12b :: Value :~> _
 day12b = MkSol
-    { sParse = Just
+    { sParse = decode . BLU.fromString
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . walkNonRed
     }

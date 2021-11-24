@@ -96,6 +96,7 @@ library:
   - pandoc
   - parser-combinators
   - profunctors
+  - scientific
   - template-haskell
   - text
   - th-abstraction
