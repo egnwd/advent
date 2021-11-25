@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day17
 -- License     : BSD3
@@ -8,36 +5,35 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 17.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 17.
 
 module AOC.Challenge.Day17 (
-    -- day17a
-  -- , day17b
+    day17a
+  , day17b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver ((:~>)(..), dyno_)
+import AOC.Common (parseLines, pDecimal, countTrue)
 
-day17a :: _ :~> _
+solve :: Int -> [Int] -> [[Int]]
+solve _ [] = []
+solve target (c : cs)
+  | c > target = solve target cs
+  | c == target = [c] : solve target cs
+  | otherwise = map (c:) (solve (target - c) cs) ++ solve target cs
+
+day17a :: [Int] :~> _
 day17a = MkSol
-    { sParse = Just
+    { sParse = parseLines pDecimal
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . length . solve (dyno_ "litres" 150)
     }
 
 day17b :: _ :~> _
 day17b = MkSol
-    { sParse = Just
+    { sParse = parseLines pDecimal
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \cs -> let pos = solve (dyno_ "litres" 150) cs
+                          mn = minimum $ map length pos
+                       in Just $ countTrue ((==mn) . length) pos
     }
