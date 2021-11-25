@@ -22,6 +22,7 @@ Table of Contents
 * [Day 13](#day-13) *(no reflection yet)*
 * [Day 14](#day-14) *(no reflection yet)*
 * [Day 15](#day-15) *(no reflection yet)*
+* [Day 16](#day-16) *(no reflection yet)*
 
 Day 1
 ------
@@ -549,5 +550,43 @@ time                 52.64 ms   (52.13 ms .. 53.88 ms)
                      0.999 R²   (0.998 R² .. 1.000 R²)
 mean                 53.95 ms   (53.44 ms .. 54.56 ms)
 std dev              1.075 ms   (832.4 μs .. 1.302 ms)
+```
+
+
+
+Day 16
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day16.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d16p]* / *[Code][d16g]* 
+
+[d16p]: https://adventofcode.com/2015/day/16
+[d16g]: https://github.com/egnwd/advent/blop/2015/src/AOC/Challenge/Day16.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 16 Benchmarks
+
+```
+>> Day 16a
+benchmarking...
+time                 5.241 ms   (5.174 ms .. 5.314 ms)
+                     0.998 R²   (0.996 R² .. 0.999 R²)
+mean                 5.247 ms   (5.182 ms .. 5.308 ms)
+std dev              193.5 μs   (148.1 μs .. 253.5 μs)
+variance introduced by outliers: 17% (moderately inflated)
+
+>> Day 16b
+benchmarking...
+time                 5.625 ms   (5.307 ms .. 6.302 ms)
+                     0.923 R²   (0.831 R² .. 0.999 R²)
+mean                 5.445 ms   (5.307 ms .. 6.054 ms)
+std dev              725.9 μs   (90.12 μs .. 1.618 ms)
+variance introduced by outliers: 73% (severely inflated)
 ```
 
