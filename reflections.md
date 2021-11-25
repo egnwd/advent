@@ -21,6 +21,7 @@ Table of Contents
 * [Day 12](#day-12) *(no reflection yet)*
 * [Day 13](#day-13) *(no reflection yet)*
 * [Day 14](#day-14) *(no reflection yet)*
+* [Day 15](#day-15) *(no reflection yet)*
 
 Day 1
 ------
@@ -511,5 +512,42 @@ time                 16.89 ms   (16.81 ms .. 16.99 ms)
                      1.000 R²   (1.000 R² .. 1.000 R²)
 mean                 16.94 ms   (16.86 ms .. 17.04 ms)
 std dev              214.3 μs   (106.3 μs .. 328.1 μs)
+```
+
+
+
+Day 15
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day15.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d15p]* / *[Code][d15g]* 
+
+[d15p]: https://adventofcode.com/2015/day/15
+[d15g]: https://github.com/egnwd/advent/blop/2015/src/AOC/Challenge/Day15.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 15 Benchmarks
+
+```
+>> Day 15a
+benchmarking...
+time                 357.9 ms   (347.0 ms .. 370.3 ms)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 363.0 ms   (360.4 ms .. 365.5 ms)
+std dev              3.266 ms   (1.549 ms .. 3.922 ms)
+variance introduced by outliers: 19% (moderately inflated)
+
+>> Day 15b
+benchmarking...
+time                 52.64 ms   (52.13 ms .. 53.88 ms)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 53.95 ms   (53.44 ms .. 54.56 ms)
+std dev              1.075 ms   (832.4 μs .. 1.302 ms)
 ```
 
