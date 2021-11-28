@@ -28,16 +28,10 @@ module AOC.Common (
                   , odds
                   , evens
                   , countTrue
-                  , Point
-                  , parseAsciiMap
-                  , parseAsciiSet
-                  , displayAsciiMap
-                  , displayAsciiSet
-                  , inBoundingBox
-                  , boundingBox
+                  , pickUnique
+                  , module AOC
                   ) where
 
-import           Control.Applicative
 import           Data.Monoid
 import           Data.Char
 import           Data.Foldable
@@ -45,21 +39,27 @@ import           Data.Semigroup
 import           Data.Semigroup.Foldable
 import           Data.Map (Map)
 import           Data.Set (Set)
+import           Data.List
 import           Data.Maybe
+import           Data.Traversable
 import           Data.Void
 import           Linear
 import           AOC.Util
 import           Control.Lens
+import           Control.Monad.State
 import           Data.Set.Lens
 import           Data.Map.Lens
 import           Data.Tuple.Strict
+import           AOC.Common.Point           as AOC
 import qualified Data.Map.NonEmpty          as NEM
-import qualified Data.Set.NonEmpty          as NES
 import qualified Data.Map                   as M
+import qualified Data.Set                   as S
 import qualified Text.Megaparsec            as P
 import qualified Text.Megaparsec.Char       as P
 import qualified Text.Megaparsec.Char.Lexer as PL
 import qualified Data.Text                  as T
+
+-- Some fns from: https://github.com/mstksg/advent-of-code-2020/blob/165461e51f991ac44bc9f8acc5c4e17caf83c13b/src/AOC/Common.hs
 
 (!?) :: [a] -> Int -> Maybe a
 []     !? _ = Nothing
@@ -125,59 +125,12 @@ evens (_:xs) = odds xs
 countTrue :: Foldable f => (a -> Bool) -> f a -> Int
 countTrue p = length . filter p . toList
 
--- https://github.com/mstksg/advent-of-code-2020/blob/165461e51f991ac44bc9f8acc5c4e17caf83c13b/src/AOC/Common/Point.hs
-
-type Point = V2 Int
-
-boundingBox :: (Foldable1 f, Applicative g, Ord a) => f (g a) -> V2 (g a)
-boundingBox = (\(T2 (Ap mn) (Ap mx)) -> V2 (getMin <$> mn) (getMax <$> mx))
-            . foldMap1 (\p -> T2 (Ap (Min <$> p)) (Ap (Max <$> p)))
-
-parseAsciiMap
-    :: (Char -> Maybe a)
-    -> String
-    -> Map Point a
-parseAsciiMap f = toMapOf (asciiGrid <. folding f)
-
-parseAsciiSet
-    :: (Char -> Bool)
-    -> String
-    -> Set Point
-parseAsciiSet f = setOf (asciiGrid . filtered f . asIndex)
-
-asciiGrid :: IndexedTraversal Point String [a] Char a
-asciiGrid = conjoined traverse $ \z ->
-      sequenceA
-    . concat
-    . zipWith (\y -> zipWith (\x -> indexed z (V2 x y :: Point)) [0..]) [0..]
-    . lines
-
-displayAsciiMap
-    :: Char             -- ^ default tile
-    -> Map Point Char   -- ^ tile map
-    -> String
-displayAsciiMap d (NEM.IsNonEmpty mp) = unlines
-    [ [ NEM.findWithDefault d (V2 x y) mp
-      | x <- [xMin .. xMax]
-      ]
-    | y <- [yMin .. yMax]
-    ]
+-- | Picks unique combinations of elements from the input as maps
+pickUnique :: (Ord k, Ord a) => [(k, Set a)] -> [Map k a]
+pickUnique mp = flip evalStateT S.empty $ do
+    fmap M.fromList . for opts . traverse $ \poss -> do
+      seen <- get
+      pick <- lift $ S.toList (poss `S.difference` seen)
+      pick <$ modify (S.insert pick)
   where
-    V2 xMin yMin `V2` V2 xMax yMax = boundingBox $ NEM.keysSet mp
-displayAsciiMap _ _ = ""
-
-displayAsciiSet
-    :: Char      -- ^ missing tile
-    -> Char      -- ^ present tile
-    -> Set Point -- ^ tile set
-    -> String
-displayAsciiSet x y = displayAsciiMap x . M.fromSet (const y)
-
-inBoundingBox
-    :: (Applicative g, Foldable g, Ord a)
-    => V2 (g a)
-    -> g a
-    -> Bool
-inBoundingBox (V2 mn mx) x = and $ go <$> x <*> mn <*> mx
-  where
-    go x' mn' mx' = x' >= mn' && x' <= mx'
+    opts = sortOn (S.size . snd) mp

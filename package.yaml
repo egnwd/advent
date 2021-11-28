@@ -73,10 +73,12 @@ library:
   - advent-of-code-api >= 0.2.7
   - aeson
   - ansi-terminal
+  - array
   - barbies
   - bytestring
   - containers
   - criterion
+  - cryptohash-md5
   - data-default-class
   - deepseq
   - directory
@@ -86,17 +88,24 @@ library:
   - haskell-names
   - haskell-src-exts
   - hpack
+  - lens
+  - linear
   - megaparsec
   - microlens-th
   - mtl
+  - nonempty-containers
   - pandoc
   - parser-combinators
   - profunctors
+  - scientific
+  - semigroupoids
+  - strict-tuple
   - template-haskell
   - text
   - th-abstraction
   - time
   - transformers
+  - utf8-string
   - yaml
 
 executables:
