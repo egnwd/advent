@@ -29,7 +29,7 @@ year = 2021
 github :: String
 github = "egnwd"
 otherYears :: S.Set Integer
-otherYears = S.fromList [2020..2021]
+otherYears = S.fromList [2015, 2020, 2021]
 
 ctx0 :: M.Map Text Text
 ctx0 = M.fromList [
@@ -103,7 +103,7 @@ main = shakeArgs opts $ do
                 in  T.pack $ printf "*%s*" linker
             dayLinks = tUnlines' . flip mapMaybe rDays $ \od ->
               T.pack
-                (printf "[day%02d]: https://github.com/%s/advent/blob/main/%s" od github (standaloneReflectionPath od))
+                (printf "[day%02d]: https://github.com/%s/advent/blob/%d/%s" od github year (standaloneReflectionPath od))
                   <$ guard (od /= d)
             ctx = ctx0 <> M.fromList
               [ ("daylong"   , T.pack $ printf "%02d" d)
@@ -191,13 +191,13 @@ yearLinks  = T.intercalate " / " . flip map (S.toList otherYears) $ \oy ->
 
 mkLinks :: Int -> Bool -> [String]
 mkLinks d hasRef = catMaybes [
-    Just $ printf "[d%02dg]: https://github.com/%s/advent/blob/main/src/AOC/Challenge/Day%02d.hs"
-      d github d
+    Just $ printf "[d%02dg]: https://github.com/%s/advent/blob/%d/src/AOC/Challenge/Day%02d.hs"
+      d github year d
   , do guard hasRef
-       Just $ printf "[d%02dr]: https://github.com/%s/advent/blob/main/reflections.md#day-%d"
-         d github d
-  , Just $ printf "[d%02db]: https://github.com/%s/advent/blob/main/reflections.md#day-%d-benchmarks"
-      d github d
+       Just $ printf "[d%02dr]: https://github.com/%s/advent/blob/%d/reflections.md#day-%d"
+         d github year d
+  , Just $ printf "[d%02db]: https://github.com/%s/advent/blob/%d/reflections.md#day-%d-benchmarks"
+      d github year d
   ]
 
 unlines' :: [String] -> String
