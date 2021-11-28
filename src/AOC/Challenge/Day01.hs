@@ -13,27 +13,27 @@ module AOC.Challenge.Day01 (
   ) where
 
 import AOC.Solver ((:~>)(..))
-import Data.Bifunctor (bimap)
+import Data.Monoid (Sum(..))
 
 day01a :: [Int] :~> Int
 day01a = MkSol
-    { sParse = Just . map getValue
+    { sParse = traverse getValue
     , sShow  = show
     , sSolve = Just . sum
     }
 
 day01b :: [Int] :~> Int
 day01b = MkSol
-    { sParse = Just . map getValue
+    { sParse = traverse getValue
     , sShow  = show
-    , sSolve = Just . snd . foldl solveb (0,0)
+    , sSolve = Just . getSum . snd . foldl solveb (0,0)
     }
 
-getValue :: Char -> Int
-getValue '(' = 1
-getValue ')' = -1
-getValue _ = undefined
+getValue :: Char -> Maybe Int
+getValue '(' = Just 1
+getValue ')' = Just (-1)
+getValue _   = Nothing
 
-solveb :: (Int, Int) -> Int -> (Int, Int)
+solveb :: (Sum Int, Sum Int) -> Int -> (Sum Int, Sum Int)
 solveb p@(-1, _) _ = p
-solveb p c = bimap (+c) (+1) p
+solveb p c = (Sum c, Sum 1) <> p
