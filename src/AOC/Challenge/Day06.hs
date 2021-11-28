@@ -29,8 +29,6 @@ import Data.Ix
 import Control.Monad
 import Control.Applicative
 
-type Point = V2 Int
-
 data OpCode = TurnOn | TurnOff | Toggle deriving (Show, Eq)
 
 data Instruction = I { op :: OpCode, box :: V2 Point } deriving (Show, Eq)

@@ -93,10 +93,13 @@ library:
   - megaparsec
   - microlens-th
   - mtl
+  - nonempty-containers
   - pandoc
   - parser-combinators
   - profunctors
   - scientific
+  - semigroupoids
+  - strict-tuple
   - template-haskell
   - text
   - th-abstraction

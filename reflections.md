@@ -24,6 +24,7 @@ Table of Contents
 * [Day 15](#day-15) *(no reflection yet)*
 * [Day 16](#day-16) *(no reflection yet)*
 * [Day 17](#day-17) *(no reflection yet)*
+* [Day 18](#day-18) *(no reflection yet)*
 
 Day 1
 ------
@@ -628,6 +629,48 @@ time                 726.9 μs   (724.8 μs .. 728.9 μs)
                      1.000 R²   (1.000 R² .. 1.000 R²)
 mean                 728.1 μs   (725.7 μs .. 733.7 μs)
 std dev              13.03 μs   (7.213 μs .. 23.66 μs)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 18
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day18.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d18p]* / *[Code][d18g]* 
+
+[d18p]: https://adventofcode.com/2015/day/18
+[d18g]: https://github.com/egnwd/advent/blop/2015/src/AOC/Challenge/Day18.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 18 Benchmarks
+
+```
+>> Day 18a
+benchmarking...
+time                 2.704 s    (2.646 s .. 2.791 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 2.661 s    (2.647 s .. 2.683 s)
+std dev              21.21 ms   (86.64 μs .. 25.95 ms)
+variance introduced by outliers: 19% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 18b
+benchmarking...
+time                 2.762 s    (2.746 s .. 2.781 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 2.764 s    (2.760 s .. 2.767 s)
+std dev              4.972 ms   (2.205 ms .. 6.747 ms)
+variance introduced by outliers: 19% (moderately inflated)
 
 * parsing and formatting times excluded
 ```

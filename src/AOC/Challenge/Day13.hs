@@ -6,35 +6,35 @@
 -- Portability : non-portable
 --
 -- Day 13.
+module AOC.Challenge.Day13
+  ( day13a,
+    day13b,
+  )
+where
 
-module AOC.Challenge.Day13 (
-    day13a
-  , day13b
-  ) where
-
-import AOC.Common (parseLines, pWord, pDecimal, pTok, CharParser)
-import AOC.Solver ((:~>)(..))
+import AOC.Common (CharParser, pDecimal, pTok, pWord, parseLines)
+import AOC.Solver ((:~>) (..))
 import Control.Monad ((<=<))
 import Data.List (permutations)
 import Data.Map (Map)
-import Data.Maybe (fromMaybe)
-import Data.Sequence (Seq((:<|)), (<|))
-import Text.Megaparsec
-import Text.Megaparsec.Char
 import qualified Data.Map as M
+import Data.Maybe (fromMaybe)
+import Data.Sequence (Seq ((:<|)), (<|))
 import qualified Data.Sequence as S
+import Text.Megaparsec ((<|>))
+import Text.Megaparsec.Char (string)
 
 type Seating = Map String (Map String Int)
 
 parseHappinessRow :: CharParser (String, [(String, Int)])
 parseHappinessRow = do
-    a <- pWord
-    pTok $ string "would"
-    m <- (1 <$ pTok (string "gain")) <|> (-1 <$ pTok (string "lose"))
-    h <- pTok pDecimal
-    pTok $ string "happiness units by sitting next to"
-    b <- init <$> pWord
-    pure (a, [(b, m * h)])
+  a <- pWord
+  pTok $ string "would"
+  m <- (1 <$ pTok (string "gain")) <|> (-1 <$ pTok (string "lose"))
+  h <- pTok pDecimal
+  pTok $ string "happiness units by sitting next to"
+  b <- init <$> pWord
+  pure (a, [(b, m * h)])
 
 buildSeating :: [(String, [(String, Int)])] -> Seating
 buildSeating = M.map M.fromList . M.fromListWith (++)
@@ -48,29 +48,31 @@ happiness _ _ = 0
 
 solve :: Seating -> Int
 solve s = mx
-    where
-        people = M.keys s
-        focus = head people
-        possibilities = map (S.cycleTaking (length people + 2) . S.fromList) . filter ((==focus) . head) $ permutations people
-        mx = maximum $ map (happiness s) possibilities
+  where
+    people = M.keys s
+    focus = head people
+    possibilities = map (S.cycleTaking (length people + 2) . S.fromList) . filter ((== focus) . head) $ permutations people
+    mx = maximum $ map (happiness s) possibilities
 
 withMe :: Seating -> Seating
 withMe s = s'
-    where
-        people = M.keys s
-        me = "Elliot"
-        s' = M.insert me (M.fromList $ zip people (repeat 0)) . M.map (M.insert me 0) $ s
+  where
+    people = M.keys s
+    me = "Elliot"
+    s' = M.insert me (M.fromList $ zip people (repeat 0)) . M.map (M.insert me 0) $ s
 
 day13a :: Seating :~> Int
-day13a = MkSol
-    { sParse = fmap buildSeating . parseLines parseHappinessRow
-    , sShow  = show
-    , sSolve = Just . solve
+day13a =
+  MkSol
+    { sParse = fmap buildSeating . parseLines parseHappinessRow,
+      sShow = show,
+      sSolve = Just . solve
     }
 
 day13b :: Seating :~> Int
-day13b = MkSol
-    { sParse = fmap buildSeating . parseLines parseHappinessRow
-    , sShow  = show
-    , sSolve = Just . solve . withMe
+day13b =
+  MkSol
+    { sParse = fmap buildSeating . parseLines parseHappinessRow,
+      sShow = show,
+      sSolve = Just . solve . withMe
     }
