@@ -166,7 +166,10 @@ main = shakeArgs opts $ do
 
     "clean" ~> do
       removeFilesAfter "_reflections" ["//*"]
-      -- removeFilesAfter "bench-out" ["//*"]
+      removeFilesAfter "data" ["//*"]
+      removeFilesAfter "logs" ["//*"]
+      removeFilesAfter "prompt" ["//*"]
+      removeFilesAfter "bench-out" ["//*"]
       removeFilesAfter "_build" ["//*"]
   where
     reflectionDays = S.fromList . mapMaybe parseDayFp <$> getDirectoryFiles "reflections" ["*.md"]
