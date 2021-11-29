@@ -32,26 +32,17 @@ module AOC.Common (
                   , module AOC
                   ) where
 
-import           Data.Monoid
 import           Data.Char
 import           Data.Foldable
-import           Data.Semigroup
-import           Data.Semigroup.Foldable
 import           Data.Map (Map)
 import           Data.Set (Set)
 import           Data.List
 import           Data.Maybe
 import           Data.Traversable
 import           Data.Void
-import           Linear
 import           AOC.Util
-import           Control.Lens
 import           Control.Monad.State
-import           Data.Set.Lens
-import           Data.Map.Lens
-import           Data.Tuple.Strict
 import           AOC.Common.Point           as AOC
-import qualified Data.Map.NonEmpty          as NEM
 import qualified Data.Map                   as M
 import qualified Data.Set                   as S
 import qualified Text.Megaparsec            as P
