@@ -18,6 +18,13 @@ packages:
       sha256: 5aa3ff178fe56b21250543384e8482de13f35ef57a06943178382b0f2e3eca24
   original:
     hackage: barbies-2.0.2.0@sha256:fa6656b45c40f7d4ab1764d078c6878f37d37fab7f7135c061e9a5baa67943c0
+- completed:
+    hackage: astar-0.3.0.0@sha256:8bf6350542e9db9451490e8993560ee843dc48a61d46a206985430f9b62461c8,967
+    pantry-tree:
+      size: 213
+      sha256: c4176cc3fc9ad39f2a9fc7eb4346c87b6e60b70ba23d8e2adbdfc81fe544b808
+  original:
+    hackage: astar-0.3.0.0@sha256:8bf6350542e9db9451490e8993560ee843dc48a61d46a206985430f9b62461c8
 snapshots:
 - completed:
     size: 532832
