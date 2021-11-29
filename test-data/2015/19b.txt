@@ -1,0 +1,16 @@
+e => H
+e => O
+H => HO
+H => OH
+O => HH
+
+HOH
+>>> 3
+e => H
+e => O
+H => HO
+H => OH
+O => HH
+
+HOHOHO
+>>> 6

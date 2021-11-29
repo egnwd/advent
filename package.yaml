@@ -74,6 +74,7 @@ library:
   - aeson
   - ansi-terminal
   - array
+  - astar
   - barbies
   - bytestring
   - containers
@@ -105,6 +106,7 @@ library:
   - th-abstraction
   - time
   - transformers
+  - unordered-containers
   - utf8-string
   - yaml
 

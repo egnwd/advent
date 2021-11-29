@@ -43,20 +43,21 @@ when we hit the basement we can just return the position.
 ```
 >> Day 01a
 benchmarking...
-time                 22.73 μs   (21.45 μs .. 24.49 μs)
-                     0.982 R²   (0.969 R² .. 0.999 R²)
-mean                 22.16 μs   (21.67 μs .. 22.88 μs)
-std dev              1.909 μs   (1.242 μs .. 2.862 μs)
-variance introduced by outliers: 81% (severely inflated)
+time                 22.63 μs   (21.96 μs .. 23.45 μs)
+                     0.994 R²   (0.990 R² .. 0.999 R²)
+mean                 22.33 μs   (22.01 μs .. 22.90 μs)
+std dev              1.378 μs   (878.7 ns .. 2.095 μs)
+variance introduced by outliers: 68% (severely inflated)
 
 * parsing and formatting times excluded
 
 >> Day 01b
 benchmarking...
-time                 38.64 μs   (38.36 μs .. 38.97 μs)
+time                 39.39 μs   (39.19 μs .. 39.63 μs)
                      1.000 R²   (0.999 R² .. 1.000 R²)
-mean                 38.47 μs   (38.36 μs .. 38.63 μs)
-std dev              461.1 ns   (336.7 ns .. 706.0 ns)
+mean                 39.86 μs   (39.57 μs .. 40.72 μs)
+std dev              1.630 μs   (772.6 ns .. 3.034 μs)
+variance introduced by outliers: 46% (moderately inflated)
 
 * parsing and formatting times excluded
 ```
