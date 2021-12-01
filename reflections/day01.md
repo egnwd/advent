@@ -20,16 +20,16 @@ part1 = length . filter (>0) . differences
 Yay! 1 star!
 
 For part 2 we can reuse the differences logic from part 1, we just need to construct a new input list using the windows.
-The easiest way to do this given the window is only length 3 is use `zipWith` again, this time with addition.
+The easiest way to do this given the window is only length 3 is use the version of `zipWith` that takes 3 lists, this time with addition.
 
 ```haskell
-windowedInput x = zipWith (+) (zipWith (+) x (drop 1 x)) (drop 2 x)
+summedSlidingWindows x = zipWith3 (\a b c -> a + b + c) x (drop 1 x) (drop 2 x)
 ```
 
 Then to solve we just use part 1.
 
 ```haskell
-part2 = part1 . windowedInput
+part2 = part1 . summedSlidingWindows
 ```
 
 Day 1 complete!
