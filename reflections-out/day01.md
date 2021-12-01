@@ -30,6 +30,8 @@ list then subtracting the two lists element-wise:
 differences x = zipWith subtract x (tail x)
 ```
 
+_N.B. `subtract` is just `-` with the arguments flipped, useful for partial application._
+
 and then to get the answer we need only the increases we just filter for where we got a postitive result:
 
 ```haskell
