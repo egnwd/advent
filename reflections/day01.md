@@ -8,7 +8,7 @@ Then for part 1 we need to get the differences, which can be achieved by droppin
 list then subtracting the two lists element-wise:
 
 ```haskell
-differences x = zipWith subtract x (drop 1 x)
+differences x = zipWith subtract x (tail x)
 ```
 
 and then to get the answer we need only the increases we just filter for where we got a postitive result:

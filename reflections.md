@@ -35,7 +35,7 @@ Then for part 1 we need to get the differences, which can be achieved by droppin
 list then subtracting the two lists element-wise:
 
 ```haskell
-differences x = zipWith subtract x (drop 1 x)
+differences x = zipWith subtract x (tail x)
 ```
 
 and then to get the answer we need only the increases we just filter for where we got a postitive result:
@@ -47,16 +47,16 @@ part1 = length . filter (>0) . differences
 Yay! 1 star!
 
 For part 2 we can reuse the differences logic from part 1, we just need to construct a new input list using the windows.
-The easiest way to do this given the window is only length 3 is use `zipWith` again, this time with addition.
+The easiest way to do this given the window is only length 3 is use the version of `zipWith` that takes 3 lists, this time with addition.
 
 ```haskell
-windowedInput x = zipWith (+) (zipWith (+) x (drop 1 x)) (drop 2 x)
+summedSlidingWindows x = zipWith3 (\a b c -> a + b + c) x (drop 1 x) (drop 2 x)
 ```
 
 Then to solve we just use part 1.
 
 ```haskell
-part2 = part1 . windowedInput
+part2 = part1 . summedSlidingWindows
 ```
 
 Day 1 complete!
@@ -67,21 +67,21 @@ Day 1 complete!
 ```
 >> Day 01a
 benchmarking...
-time                 44.27 μs   (43.35 μs .. 45.30 μs)
-                     0.997 R²   (0.996 R² .. 0.998 R²)
-mean                 43.47 μs   (42.88 μs .. 44.14 μs)
-std dev              2.237 μs   (1.878 μs .. 2.593 μs)
-variance introduced by outliers: 57% (severely inflated)
+time                 47.27 μs   (46.45 μs .. 48.43 μs)
+                     0.994 R²   (0.990 R² .. 0.997 R²)
+mean                 47.09 μs   (45.79 μs .. 48.64 μs)
+std dev              4.412 μs   (3.534 μs .. 5.703 μs)
+variance introduced by outliers: 82% (severely inflated)
 
 * parsing and formatting times excluded
 
 >> Day 01b
 benchmarking...
-time                 86.93 μs   (85.04 μs .. 89.42 μs)
-                     0.997 R²   (0.995 R² .. 0.998 R²)
-mean                 88.99 μs   (87.57 μs .. 90.06 μs)
-std dev              4.159 μs   (3.664 μs .. 4.798 μs)
-variance introduced by outliers: 49% (moderately inflated)
+time                 208.5 μs   (202.4 μs .. 214.6 μs)
+                     0.994 R²   (0.990 R² .. 0.997 R²)
+mean                 210.7 μs   (206.9 μs .. 216.4 μs)
+std dev              15.33 μs   (10.99 μs .. 20.72 μs)
+variance introduced by outliers: 67% (severely inflated)
 
 * parsing and formatting times excluded
 ```
