@@ -14,26 +14,27 @@ module AOC.Challenge.Day01 (
 
 import AOC.Solver ((:~>)(..))
 import AOC.Common (countTrue)
+import Text.Read  (readMaybe)
 
-parser :: String -> [Int]
-parser = map read . lines
+parser :: String -> Maybe [Int]
+parser = traverse readMaybe . lines
 
 solve :: [Int] -> Int
 solve x = countTrue (>0) $ zipWith subtract x (drop 1 x)
 
-addToWindow :: (Num a) => [a] -> [a] -> [a]
-addToWindow w x = zipWith (+) w (drop 1 x)
+summedSlidingWindows :: (Num a) => [a] -> [a]
+summedSlidingWindows x = zipWith (+) (zipWith (+) x (drop 1 x)) (drop 2 x)
 
 day01a :: [Int] :~> Int
 day01a = MkSol
-    { sParse = Just . parser
+    { sParse = parser
     , sShow  = show
     , sSolve = Just . solve
     }
 
 day01b :: [Int] :~> Int
 day01b = MkSol
-    { sParse = Just . parser
+    { sParse = parser
     , sShow  = show
-    , sSolve = \x -> Just . solve $ addToWindow (addToWindow x x) (drop 1 x)
+    , sSolve = Just . solve . summedSlidingWindows
     }
