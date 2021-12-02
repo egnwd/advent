@@ -16,55 +16,44 @@ module AOC.Challenge.Day02 (
 
 import AOC.Solver          ((:~>)(..))
 import AOC.Common          (parseLines, pTok, pDecimal, Point, CharParser)
-import Data.Foldable       (traverse_)
 import Linear              (V2(..))
 import Control.Applicative ((<|>))
-import Control.Monad.State (execState)
-import Control.Lens        (makeLenses, (+=), use)
+import Data.Monoid         (Sum(..))
 
-data Direction = Forward | Up | Down deriving Eq
+data Submarine = Sub { loc :: Point, aim :: Int } deriving Show
 
-type Instruction = (Direction, Int)
+instance Semigroup Submarine where
+    (Sub v a) <> (Sub (V2 x' y') a') = Sub (v + V2 x' (y' + x' * a)) (a + a')
 
-data Submarine = Sub { _loc :: Point, _aim :: Int }
+instance Monoid Submarine where
+    mempty = Sub (pure 0) 0
 
-$(makeLenses ''Submarine)
+parser :: CharParser (Sum Point)
+parser = do
+  dir <- pTok $
+        (Sum . flip V2 0     <$ "forward")
+    <|> (Sum . V2 0 . negate <$ "up")
+    <|> (Sum . V2 0          <$ "down")
+  dir <$> pDecimal
 
-initialSubmarine :: Submarine
-initialSubmarine = Sub (pure 0) 0
+parser' :: CharParser Submarine
+parser' = do
+    dir <- pTok $
+          ((\x -> Sub (V2 x 0) 0) <$ "forward")
+      <|> (Sub (pure 0) . negate  <$ "up")
+      <|> (Sub (pure 0)           <$ "down")
+    dir <$> pDecimal
 
-parser :: CharParser Instruction
-parser = (,) <$> pTok ((Forward <$ "forward") <|> (Up <$ "up") <|> (Down <$ "down")) <*> pDecimal
-
-solve :: [Instruction] -> Point
-solve = sum . map (\(d,n) -> pure n * positionUpdate d)
-    where
-        positionUpdate = \case
-            Forward -> V2 1 0
-            Up      -> V2 0 (-1)
-            Down    -> V2 0 1
-
-solveb :: [Instruction] -> Point
-solveb = _loc . flip execState initialSubmarine . traverse_ (uncurry moveSubmarine)
-    where
-        moveSubmarine Forward n = use aim >>= \a -> loc += V2 n (n*a)
-        moveSubmarine d       n = aim += n * aimUpdate d
-
-        aimUpdate = \case
-            Up   -> -1
-            Down -> 1
-            _    -> 0
-
-day02a :: [Instruction] :~> Int
+day02a :: [Sum Point] :~> Int
 day02a = MkSol
     { sParse = parseLines parser
     , sShow  = show
-    , sSolve = Just . product . solve
+    , sSolve = Just . product . getSum . mconcat
     }
 
-day02b :: [Instruction] :~> Int
+day02b :: [Submarine] :~> Int
 day02b = MkSol
-    { sParse = parseLines parser
+    { sParse = parseLines parser'
     , sShow  = show
-    , sSolve = Just . product . solveb
+    , sSolve = Just . product . loc . mconcat
     }
