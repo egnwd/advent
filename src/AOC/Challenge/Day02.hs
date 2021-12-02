@@ -16,14 +16,13 @@ module AOC.Challenge.Day02 (
 
 import AOC.Solver          ((:~>)(..))
 import AOC.Common          (parseLines, pTok, pDecimal, Point, CharParser)
-import Data.Foldable       (for_)
+import Data.Foldable       (traverse_)
 import Linear              (V2(..))
-import Text.Megaparsec     (try, choice)
+import Control.Applicative ((<|>))
 import Control.Monad.State (execState)
-import Data.Monoid         (Sum(..))
 import Control.Lens        (makeLenses, (+=), use)
 
-data Direction = Forward | Up | Down | Backward deriving Eq
+data Direction = Forward | Up | Down deriving Eq
 
 type Instruction = (Direction, Int)
 
@@ -35,36 +34,21 @@ initialSubmarine :: Submarine
 initialSubmarine = Sub (pure 0) 0
 
 parser :: CharParser Instruction
-parser = (,) <$> pTok directionParser <*> pDecimal
-
-directionParser :: CharParser Direction
-directionParser = try $ choice
-    [ Forward  <$ "forward"
-    , Backward <$ "backward"
-    , Up       <$ "up"
-    , Down     <$ "down"
-    ]
+parser = (,) <$> pTok ((Forward <$ "forward") <|> (Up <$ "up") <|> (Down <$ "down")) <*> pDecimal
 
 solve :: [Instruction] -> Point
-solve = getSum . foldMap (\(d,n) -> Sum (pure n * positionUpdate d))
+solve = sum . map (\(d,n) -> pure n * positionUpdate d)
     where
-        positionUpdate Forward  = V2 1     0
-        positionUpdate Backward = V2 (-1)  0
-        positionUpdate Up       = V2 0     (-1)
-        positionUpdate Down     = V2 0     1
+        positionUpdate = \case
+            Forward -> V2 1 0
+            Up      -> V2 0 (-1)
+            Down    -> V2 0 1
 
 solveb :: [Instruction] -> Point
-solveb is = _loc $ flip execState initialSubmarine $
-    for_ is (\(d, n) -> do
-        a <- use aim
-        loc += pure n * positionUpdate a d
-        aim += n * aimUpdate d)
-
+solveb = _loc . flip execState initialSubmarine . traverse_ (uncurry moveSubmarine)
     where
-        positionUpdate a = \case
-            Forward  -> V2 1    a
-            Backward -> V2 (-1) 0
-            _        -> V2 0    0
+        moveSubmarine Forward n = use aim >>= \a -> loc += V2 n (n*a)
+        moveSubmarine d       n = aim += n * aimUpdate d
 
         aimUpdate = \case
             Up   -> -1
