@@ -10,7 +10,7 @@ that file instead!
 *[Prompt][d${daylong}p]* / *[Code][d${daylong}g]*
 
 [d${daylong}p]: https://adventofcode.com/${year}/day/${dayshort}
-[d${daylong}g]: https://github.com/${github}/advent/blop/${year}/src/AOC/Challenge/Day${daylong}.hs
+[d${daylong}g]: https://github.com/${github}/advent/blob/${year}/src/AOC/Challenge/Day${daylong}.hs
 
 ${body}
 

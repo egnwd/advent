@@ -24,7 +24,7 @@ that file instead!
 *[Prompt][d01p]* / *[Code][d01g]*
 
 [d01p]: https://adventofcode.com/2021/day/1
-[d01g]: https://github.com/egnwd/advent/blop/2021/src/AOC/Challenge/Day01.hs
+[d01g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day01.hs
 
 Reading a list of ints always seems to be early on, we can do that easily with:
 
@@ -103,7 +103,7 @@ that file instead!
 *[Prompt][d02p]* / *[Code][d02g]*
 
 [d02p]: https://adventofcode.com/2021/day/2
-[d02g]: https://github.com/egnwd/advent/blop/2021/src/AOC/Challenge/Day02.hs
+[d02g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day02.hs
 
 Moving around a 2D map, another AoC classic challenge.
 
