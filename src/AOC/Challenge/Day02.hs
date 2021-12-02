@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -- |
@@ -9,32 +7,32 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 2.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 2.
 
 module AOC.Challenge.Day02 (
     day02a
   , day02b
   ) where
 
-import AOC.Prelude hiding (Down)
-import Linear
-import Text.Megaparsec
-import Text.Megaparsec.Char
+import AOC.Solver          ((:~>)(..))
+import AOC.Common          (parseLines, pTok, pDecimal, Point, CharParser)
+import Data.Foldable       (for_)
+import Linear              (V2(..))
+import Text.Megaparsec     (try, choice)
+import Control.Monad.State (execState)
+import Data.Monoid         (Sum(..))
+import Control.Lens        (makeLenses, (+=), use)
 
 data Direction = Forward | Up | Down | Backward deriving Eq
 
 type Instruction = (Direction, Int)
+
+data Submarine = Sub { _loc :: Point, _aim :: Int }
+
+$(makeLenses ''Submarine)
+
+initialSubmarine :: Submarine
+initialSubmarine = Sub (pure 0) 0
 
 parser :: CharParser Instruction
 parser = (,) <$> pTok directionParser <*> pDecimal
@@ -55,18 +53,23 @@ solve = getSum . foldMap (\(d,n) -> Sum (pure n * positionUpdate d))
         positionUpdate Up       = V2 0     (-1)
         positionUpdate Down     = V2 0     1
 
-solveb :: [Instruction] -> (Point, Int)
-solveb = foldl (\(p,a) (d,n) -> (update p (pure n) (positionUpdate d a), update a n (aimUpdate d))) (pure 0, 0)
+solveb :: [Instruction] -> Point
+solveb is = _loc $ flip execState initialSubmarine $
+    for_ is (\(d, n) -> do
+        a <- use aim
+        loc += pure n * positionUpdate a d
+        aim += n * aimUpdate d)
+
     where
-        update a n a' = a + n * a'
+        positionUpdate a = \case
+            Forward  -> V2 1    a
+            Backward -> V2 (-1) 0
+            _        -> V2 0    0
 
-        positionUpdate Forward  = V2 1
-        positionUpdate Backward = const $ V2 (-1) 0
-        positionUpdate _        = const $ V2 0 0
-
-        aimUpdate Up   = -1
-        aimUpdate Down = 1
-        aimUpdate _    = 0
+        aimUpdate = \case
+            Up   -> -1
+            Down -> 1
+            _    -> 0
 
 day02a :: [Instruction] :~> Int
 day02a = MkSol
@@ -79,5 +82,5 @@ day02b :: [Instruction] :~> Int
 day02b = MkSol
     { sParse = parseLines parser
     , sShow  = show
-    , sSolve = Just . product . fst . solveb
+    , sSolve = Just . product . solveb
     }
