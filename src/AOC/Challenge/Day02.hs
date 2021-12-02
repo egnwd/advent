@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day02
@@ -27,45 +28,56 @@ module AOC.Challenge.Day02 (
   ) where
 
 import AOC.Prelude hiding (Down)
+import Linear
+import Text.Megaparsec
+import Text.Megaparsec.Char
 
 data Direction = Forward | Up | Down | Backward deriving Eq
 
-type Instructions = [(Direction, Int)]
+type Instruction = (Direction, Int)
 
-parser :: CharParser Instructions
-parser = undefined
+parser :: CharParser Instruction
+parser = (,) <$> pTok directionParser <*> pDecimal
 
-parserDirty :: [String] -> (Direction, Int)
-parserDirty ["forward", n] = (Forward, read n)
-parserDirty ["up", n] = (Up, read n)
-parserDirty ["backward", n] = (Backward, read n)
-parserDirty ["down", n] = (Down, read n)
-parserDirty _ = error "Oh no"
+directionParser :: CharParser Direction
+directionParser = try $ choice
+    [ Forward  <$ "forward"
+    , Backward <$ "backward"
+    , Up       <$ "up"
+    , Down     <$ "down"
+    ]
 
-solve :: Instructions -> (Int, Int) -> (Int, Int)
-solve [] p = p
-solve ((Forward, n):rs) (x,y) = solve rs (x-n, y)
-solve ((Backward, n):rs) (x,y) = solve rs (x+n, y)
-solve ((Up, n):rs) (x,y) = solve rs (x, y+n)
-solve ((Down, n):rs) (x,y) = solve rs (x, y-n)
+solve :: [Instruction] -> Point
+solve = getSum . foldMap (\(d,n) -> Sum (pure n * positionUpdate d))
+    where
+        positionUpdate Forward  = V2 1     0
+        positionUpdate Backward = V2 (-1)  0
+        positionUpdate Up       = V2 0     (-1)
+        positionUpdate Down     = V2 0     1
 
-solveb :: Instructions -> (Int, Int, Int) -> (Int, Int, Int)
-solveb [] p = p
-solveb ((Forward, n):rs) (x,y, a) = solveb rs (x+n, y+(a*n), a)
-solveb ((Backward, n):rs) (x,y, a) = solveb rs (x-n, y, a)
-solveb ((Up, n):rs) (x,y, a) = solveb rs (x, y, a-n)
-solveb ((Down, n):rs) (x,y,a) = solveb rs (x, y, a+n)
+solveb :: [Instruction] -> (Point, Int)
+solveb = foldl (\(p,a) (d,n) -> (update p (pure n) (positionUpdate d a), update a n (aimUpdate d))) (pure 0, 0)
+    where
+        update a n a' = a + n * a'
 
-day02a :: Instructions :~> _
+        positionUpdate Forward  = V2 1
+        positionUpdate Backward = const $ V2 (-1) 0
+        positionUpdate _        = const $ V2 0 0
+
+        aimUpdate Up   = -1
+        aimUpdate Down = 1
+        aimUpdate _    = 0
+
+day02a :: [Instruction] :~> Int
 day02a = MkSol
-    { sParse = Just . map (parserDirty . words) . lines
+    { sParse = parseLines parser
     , sShow  = show
-    , sSolve = \x -> let (z,y) = solve x (0,0) in Just (z*y)
+    , sSolve = Just . product . solve
     }
 
-day02b :: _ :~> _
+day02b :: [Instruction] :~> Int
 day02b = MkSol
-    { sParse = sParse day02a
+    { sParse = parseLines parser
     , sShow  = show
-    , sSolve = \x -> let (z,y,a) = solveb x (0,0,0) in Just (z*y)
+    , sSolve = Just . product . fst . solveb
     }
