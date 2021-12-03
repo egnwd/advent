@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day03
 -- License     : BSD3
@@ -8,70 +5,78 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 3.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 3.
 
 module AOC.Challenge.Day03 (
     day03a
   , day03b
   ) where
 
-import           AOC.Prelude
-import GHC.Float
+import AOC.Solver     ((:~>)(..))
+import AOC.Common     (loopEither)
+import Data.List      (transpose)
+import Data.Char      (digitToInt)
+import Data.Bifunctor (first, second)
+import Control.Lens   (each, (%~))
+import Data.Finite
 
-parser = traverse (\x -> readMaybe [x] :: Maybe Int)
+type Bit = Finite 2
+type Bits = [Bit]
 
-solve xs = let a = solve' xs in [a, 1-a]
-solve' xs | countTrue (==1) xs >= countTrue (==0) xs = 1
-          | otherwise = 0
+zero, one :: Bit
+zero = finite 0
+one = finite 1
 
-toDec = sum . map(\(a,b) -> (2 ** a) * fromIntegral b) . zip [0..] . reverse
+parser :: String -> Maybe [Bits]
+parser = traverse (traverse (packFinite . fromIntegral . digitToInt)) . lines
 
-solveb xs = double2Int $ toDec o * toDec c
+mostAndLeastCommonBit :: Bits -> (Bit, Bit)
+mostAndLeastCommonBit bs = let b = mostCommonBit bs in (b, 1-b)
+
+leastCommonBit, mostCommonBit :: Bits -> Bit
+leastCommonBit = (1-) . mostCommonBit
+mostCommonBit bs = let (zeros, ones) = foldr go (0,0) bs
+                    in if ones >= zeros then one else zero
     where
-        o = loopEither oxygen (0, xs)
-        c = loopEither co2 (0, xs)
+        go :: Bit -> (Int, Int) -> (Int, Int)
+        go 0 = first succ
+        go 1 = second succ
 
-oxygen (i, ns) = if length filtered == 1 then Left (head filtered) else Right (i+1, filtered)
+binToDec :: Bits -> Int
+binToDec = foldl (\a -> (+) (2*a) . fromEnum . (== 1)) 0
+
+solvea :: [Bits] -> Int
+solvea xs = let (γ, ε) = (each %~ binToDec) . unzip . map mostAndLeastCommonBit . transpose $ xs
+             in γ * ε
+
+solveb :: [Bits] -> Int
+solveb bs = o * c
     where
-        common = map solve' (transpose ns)
-        filtered = filter ((==(common !! i)) . (!! i)) ns
+        o = binToDec $ loopEither oxygen (0, bs)
+        c = binToDec $ loopEither co2 (0, bs)
 
-co2 (i, ns) = if length filtered == 1 then Left (head filtered) else Right (i+1, filtered)
-    where
-        common = map ((1-) . solve') (transpose ns)
-        filtered = filter ((==(common !! i)) . (!! i)) ns
+oxygen, co2 :: (Int, [Bits]) -> Either Bits (Int, [Bits])
+oxygen = criteria mostCommonBit
+co2 = criteria leastCommonBit
 
-loopEither
-    :: (a -> Either r a)
-    -> a
-    -> r
-loopEither f = go
-  where
-    go !x = case f x of
-      Left  r  -> r
-      Right !y -> go y
+criteria :: _ -> (Int, [Bits]) -> Either Bits (Int, [Bits])
+criteria f (i, xs) = case filter ((== b) . (!! i)) xs of
+                       [n] -> Left n
+                       ns  -> Right (succ i, ns)
+   where
+       bs = map f . transpose $ xs
+       b = bs !! i
 
-day03a :: _ :~> Int
+day03a :: [Bits] :~> Int
 day03a = MkSol
-    { sParse = traverse parser . lines
+    { sParse = parser
     , sShow  = show
-    , sSolve = Just . double2Int . product . map toDec . transpose . map (solve . sort) . transpose
+    , sSolve = Just . solvea
     }
 
-day03b :: _ :~> _
+day03b :: [Bits] :~> Int
 day03b = MkSol
-    { sParse = traverse parser . lines
+    { sParse = parser
     , sShow  = show
     , sSolve = Just . solveb
     }

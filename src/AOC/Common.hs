@@ -23,6 +23,7 @@ module AOC.Common (
                   , parseLines
                   , parseLinesOrError
                   , fixedPoint
+                  , loopEither
                   , freqs
                   , lookupFreq
                   , odds
@@ -94,6 +95,17 @@ fixedPoint f = go
         | otherwise = go y
       where
         y = f x
+
+loopEither
+    :: (a -> Either r a)
+    -> a
+    -> r
+loopEither f = go
+  where
+    go !x = case f x of
+      Left  r  -> r
+      Right !y -> go y
+
 
 -- | Build a frequency map
 freqs :: (Foldable f, Ord a) => f a -> Map a Int

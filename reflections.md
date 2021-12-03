@@ -11,6 +11,7 @@ Table of Contents
 
 * [Day 1](#day-1)
 * [Day 2](#day-2)
+* [Day 3](#day-3) *(no reflection yet)*
 
 Day 1
 ------
@@ -108,55 +109,60 @@ that file instead!
 Moving around a 2D map, another AoC classic challenge.
 
 My initial solution used recursion and word splitting for the solution,
-but I have an affinity for parsing and the state monad, so that's what I'll describe here.
+the second used State, and that too was more difficult to understand, and felt more imperative.
 
-To parse we can read many tuples of `(Direction, Distance)` and have that as our instruction set.
+The version here uses Monoids to combine the values (part a ended up similar to my first fold attempt).
+
+To parse we can read many `Sum`mable `Points` and have that as our instruction set.
 The parser combinators make this quite nice to do:
 
 ```haskell
 parser = do
-  dir <- pTok $ (Forward <$ "forward") <|> (Up <$ "up") <|> (Down <$ "down")
-  dist <- pDecimal
-  return (dir, dist)
+  dir <- pTok $
+        (Sum . flip V2 0     <$ "forward")
+    <|> (Sum . V2 0 . negate <$ "up")
+    <|> (Sum . V2 0          <$ "down")
+  dir <$> pDecimal
 ```
 
-Then to solve part 1 we just need to move through the instructions, summing the scaled vectors together.
+Then to solve part 1 we just need to combine the instructions.
 I used the `V2` type from `Linear.V2` to represent points as they are 2D vectors with the added bonus of
 being able to easily to component-wise addition of vectors.
 
-
-To get the vectors:
-
 ```haskell
-positionUpdate = \case
-    Forward -> V2 1 0
-    Up      -> V2 0 (-1)
-    Down    -> V2 0 1
-```
-
-```haskell
-solve = product . sum . map (\(d,n) -> pure n * positionUpdate d)
+solve = product . getSum . mconcat
 ```
 
 After the submarine's epic journey, we get 1 star!
 
-For part two, I used the State monad.
-You can quite easily use a fold, which I did initially but it was quite messy, I felt this was easier to read.
+For part two, I wrote a new type `Submarine` with a location and aim.
 
-To update the state we have the following, for each instruction, update the location or aim using:
 ```haskell
-moveSubmarine Forward n = do
-        a <- use aim
-        loc += V2 n (n*a)
-moveSubmarine d n = aim += n * aimUpdate d
-    where
-        aimUpdate = \case
-            Up   -> -1
-            Down -> 1
-            _    -> 0
+data Submarine = Sub { loc :: Point, aim :: Int }
 ```
 
-then we just extract the final `loc` and get the `product` like last time.
+this time to combine we must implement `Monoid`, and first Semigroup.
+
+```haskell
+instance Semigroup Submarine where
+    (Sub v a) <> (Sub (V2 x' y') a') = Sub (v + V2 x' (y' + x' * a)) (a + a')
+
+instance Monoid Submarine where
+    mempty = Sub (pure 0) 0
+    mconcat = foldl (<>) mempty
+```
+
+`(<>)` combines two commands, adding the forward components `x+x'`,
+updates the depth taking into account the previous aim and the forward distance
+`y + y' + x' * a` (for the `up` & `down` commands `x'` & `y'` are `0` so that term cancels),
+and finally the aim is updated (for `forward` this is `0` so is also a noop).
+
+Then to combine we do similar to part 1:
+```haskell
+solve = product . loc . mconcat
+```
+
+where `loc` gets the vector from the `Submarine` akin to `getSum` getting the vector from `Sum`.
 
 Submarine successfully piloted!
 
@@ -179,5 +185,47 @@ time                 2.332 ms   (2.310 ms .. 2.357 ms)
 mean                 2.345 ms   (2.330 ms .. 2.363 ms)
 std dev              54.61 μs   (42.35 μs .. 69.57 μs)
 variance introduced by outliers: 10% (moderately inflated)
+```
+
+
+
+Day 3
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day03.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d03p]* / *[Code][d03g]*
+
+[d03p]: https://adventofcode.com/2021/day/3
+[d03g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day03.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 3 Benchmarks
+
+```
+>> Day 03a
+benchmarking...
+time                 2.608 ms   (2.560 ms .. 2.668 ms)
+                     0.997 R²   (0.996 R² .. 0.998 R²)
+mean                 2.565 ms   (2.531 ms .. 2.593 ms)
+std dev              111.2 μs   (82.98 μs .. 138.1 μs)
+variance introduced by outliers: 28% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 03b
+benchmarking...
+time                 502.3 μs   (499.8 μs .. 505.3 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 508.0 μs   (505.6 μs .. 511.4 μs)
+std dev              10.85 μs   (7.919 μs .. 18.69 μs)
+variance introduced by outliers: 12% (moderately inflated)
+
+* parsing and formatting times excluded
 ```
 

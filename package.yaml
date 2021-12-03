@@ -91,6 +91,7 @@ library:
   - hpack
   - lens
   - linear
+  - matrix
   - megaparsec
   - microlens-th
   - mtl
