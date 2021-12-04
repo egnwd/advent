@@ -59,13 +59,12 @@ oxygen, co2 :: (Int, [Bits]) -> Either Bits (Int, [Bits])
 oxygen = criteria mostCommonBit
 co2 = criteria leastCommonBit
 
-criteria :: _ -> (Int, [Bits]) -> Either Bits (Int, [Bits])
-criteria f (i, xs) = case filter ((== b) . (!! i)) xs of
-                       [n] -> Left n
-                       ns  -> Right (succ i, ns)
-   where
-       bs = map f . transpose $ xs
-       b = bs !! i
+criteria :: (Bits -> Bit) -> (Int, [Bits]) -> Either Bits (Int, [Bits])
+criteria f (i, xs)
+  = let b = (f . map (!! i) $ xs)
+     in case filter ((== b) . (!! i)) xs of
+          [n] -> Left n
+          ns  -> Right (succ i, ns)
 
 day03a :: [Bits] :~> Int
 day03a = MkSol
