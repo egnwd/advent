@@ -14,14 +14,23 @@ module AOC.Challenge.Day04 (
   , day04b
   ) where
 
-import AOC.Solver    ((:~>)(..))
-import Data.Function (on)
-import Control.Lens  (mapped, (<&>), _head, (%~), preview)
-import Data.List     (partition, transpose)
-import Data.Either   (isLeft)
+import AOC.Solver     ((:~>)(..))
+import Data.Semigroup (First(..), Last(..), getFirst, getLast)
+import Data.List      (transpose, partition)
+import Control.Lens   (mapped, (<&>), (%~))
 import qualified Data.Text as T
 
-type BingoCard = [[Either Int Int]]
+data BingoNumber = Unmarked Int | Marked Int deriving (Eq, Show)
+type BingoCard = [[BingoNumber]]
+
+unmarkedValue :: BingoNumber -> Int
+unmarkedValue (Unmarked n) = n
+unmarkedValue (Marked _)   = 0
+
+isMarked :: BingoNumber -> Bool
+isMarked = \case
+    Marked _ -> True
+    _ -> False
 
 parse :: String -> ([Int], [BingoCard])
 parse s = let (x:_:xs) = lines s
@@ -32,36 +41,36 @@ parseBingoCards xs = let bs = T.splitOn "\n\n" (T.pack xs)
                        in map parseBingoCard bs
 
 parseBingoCard :: T.Text -> BingoCard
-parseBingoCard = map (map (Right . read @Int) . words) . lines . T.unpack
+parseBingoCard = map (map (Unmarked . read @Int) . words) . lines . T.unpack
 
-solve :: ([BingoCard] -> [BingoCard] -> Bool) -> [Int] -> [BingoCard] -> Maybe Int
-solve _ [] _ = Nothing
-solve finished (n:ns) bs = if finished bs w then scoreFirstBoard w else solve finished ns l
+solve' :: (Semigroup s) => (Int -> s) -> [Int] -> [BingoCard] -> Maybe s
+solve' _ [] _ = Nothing
+solve' f (n:ns) bs = winners <> solve' f ns l
     where
+        winners = foldMap (Just . f . scoreBoard) w
+        (w,l) = partition winner bs'
         scoreBoard b = (sum . unmarked $ b) * n
-        unmarked = map (either (const 0) id) . concat
-        scoreFirstBoard = fmap scoreBoard . preview _head
-        (w,l) = partition winner newboards
-        newboards = bs <&> mapped.mapped %~ mark
-        mark (Right x) | x == n = Left x
+        unmarked = map unmarkedValue . concat
+        bs' = bs <&> mapped.mapped %~ mark
+        mark (Unmarked x) | x == n = Marked x
         mark x = x
 
 winner :: BingoCard -> Bool
 winner bs = row bs || column bs
     where
         column = row . transpose
-        row = any (all isLeft)
+        row = any (all isMarked)
 
-day04a :: ([Int], [[[Either Int Int]]]) :~> _
+day04a :: ([Int], [BingoCard]) :~> _
 day04a = MkSol
     { sParse = Just . parse
     , sShow  = show
-    , sSolve = uncurry $ solve (const (not . null))
+    , sSolve = fmap getFirst . uncurry (solve' First)
     }
 
-day04b :: _ :~> _
+day04b :: ([Int], [BingoCard]) :~> _
 day04b = MkSol
     { sParse = Just . parse
     , sShow  = show
-    , sSolve = uncurry $ solve ((==) `on` length)
+    , sSolve = fmap getLast . uncurry (solve' Last)
     }
