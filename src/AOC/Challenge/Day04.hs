@@ -47,9 +47,9 @@ solve' :: (Semigroup s) => (Int -> s) -> [Int] -> [BingoCard] -> Maybe s
 solve' _ [] _ = Nothing
 solve' f (n:ns) bs = winners <> solve' f ns l
     where
-        winners = foldMap (Just . f . scoreBoard) w
+        winners = foldMap (Just . f . scoreCard) w
         (w,l) = partition winner bs'
-        scoreBoard b = (sum . unmarked $ b) * n
+        scoreCard b = (sum . unmarked $ b) * n
         unmarked = map unmarkedValue . concat
         bs' = bs <&> mapped.mapped %~ mark
         mark (Unmarked x) | x == n = Marked x
