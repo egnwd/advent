@@ -9,7 +9,6 @@
 -- different parts in the challenge.
 --
 
-
 module AOC.Common (
                     (!?)
                   , CharParser
@@ -30,6 +29,7 @@ module AOC.Common (
                   , evens
                   , countTrue
                   , pickUnique
+                  , lineTo
                   , module AOC
                   ) where
 
@@ -43,6 +43,7 @@ import           Data.Traversable
 import           Data.Void
 import           AOC.Util
 import           Control.Monad.State
+import           Linear
 import           AOC.Common.Point           as AOC
 import qualified Data.Map                   as M
 import qualified Data.Set                   as S
@@ -137,3 +138,11 @@ pickUnique mp = flip evalStateT S.empty $ do
       pick <$ modify (S.insert pick)
   where
     opts = sortOn (S.size . snd) mp
+
+lineTo :: V2 Point -> [Point]
+lineTo (V2 p0 p1) = [p0 + t *^ step | t <- [0 .. gcf]]
+  where
+    d@(V2 dx dy) = p1 - p0
+    gcf          = gcd dx dy
+    step         = (`div` gcf) <$> d
+
