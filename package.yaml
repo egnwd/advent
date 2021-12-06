@@ -99,6 +99,7 @@ library:
   - pandoc
   - parser-combinators
   - profunctors
+  - recursion-schemes
   - scientific
   - semigroupoids
   - strict-tuple
