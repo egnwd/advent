@@ -15,9 +15,8 @@ module AOC.Challenge.Day06 (
   ) where
 
 import AOC.Solver                ((:~>)(..), dyno_)
-import AOC.Common                (freqs, pDecimal, CharParser, (!?))
+import AOC.Common                (freqs, pDecimal, parseMaybeLenient, CharParser, (!?))
 import Data.Finite               (Finite, finite, unshift, weaken)
-import Text.Megaparsec           (parseMaybe)
 import Control.Monad.Combinators (sepBy)
 import Data.Map                  (Map)
 import qualified Data.Map as M
@@ -43,14 +42,14 @@ reproducingFish = finite 0
 
 day06a :: [Fish] :~> Int
 day06a = MkSol
-    { sParse = parseMaybe parser
+    { sParse = parseMaybeLenient parser
     , sShow  = show
     , sSolve = solve (dyno_ "days" 80)
     }
 
 day06b :: [Fish] :~> Int
 day06b = MkSol
-    { sParse = parseMaybe parser
+    { sParse = parseMaybeLenient parser
     , sShow  = show
     , sSolve = solve (dyno_ "days" 256)
     }

@@ -34,7 +34,7 @@ Check out the [reflections][] --- more info below!
 | Day  3    |             | [x][d03g] | [x][d03b]  |
 | Day  4    | [x][d04r]   | [x][d04g] | [x][d04b]  |
 | Day  5    | [x][d05r]   | [x][d05g] | [x][d05b]  |
-| Day  6    |             | [x][d06g] | [x][d06b]  |
+| Day  6    | [x][d06r]   | [x][d06g] | [x][d06b]  |
 | Day  7    |             |           |            |
 | Day  8    |             |           |            |
 | Day  9    |             |           |            |
@@ -293,4 +293,5 @@ All networking features are powered by *[advent-of-code-api][]*.
 [d05r]: https://github.com/egnwd/advent/blob/2021/reflections.md#day-5
 [d05b]: https://github.com/egnwd/advent/blob/2021/reflections.md#day-5-benchmarks
 [d06g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day06.hs
+[d06r]: https://github.com/egnwd/advent/blob/2021/reflections.md#day-6
 [d06b]: https://github.com/egnwd/advent/blob/2021/reflections.md#day-6-benchmarks
