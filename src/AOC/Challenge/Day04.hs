@@ -43,9 +43,9 @@ parseBingoCards xs = let bs = T.splitOn "\n\n" (T.pack xs)
 parseBingoCard :: T.Text -> BingoCard
 parseBingoCard = map (map (Unmarked . read @Int) . words) . lines . T.unpack
 
-solve' :: (Semigroup s) => (Int -> s) -> [Int] -> [BingoCard] -> Maybe s
-solve' _ [] _ = Nothing
-solve' f (n:ns) bs = winners <> solve' f ns l
+solve :: (Semigroup s) => (Int -> s) -> [Int] -> [BingoCard] -> Maybe s
+solve _ [] _ = Nothing
+solve f (n:ns) bs = winners <> solve f ns l
     where
         winners = foldMap (Just . f . scoreCard) w
         (w,l) = partition winner bs'
@@ -61,16 +61,16 @@ winner bs = row bs || column bs
         column = row . transpose
         row = any (all isMarked)
 
-day04a :: ([Int], [BingoCard]) :~> _
+day04a :: ([Int], [BingoCard]) :~> Int
 day04a = MkSol
     { sParse = Just . parse
     , sShow  = show
-    , sSolve = fmap getFirst . uncurry (solve' First)
+    , sSolve = fmap getFirst . uncurry (solve First)
     }
 
-day04b :: ([Int], [BingoCard]) :~> _
+day04b :: ([Int], [BingoCard]) :~> Int
 day04b = MkSol
     { sParse = Just . parse
     , sShow  = show
-    , sSolve = fmap getLast . uncurry (solve' Last)
+    , sSolve = fmap getLast . uncurry (solve Last)
     }
