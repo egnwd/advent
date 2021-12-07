@@ -385,21 +385,20 @@ Phew! and Done!
 ```
 >> Day 03a
 benchmarking...
-time                 2.608 ms   (2.560 ms .. 2.668 ms)
-                     0.997 R²   (0.996 R² .. 0.998 R²)
-mean                 2.565 ms   (2.531 ms .. 2.593 ms)
-std dev              111.2 μs   (82.98 μs .. 138.1 μs)
-variance introduced by outliers: 28% (moderately inflated)
+time                 2.616 ms   (2.580 ms .. 2.653 ms)
+                     0.998 R²   (0.996 R² .. 0.999 R²)
+mean                 2.579 ms   (2.545 ms .. 2.617 ms)
+std dev              127.0 μs   (94.73 μs .. 169.5 μs)
+variance introduced by outliers: 31% (moderately inflated)
 
 * parsing and formatting times excluded
 
 >> Day 03b
 benchmarking...
-time                 502.3 μs   (499.8 μs .. 505.3 μs)
+time                 509.8 μs   (508.6 μs .. 511.3 μs)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 508.0 μs   (505.6 μs .. 511.4 μs)
-std dev              10.85 μs   (7.919 μs .. 18.69 μs)
-variance introduced by outliers: 12% (moderately inflated)
+mean                 508.9 μs   (508.1 μs .. 510.1 μs)
+std dev              3.314 μs   (2.671 μs .. 4.362 μs)
 
 * parsing and formatting times excluded
 ```
@@ -731,20 +730,20 @@ that file instead!
 ```
 >> Day 07a
 benchmarking...
-time                 31.68 ms   (31.25 ms .. 31.97 ms)
-                     0.999 R²   (0.998 R² .. 1.000 R²)
-mean                 31.38 ms   (30.78 ms .. 31.71 ms)
-std dev              881.4 μs   (506.7 μs .. 1.463 ms)
+time                 32.43 ms   (32.06 ms .. 32.90 ms)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 31.91 ms   (31.36 ms .. 32.27 ms)
+std dev              947.0 μs   (535.8 μs .. 1.565 ms)
 
 * parsing and formatting times excluded
 
 >> Day 07b
 benchmarking...
-time                 30.38 ms   (29.27 ms .. 31.25 ms)
-                     0.993 R²   (0.984 R² .. 0.998 R²)
-mean                 29.23 ms   (28.61 ms .. 29.89 ms)
-std dev              1.486 ms   (1.159 ms .. 1.758 ms)
-variance introduced by outliers: 17% (moderately inflated)
+time                 2.616 s    (NaN s .. 2.654 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 2.597 s    (2.591 s .. 2.607 s)
+std dev              9.376 ms   (1.954 ms .. 12.41 ms)
+variance introduced by outliers: 19% (moderately inflated)
 
 * parsing and formatting times excluded
 ```

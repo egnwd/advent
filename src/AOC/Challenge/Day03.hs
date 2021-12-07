@@ -16,8 +16,6 @@ import AOC.Solver            ((:~>)(..))
 import Data.List             (transpose)
 import Data.Char             (digitToInt)
 import Data.Bifunctor        (first, second)
-import Control.Lens          (alaf)
-import Data.Monoid           (Product(Product))
 import Data.Finite           (Finite, finite, packFinite)
 import Data.Functor.Foldable (ListF(..), apo)
 import Control.Arrow         ((&&&))
@@ -50,7 +48,7 @@ binToDec :: Bits -> Int
 binToDec = foldl (\a -> (+) (2*a) . fromEnum . (== 1)) 0
 
 binaryProduct :: (Bits, Bits) -> Int
-binaryProduct = alaf Product foldMap binToDec . uncurry V2
+binaryProduct = product . fmap binToDec . uncurry V2
 
 solvea :: [Bits] -> Int
 solvea = binaryProduct . unzip . map mostAndLeastCommonBit . transpose
