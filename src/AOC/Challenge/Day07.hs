@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day07
@@ -8,36 +7,41 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 7.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 7.
 
 module AOC.Challenge.Day07 (
-    -- day07a
-  -- , day07b
+    day07a
+  , day07b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver               ((:~>)(..))
+import Text.Read                (readMaybe)
+import Data.Semigroup           (Min(..))
+import qualified Data.Text as T
 
-day07a :: _ :~> _
+parser :: String -> Maybe [Int]
+parser = traverse (readMaybe . T.unpack) . T.splitOn "," . T.pack
+
+parta, partb :: Int -> Int
+parta = id
+partb x = (x * (x+1)) `div` 2
+
+score :: (Int -> Int) -> [Int] -> Int -> Int
+score f cs c = sum . map (f . abs . subtract c) $ cs
+
+solve :: (Int -> Int) -> [Int] -> Maybe Int
+solve f cs = fmap getMin . foldMap (Just . Min . score f cs) $ [minimum cs .. maximum cs]
+
+day07a :: [Int] :~> Int
 day07a = MkSol
-    { sParse = Just
+    { sParse = parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = solve parta
     }
 
-day07b :: _ :~> _
+day07b :: [Int] :~> Int
 day07b = MkSol
-    { sParse = Just
+    { sParse = parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = solve partb
     }
