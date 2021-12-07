@@ -18,6 +18,7 @@ import AOC.Solver     ((:~>)(..))
 import Data.Semigroup (First(..), Last(..), getFirst, getLast)
 import Data.List      (transpose, partition)
 import Control.Lens   (mapped, (<&>), (%~))
+import Text.Read      (readMaybe)
 import qualified Data.Text as T
 
 data BingoNumber = Unmarked Int | Marked Int deriving (Eq, Show)
@@ -32,16 +33,18 @@ isMarked = \case
     Marked _ -> True
     _ -> False
 
-parse :: String -> ([Int], [BingoCard])
+parse :: String -> Maybe ([Int], [BingoCard])
 parse s = let (x:_:xs) = lines s
-           in (map (read . T.unpack) (T.splitOn "," (T.pack x)), parseBingoCards (unlines xs))
+              draws    = traverse (readMaybe . T.unpack) (T.splitOn "," (T.pack x))
+              cards    = parseBingoCards (unlines xs)
+           in (,) <$> draws <*> cards
 
-parseBingoCards :: String -> [BingoCard]
+parseBingoCards :: String -> Maybe [BingoCard]
 parseBingoCards xs = let bs = T.splitOn "\n\n" (T.pack xs)
-                       in map parseBingoCard bs
+                       in traverse parseBingoCard bs
 
-parseBingoCard :: T.Text -> BingoCard
-parseBingoCard = map (map (Unmarked . read @Int) . words) . lines . T.unpack
+parseBingoCard :: T.Text -> Maybe BingoCard
+parseBingoCard = traverse (traverse (fmap Unmarked . readMaybe @Int) . words) . lines . T.unpack
 
 solve :: (Semigroup s) => (Int -> s) -> [Int] -> [BingoCard] -> Maybe s
 solve _ [] _ = Nothing
@@ -63,14 +66,14 @@ winner bs = row bs || column bs
 
 day04a :: ([Int], [BingoCard]) :~> Int
 day04a = MkSol
-    { sParse = Just . parse
+    { sParse = parse
     , sShow  = show
     , sSolve = fmap getFirst . uncurry (solve First)
     }
 
 day04b :: ([Int], [BingoCard]) :~> Int
 day04b = MkSol
-    { sParse = Just . parse
+    { sParse = parse
     , sShow  = show
     , sSolve = fmap getLast . uncurry (solve Last)
     }
