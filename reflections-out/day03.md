@@ -96,7 +96,7 @@ cata :: ([a] ->       b)  -> [a] -> b
 para :: ([a] -> ([a], b)) -> [a] -> b
 ```
 
-So, an _apomorphism_ is hte dual of the _paramorphism_, and the way I have tried to think of it (which may be wrong) is:
+So, an _apomorphism_ is the dual of the _paramorphism_, and the way I have tried to think of it (which may be wrong) is:
 you take a seed value and build a structure by providing either the rest of the structure, or a bit of the structure and the next seed. The type is roughly:
 
 ```haskell
