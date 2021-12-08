@@ -27,25 +27,21 @@ module AOC.Challenge.Day08 (
   , day08b
   ) where
 
-import           AOC.Prelude
+import AOC.Prelude
+import Control.Lens
 import qualified Data.Text as T
 import qualified Data.Set as S
 import qualified Data.Map as M
+import Control.Monad.Loops
 
-splitOn :: T.Text -> String -> [String]
-splitOn c = map T.unpack . T.splitOn c . T.pack
+type Segments = S.Set Char
 
-parser :: String -> [[[String]]]
-parser = map (map words . splitOn "|") . lines
+data Entry = Entry { signals :: [Segments], outputs :: [Segments] } deriving (Eq, Show)
 
-outputs, signals :: [[String]] -> [String]
-outputs [_, o] = o
-signals [s, _] = s
+parser :: String -> [Entry]
+parser = map (uncurry Entry . over both (map S.fromList) . second (drop 1) . break (=="|") . words) . lines
 
-solvea :: [[[String]]] -> Int
-solvea = countTrue ((`elem` [2,3,4,7]) . length) . concatMap outputs
-
-zero, one, two, three, four, five, six, seven, eight, nine :: S.Set Char
+zero, one, two, three, four, five, six, seven, eight, nine :: Segments
 zero  = S.fromList "abcefg"
 one   = S.fromList "cf"
 two   = S.fromList "acdeg"
@@ -57,39 +53,40 @@ seven = S.fromList "acf"
 eight = S.fromList "abcdefg"
 nine  = S.fromList "abcdfg"
 
-digits :: M.Map (S.Set Char) Int
+digits :: M.Map Segments Int
 digits = M.fromList $ zip [zero, one, two, three, four, five, six, seven, eight, nine] [0..]
 
-solveb :: [[[String]]] -> Maybe Int
-solveb ds = sum <$> zipWithM (\r -> fmap (\m -> numberFromDigits . map (pickNumber . translate m) . outputs $ r)) ds answers
+solveb :: [Entry] -> Maybe Int
+solveb ds = sum <$> zipWithM (\e t -> t >>= outputToNumber (outputs e)) ds translations
     where
-        uniqueChoices = map (pickUnique . M.toList . M.fromListWith S.intersection . choices . signals) ds
-        answers = zipWith (\r -> find (\m -> all (\s -> translate m s `M.member` digits) . signals $ r)) ds uniqueChoices
-        translate m = S.fromList . map (m M.!)
+        outputToNumber o t = numberFromDigits <$> mapM (pickNumber <=< translate t) o
+        translations       = map (decodeEntry . signals) ds
+        decodeEntry e      = join $ findMOf traverse (\m -> allM (fmap (`M.member` digits) . translate m) e) (choices e)
+        translate t        = fmap S.fromList . mapM (`M.lookup` t) . S.toList
 
-pickNumber :: S.Set Char -> Int
-pickNumber = (digits M.!)
+pickNumber :: Segments -> Maybe Int
+pickNumber = flip M.lookup digits
 
-numberFromDigits :: [Int] -> Int
+numberFromDigits :: (Foldable t) => t Int -> Int
 numberFromDigits = foldl (\n d -> n * 10 + d) 0
 
-choices :: [String] -> [(Char, S.Set Char)]
-choices = concatMap choices'
+choices :: [Segments] -> [M.Map Char Char]
+choices = pickUnique . M.toList . M.fromListWith S.intersection . S.toList . S.unions . map choices'
     where
-        choices' s | length s == 2 = map (, one) s
-                   | length s == 3 = map (, seven) s
-                   | length s == 4 = map (, four) s
-                   | length s == 7 = map (, eight) s
-                   | otherwise = []
+        choices' s | S.size s == 2 = S.map (, one)   s
+                   | S.size s == 3 = S.map (, seven) s
+                   | S.size s == 4 = S.map (, four)  s
+                   | S.size s == 7 = S.map (, eight) s
+                   | otherwise = S.empty
 
-day08a :: _ :~> _
+day08a :: [Entry] :~> Int
 day08a = MkSol
     { sParse = Just . parser
     , sShow  = show
-    , sSolve = Just . solvea
+    , sSolve = Just . countTrue ((`elem` [2,3,4,7]) . length) . concatMap outputs
     }
 
-day08b :: _ :~> _
+day08b :: [Entry] :~> Int
 day08b = MkSol
     { sParse = Just . parser
     , sShow  = show
