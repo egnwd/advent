@@ -95,7 +95,6 @@ library:
   - megaparsec
   - microlens-th
   - mtl
-  - monad-loops
   - nonempty-containers
   - pandoc
   - parser-combinators
