@@ -16,6 +16,7 @@ Table of Contents
 * [Day 5](#day-5)
 * [Day 6](#day-6)
 * [Day 7](#day-7)
+* [Day 8](#day-8) *(no reflection yet)*
 
 Day 1
 ------
@@ -791,5 +792,43 @@ std dev              9.376 ms   (1.954 ms .. 12.41 ms)
 variance introduced by outliers: 19% (moderately inflated)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 8
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day08.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d08p]* / *[Code][d08g]*
+
+[d08p]: https://adventofcode.com/2021/day/8
+[d08g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day08.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 8 Benchmarks
+
+```
+>> Day 08a
+benchmarking...
+time                 5.454 ms   (5.400 ms .. 5.518 ms)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 5.501 ms   (5.439 ms .. 5.623 ms)
+std dev              270.0 μs   (184.1 μs .. 397.3 μs)
+variance introduced by outliers: 26% (moderately inflated)
+
+>> Day 08b
+benchmarking...
+time                 13.95 ms   (13.58 ms .. 14.56 ms)
+                     0.993 R²   (0.984 R² .. 1.000 R²)
+mean                 13.67 ms   (13.54 ms .. 14.00 ms)
+std dev              477.7 μs   (169.0 μs .. 834.5 μs)
+variance introduced by outliers: 11% (moderately inflated)
 ```
 
