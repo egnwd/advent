@@ -32,61 +32,66 @@ import qualified Data.Text as T
 import qualified Data.Set as S
 import qualified Data.Map as M
 
+splitOn :: T.Text -> String -> [String]
 splitOn c = map T.unpack . T.splitOn c . T.pack
 
+parser :: String -> [[[String]]]
 parser = map (map words . splitOn "|") . lines
 
+outputs, signals :: [[String]] -> [String]
 outputs [_, o] = o
 signals [s, _] = s
 
-predi = (`elem` [2,3,4,7]) . length
+solvea :: [[[String]]] -> Int
+solvea = countTrue ((`elem` [2,3,4,7]) . length) . concatMap outputs
 
-solve = countTrue predi . concatMap outputs
+zero, one, two, three, four, five, six, seven, eight, nine :: S.Set Char
+zero  = S.fromList "abcefg"
+one   = S.fromList "cf"
+two   = S.fromList "acdeg"
+three = S.fromList "acdfg"
+four  = S.fromList "bcdf"
+five  = S.fromList "abdfg"
+six   = S.fromList "abdefg"
+seven = S.fromList "acf"
+eight = S.fromList "abcdefg"
+nine  = S.fromList "abcdfg"
 
-zero  = "abcefg"
-one   = "cf"
-two   = "acdeg"
-three = "acdfg"
-four  = "bcdf"
-five  = "abdfg"
-six   = "abdefg"
-seven = "acf"
-eight = "abcdefg"
-nine  = "abcdfg"
+digits :: M.Map (S.Set Char) Int
+digits = M.fromList $ zip [zero, one, two, three, four, five, six, seven, eight, nine] [0..]
 
-digits = map S.fromList [zero, one, two, three, four, five, six, seven, eight, nine]
-
-solveb ds = sum $ zipWith (\r m -> numberFromDigits . map (pickNumber . S.fromList . map (m M.!)) $ outputs r) ds answers
+solveb :: [[[String]]] -> Maybe Int
+solveb ds = sum <$> zipWithM (\r -> fmap (\m -> numberFromDigits . map (pickNumber . translate m) . outputs $ r)) ds answers
     where
         uniqueChoices = map (pickUnique . M.toList . M.fromListWith S.intersection . choices . signals) ds
-        answers = zipWith (\r ms -> head . filter (\m -> all (\s -> S.fromList (map (m M.!) s) `elem` digits) $ signals r) $ ms) ds uniqueChoices
+        answers = zipWith (\r -> find (\m -> all (\s -> translate m s `M.member` digits) . signals $ r)) ds uniqueChoices
+        translate m = S.fromList . map (m M.!)
 
-pickNumber s = pickNumber' digits 0
-    where
-        pickNumber' (d:ds) n | d == s = n
-                             | otherwise = pickNumber' ds (n+1)
+pickNumber :: S.Set Char -> Int
+pickNumber = (digits M.!)
 
+numberFromDigits :: [Int] -> Int
 numberFromDigits = foldl (\n d -> n * 10 + d) 0
 
 choices :: [String] -> [(Char, S.Set Char)]
-choices ss = concatMap choices' ss
+choices = concatMap choices'
     where
-        choices' s | length s == 2 = map (, S.fromList one) s
-                   | length s == 3 = map (, S.fromList seven) s
-                   | length s == 4 = map (, S.fromList four) s
-                   | length s == 7 = map (, S.fromList eight) s
+        choices' s | length s == 2 = map (, one) s
+                   | length s == 3 = map (, seven) s
+                   | length s == 4 = map (, four) s
+                   | length s == 7 = map (, eight) s
                    | otherwise = []
 
 day08a :: _ :~> _
 day08a = MkSol
     { sParse = Just . parser
     , sShow  = show
-    , sSolve = Just . solve
+    , sSolve = Just . solvea
     }
 
 day08b :: _ :~> _
 day08b = MkSol
     { sParse = Just . parser
     , sShow  = show
-    , sSolve = Just . solveb
+    , sSolve = solveb
     }
