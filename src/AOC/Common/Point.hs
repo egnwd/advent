@@ -81,4 +81,4 @@ displayAsciiSet
 displayAsciiSet x y = displayAsciiMap x . M.fromSet (const y)
 
 neighbours :: Point -> [Point]
-neighbours k = [k' | k' <- (k +) <$> [ V2 0 (-1), V2 1 0, V2 0 1, V2 (-1) 0 ]]
+neighbours k = (k +) <$> [V2 0 (-1), V2 1 0, V2 0 1, V2 (-1) 0]

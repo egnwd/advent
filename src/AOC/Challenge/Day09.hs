@@ -35,9 +35,9 @@ solvea :: Landscape -> Int
 solvea = getSum . M.foldMapWithKey (const score) . findLowPoints
 
 findLowPoints :: Landscape -> Landscape
-findLowPoints nss = M.filterWithKey p nss
+findLowPoints nss = M.filterWithKey isLowest nss
     where
-        p k h = all (maybe True (h <) . (`M.lookup` nss)) (neighbours k)
+        isLowest k h = all (maybe True (h <) . (`M.lookup` nss)) (neighbours k)
 
 solveb :: Landscape -> Int
 solveb land = product . largest 3 . map getBasinSize $ lowPointSeeds
@@ -52,9 +52,9 @@ buildBasin
     -> Landscape                                           -- | Original grid
     -> (S.Set Point, S.Set Point)                          -- | Seen points, and next points
     -> ListF Int (Either [Int] (S.Set Point, S.Set Point)) -- | ListF of current region sizes over the next regions to visit
-buildBasin nss land (seen, next) = Cons (S.size next) go
+buildBasin ns land (seen, next) = Cons (S.size next) go
     where
-        neighbouringBasinLocations = M.keysSet . M.restrictKeys land . S.unions . S.map (fromMaybe S.empty . (`M.lookup` nss))
+        neighbouringBasinLocations = M.keysSet . M.restrictKeys land . S.unions . S.map (fromMaybe S.empty . (`M.lookup` ns))
         next' = neighbouringBasinLocations next `S.difference` seen
         seen' = S.union seen next
         go = if null next'
