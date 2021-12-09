@@ -48,10 +48,10 @@ solveb land = product . largest 3 . map getBasinSize $ lowPointSeeds
         lowPointSeeds = map (\l -> (S.empty, S.singleton l)) . M.keys . findLowPoints $ land
 
 buildBasin
-    :: M.Map Point (S.Set Point)                                    -- | Map from point to neighbouring values
-    -> Landscape                                                    -- | Original grid
-    -> (S.Set Point, S.Set Point)                                   -- | Seen points, and next points
-    -> ListF Int (Either [Int] (S.Set Point, S.Set Point))
+    :: M.Map Point (S.Set Point)                           -- | Map from point to neighbouring values
+    -> Landscape                                           -- | Original grid
+    -> (S.Set Point, S.Set Point)                          -- | Seen points, and next points
+    -> ListF Int (Either [Int] (S.Set Point, S.Set Point)) -- | ListF of current region sizes over the next regions to visit
 buildBasin nss land (seen, next) = Cons (S.size next) go
     where
         neighbouringBasinLocations = M.keysSet . M.restrictKeys land . S.unions . S.map (fromMaybe S.empty . (`M.lookup` nss))
