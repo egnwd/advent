@@ -13,20 +13,20 @@ module AOC.Challenge.Day09 (
   ) where
 
 import           AOC.Solver            ((:~>)(..))
-import           AOC.Common            (parseAsciiMap, boundingBox, neighbours, Point)
+import           AOC.Common            (parseAsciiMap, neighbours, Point)
 import           Data.Char             (digitToInt)
-import           Data.Foldable         (fold)
 import           Data.Functor.Foldable (apo, ListF(..))
 import           Data.List             (sortOn)
 import           Data.Monoid           (Sum(Sum), getSum)
-import qualified Data.List.NonEmpty as NE
+import           Data.Maybe            (fromMaybe)
+import           Control.Monad         (mfilter)
 import qualified Data.Map as M
 import qualified Data.Set as S
 
 type Landscape = M.Map Point Int
 
 parse :: String -> Landscape
-parse = parseAsciiMap (pure . digitToInt)
+parse = parseAsciiMap (mfilter (<9) . pure . digitToInt)
 
 score :: Int -> Sum Int
 score n = Sum (1+n)
@@ -37,27 +37,24 @@ solvea = getSum . M.foldMapWithKey (const score) . findLowPoints
 findLowPoints :: Landscape -> Landscape
 findLowPoints nss = M.filterWithKey p nss
     where
-        bounds = boundingBox . NE.fromList . M.keys $ nss
-        p k h = all ((h<) . (nss M.!)) (neighbours bounds k)
+        p k h = all (maybe True (h <) . (`M.lookup` nss)) (neighbours k)
 
 solveb :: Landscape -> Int
-solveb land = product . largest 3 $ basins
+solveb land = product . largest 3 . map getBasinSize $ lowPointSeeds
     where
         largest n = take n . sortOn negate
-        basins = map snd . M.toList . M.mapWithKey (const . getBasinSize) $ lowPointSeeds
-        getBasinSize = getSum . fold . apo (buildBasin allNeighbours land)
-        allNeighbours = M.mapWithKey (const . S.fromList . neighbours bounds) land
-        bounds = boundingBox . NE.fromList . M.keys $ land
-        lowPointSeeds = M.mapKeys (\l -> (S.empty, S.singleton l)) . findLowPoints $ land
+        getBasinSize = sum . apo (buildBasin allNeighbours land)
+        allNeighbours = M.mapWithKey (const . S.fromList . neighbours) land
+        lowPointSeeds = map (\l -> (S.empty, S.singleton l)) . M.keys . findLowPoints $ land
 
 buildBasin
     :: M.Map Point (S.Set Point)                                    -- | Map from point to neighbouring values
     -> Landscape                                                    -- | Original grid
     -> (S.Set Point, S.Set Point)                                   -- | Seen points, and next points
-    -> ListF (Sum Int) (Either [Sum Int] (S.Set Point, S.Set Point))
-buildBasin nss land (seen, next) = Cons (Sum (S.size next)) go
+    -> ListF Int (Either [Int] (S.Set Point, S.Set Point))
+buildBasin nss land (seen, next) = Cons (S.size next) go
     where
-        neighbouringBasinLocations = M.keysSet . M.filter (/=9) . M.restrictKeys land . S.unions . S.map (nss M.!)
+        neighbouringBasinLocations = M.keysSet . M.restrictKeys land . S.unions . S.map (fromMaybe S.empty . (`M.lookup` nss))
         next' = neighbouringBasinLocations next `S.difference` seen
         seen' = S.union seen next
         go = if null next'

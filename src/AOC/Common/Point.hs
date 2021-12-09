@@ -80,5 +80,5 @@ displayAsciiSet
     -> String
 displayAsciiSet x y = displayAsciiMap x . M.fromSet (const y)
 
-neighbours :: V2 Point -> Point -> [Point]
-neighbours bounds k = [k' | k' <- (k +) <$> [ V2 0 (-1), V2 1 0, V2 0 1, V2 (-1) 0 ], inBoundingBox bounds k']
+neighbours :: Point -> [Point]
+neighbours k = [k' | k' <- (k +) <$> [ V2 0 (-1), V2 1 0, V2 0 1, V2 (-1) 0 ]]
