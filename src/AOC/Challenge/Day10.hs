@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# LANGUAGE ExistentialQuantification #-}
 
 -- |
@@ -9,25 +7,18 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 10.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 10.
 
 module AOC.Challenge.Day10 (
     day10a
   , day10b
   ) where
 
-import           AOC.Prelude
+import AOC.Common  ((!?))
+import AOC.Solver  ((:~>)(..))
+import Data.List   (sort)
+import Data.Maybe  (mapMaybe)
+import Data.Monoid (Sum(Sum), getSum)
 
 data AutocompleteScore a = (Num a) => Auto { autoScore :: a }
 
@@ -64,7 +55,6 @@ scoreb = \case
     '{' -> Auto 3
     '<' -> Auto 4
     _   -> mempty
-
 
 solvea :: String -> Maybe (Sum Integer)
 solvea [] = Nothing
