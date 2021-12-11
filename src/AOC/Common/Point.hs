@@ -8,6 +8,7 @@ module AOC.Common.Point
   , displayAsciiMap
   , displayAsciiSet
   , neighbours
+  , allNeighbours
   ) where
 
 import           Data.Monoid
@@ -82,3 +83,7 @@ displayAsciiSet x y = displayAsciiMap x . M.fromSet (const y)
 
 neighbours :: Point -> [Point]
 neighbours k = (k +) <$> [V2 0 (-1), V2 1 0, V2 0 1, V2 (-1) 0]
+
+allNeighbours :: Point -> [Point]
+allNeighbours k = [k + k' | k' <- sequence (pure [-1, 0, 1]), k' /= pure 0]
+

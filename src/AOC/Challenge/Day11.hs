@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day11
 -- License     : BSD3
@@ -8,36 +5,51 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 11.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 11.
 
 module AOC.Challenge.Day11 (
-    -- day11a
-  -- , day11b
+    day11a
+  , day11b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver ((:~>)(..), dyno_)
+import AOC.Common (Point, lookupFreq, freqs, countTrue, fixedPoint, parseAsciiMap, allNeighbours)
+import Data.Char (digitToInt)
+import qualified Data.Map as M
 
-day11a :: _ :~> _
+type Octopuses = M.Map Point Int
+
+solvea :: Int -> Octopuses -> Int
+solvea n = (!! n) . scanl1 (+) . map (countTrue (==0)) . iterate step
+
+step :: Octopuses -> Octopuses
+step os = fmap reset . snd . fixedPoint (uncurry next) $ (1 <$ os, os)
+    where
+        reset o = if o > 9 then 0 else o
+        next :: M.Map Point Int -> Octopuses -> (M.Map Point Int, Octopuses)
+        next keys os'' = (keys', fst <$> os''')
+            where
+                keys' = (`M.restrictKeys` M.keysSet didn'tFlash) . freqs . concatMap allNeighbours . M.keys $ flashed
+                (flashed, didn'tFlash) = M.partition snd os'''
+                os''' = M.mapWithKey (step' keys) os''
+
+step' :: Octopuses -> Point -> Int -> (Int, Bool)
+step' ks k o | k `M.member` ks && o < 10 = let o' = o + lookupFreq k ks in (o', o' > 9)
+             | otherwise   = (o, False)
+
+solveb :: Octopuses -> Int
+solveb = fst . head . dropWhile (not . all (==0) . snd) . zip [0..] . iterate step
+
+day11a :: Octopuses :~> Int
 day11a = MkSol
-    { sParse = Just
+    { sParse = Just . parseAsciiMap (pure . digitToInt)
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . solvea (dyno_ "days" 100)
     }
 
-day11b :: _ :~> _
+day11b :: Octopuses :~> Int
 day11b = MkSol
-    { sParse = Just
+    { sParse = Just . parseAsciiMap (pure . digitToInt)
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . solveb
     }

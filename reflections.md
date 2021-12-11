@@ -19,6 +19,7 @@ Table of Contents
 * [Day 8](#day-8) *(no reflection yet)*
 * [Day 9](#day-9)
 * [Day 10](#day-10) *(no reflection yet)*
+* [Day 11](#day-11) *(no reflection yet)*
 
 Day 1
 ------
@@ -1004,6 +1005,48 @@ time                 489.7 μs   (483.7 μs .. 501.2 μs)
 mean                 489.7 μs   (484.4 μs .. 501.1 μs)
 std dev              24.51 μs   (11.37 μs .. 42.20 μs)
 variance introduced by outliers: 44% (moderately inflated)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 11
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day11.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d11p]* / *[Code][d11g]*
+
+[d11p]: https://adventofcode.com/2021/day/11
+[d11g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day11.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 11 Benchmarks
+
+```
+>> Day 11a
+benchmarking...
+time                 25.97 ms   (24.84 ms .. 26.81 ms)
+                     0.994 R²   (0.985 R² .. 0.998 R²)
+mean                 26.48 ms   (25.99 ms .. 27.47 ms)
+std dev              1.333 ms   (710.4 μs .. 2.377 ms)
+variance introduced by outliers: 16% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 11b
+benchmarking...
+time                 120.9 ms   (103.9 ms .. 142.3 ms)
+                     0.970 R²   (0.931 R² .. 0.999 R²)
+mean                 110.4 ms   (107.4 ms .. 118.4 ms)
+std dev              7.722 ms   (1.700 ms .. 11.59 ms)
+variance introduced by outliers: 23% (moderately inflated)
 
 * parsing and formatting times excluded
 ```
