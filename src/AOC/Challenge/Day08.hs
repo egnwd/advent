@@ -48,9 +48,9 @@ digits = M.fromList $ zip [zero, one, two, three, four, five, six, seven, eight,
 solveb :: [Entry] -> Maybe Int
 solveb ds = sum <$> zipWithM (\e -> outputToNumber (outputs e) <=< id) ds translations
     where
-        outputToNumber o t = numberFromDigits <$> mapM (pickNumber <=< translate t) o
+        outputToNumber o t = numberFromDigits <$> traverse (pickNumber <=< translate t) o
+        translate t        = fmap S.fromList . traverse (`M.lookup` t) . S.toList
         translations       = map (decodeEntry . signals) ds
-        translate t        = fmap S.fromList . mapM (`M.lookup` t) . S.toList
         decodeEntry e = find valid (choices e)
             where
                 valid m = maybe False (all (`M.member` digits)) . traverse (translate m) $ e
@@ -62,13 +62,14 @@ numberFromDigits :: (Foldable t) => t Int -> Int
 numberFromDigits = foldl (\n d -> n * 10 + d) 0
 
 choices :: [Segments] -> [M.Map Char Char]
-choices = pickUnique . M.toList . M.fromListWith S.intersection . S.toList . S.unions . map choices'
+choices = pickUnique . M.toList . M.fromListWith S.intersection . concatMap choices'
     where
-        choices' s | S.size s == 2 = S.map (, one)   s
-                   | S.size s == 3 = S.map (, seven) s
-                   | S.size s == 4 = S.map (, four)  s
-                   | S.size s == 7 = S.map (, eight) s
-                   | otherwise = S.empty
+        chooseFrom s n = S.toList . S.map (, n) $ s
+        choices' s | S.size s == 2 = s `chooseFrom` one
+                   | S.size s == 3 = s `chooseFrom` seven
+                   | S.size s == 4 = s `chooseFrom` four
+                   | S.size s == 7 = s `chooseFrom` eight
+                   | otherwise = []
 
 day08a :: [Entry] :~> Int
 day08a = MkSol
