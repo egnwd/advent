@@ -1075,20 +1075,20 @@ that file instead!
 ```
 >> Day 12a
 benchmarking...
-time                 23.02 ms   (22.88 ms .. 23.15 ms)
-                     1.000 R²   (0.999 R² .. 1.000 R²)
-mean                 22.98 ms   (22.87 ms .. 23.08 ms)
-std dev              238.2 μs   (159.8 μs .. 352.0 μs)
+time                 8.572 ms   (8.524 ms .. 8.630 ms)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 8.585 ms   (8.552 ms .. 8.637 ms)
+std dev              132.2 μs   (86.57 μs .. 206.6 μs)
 
 * parsing and formatting times excluded
 
 >> Day 12b
 benchmarking...
-time                 563.7 ms   (552.4 ms .. NaN s)
+time                 248.2 ms   (244.0 ms .. 251.0 ms)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 556.6 ms   (554.2 ms .. 560.5 ms)
-std dev              3.816 ms   (272.2 μs .. 4.821 ms)
-variance introduced by outliers: 19% (moderately inflated)
+mean                 259.9 ms   (255.3 ms .. 266.5 ms)
+std dev              7.280 ms   (4.029 ms .. 9.361 ms)
+variance introduced by outliers: 16% (moderately inflated)
 
 * parsing and formatting times excluded
 ```

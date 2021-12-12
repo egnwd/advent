@@ -14,6 +14,7 @@ module AOC.Challenge.Day12 (
 
 import           AOC.Solver           ((:~>)(..))
 import           AOC.Common           (CharParser, parseLines)
+import           Control.Lens         ((^.), _3)
 import           Control.Monad        (guard)
 import           Data.Bifunctor       (second)
 import           Data.Char            (isUpper)
@@ -22,8 +23,6 @@ import           Text.Megaparsec      (many)
 import           Text.Megaparsec.Char (char, letterChar)
 import qualified Data.Graph as G
 import qualified Data.Map as M
-import qualified Data.Set as S
-
 
 type Cave = String
 type GraphNeighbours = Cave -> (Bool, Cave, [Cave])
@@ -46,16 +45,15 @@ buildGraph paths = maybe (False, "end", []) nodeFromVertex . vertexFromKey
         paths' = map swap paths
 
 findPaths :: EnterCavePredicate -> GraphNeighbours -> Int
-findPaths canEnterCave getNode = S.size . S.fromList $ findPaths' M.empty start
+findPaths canEnterCave getNode = sum $ findPaths' M.empty start
     where
-        start = let (_, s, ns) = getNode "start" in (s, ns)
-        findPaths' _ (_, []) = [[]]
-        findPaths' seen (curr, ns) = do
+        start = getNode "start" ^. _3
+        findPaths' _ [] = return 1
+        findPaths' seen ns = do
             (large, n, ns') <- map getNode ns
             guard $ canEnterCave seen n large
             let seen' = if large then seen else M.alter (pure . maybe 1 succ) n seen
-            rest <- findPaths' seen' (n, ns')
-            pure $ curr : rest
+            findPaths' seen' ns'
 
 partaPredicate, partbPredicate :: EnterCavePredicate
 partaPredicate seen a large = large || a `M.notMember` seen
