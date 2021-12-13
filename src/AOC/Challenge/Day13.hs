@@ -16,12 +16,13 @@ module AOC.Challenge.Day13 (
 
 import           AOC.Solver           ((:~>)(..))
 import           AOC.Common           (parseMaybeLenient, pTok, pDecimal, Point, CharParser)
+import           Advent.OCR           (parseLettersWith)
+import           Control.Lens         (view, _head, (^?))
+import           Control.Monad        (void)
+import           Data.Bifunctor       (first)
 import           Linear               (V2(..), _x, _y)
 import           Text.Megaparsec      (many, try, eof, (<|>))
 import           Text.Megaparsec.Char (char, newline)
-import           Control.Lens         (view, _head, (^?))
-import           Advent.OCR           (parseLettersWith)
-import           Control.Monad        (void)
 import qualified Data.Set as S
 
 type TransparentPaper = S.Set Point
@@ -47,11 +48,10 @@ fullyFold :: TransparentPaper -> [Fold] -> TransparentPaper
 fullyFold = foldl applyFold
 
 applyFold :: TransparentPaper -> Fold -> TransparentPaper
-applyFold points f = points'
+applyFold points f = uncurry S.union . first remapPoints . partitionPoints $ points
     where
-        points' = S.union remainingPoints remappedPoints
-        remappedPoints = S.map (`remapPoint` f) pointsToMove
-        (pointsToMove, remainingPoints) = S.partition (`beyondFold` f) points
+        remapPoints = S.map (`remapPoint` f)
+        partitionPoints = S.partition (`beyondFold` f)
 
 remapPoint :: Point -> Fold -> Point
 remapPoint (V2 x y) = \case
