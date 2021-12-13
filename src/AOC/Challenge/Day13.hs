@@ -48,10 +48,10 @@ fullyFold :: TransparentPaper -> [Fold] -> TransparentPaper
 fullyFold = foldl applyFold
 
 applyFold :: TransparentPaper -> Fold -> TransparentPaper
-applyFold points f = uncurry S.union . first remapPoints . partitionPoints $ points
+applyFold points f = uncurry S.union . first remap . partition $ points
     where
-        remapPoints = S.map (`remapPoint` f)
-        partitionPoints = S.partition (`beyondFold` f)
+        remap = S.map (`remapPoint` f)
+        partition = S.partition (`beyondFold` f)
 
 remapPoint :: Point -> Fold -> Point
 remapPoint (V2 x y) = \case
