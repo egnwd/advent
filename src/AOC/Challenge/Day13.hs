@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day13
@@ -8,36 +7,72 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 13.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 13.
 
 module AOC.Challenge.Day13 (
-    -- day13a
-  -- , day13b
+    day13a
+  , day13b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver           ((:~>)(..))
+import           AOC.Common           (parseMaybeLenient, pTok, pDecimal, Point, CharParser)
+import           Linear               (V2(..), _x, _y)
+import           Text.Megaparsec      (many, try, eof, (<|>))
+import           Text.Megaparsec.Char (char, newline)
+import           Control.Lens         (view, _head, (^?))
+import           Advent.OCR           (parseLettersWith)
+import           Control.Monad        (void)
+import qualified Data.Set as S
 
-day13a :: _ :~> _
+type TransparentPaper = S.Set Point
+data Fold = FX Int | FY Int
+
+parser :: CharParser (TransparentPaper, [Fold])
+parser =  (,) <$> parsePoints <*> parseFolds
+
+parsePoints :: CharParser TransparentPaper
+parsePoints = S.fromList <$> many (try (parsePoint <* newline)) <* newline
+    where
+        parsePoint = V2 <$> pDecimal <* char ',' <*> pDecimal
+
+parseFolds :: CharParser [Fold]
+parseFolds = many $ foldAlong *> (parseX <|> parseY) <* trailing
+    where
+        foldAlong = pTok "fold along"
+        parseX = FX <$> ("x=" *> pDecimal)
+        parseY = FY <$> ("y=" *> pDecimal)
+        trailing = void newline <|> eof
+
+fullyFold :: TransparentPaper -> [Fold] -> TransparentPaper
+fullyFold = foldl applyFold
+
+applyFold :: TransparentPaper -> Fold -> TransparentPaper
+applyFold points f = points'
+    where
+        points' = S.union remainingPoints remappedPoints
+        remappedPoints = S.map (`remapPoint` f) pointsToMove
+        (pointsToMove, remainingPoints) = S.partition (`beyondFold` f) points
+
+remapPoint :: Point -> Fold -> Point
+remapPoint (V2 x y) = \case
+    FX fx -> V2 (2*fx-x) y
+    FY fy -> V2 x        (2*fy-y)
+
+beyondFold :: Point -> Fold -> Bool
+beyondFold (V2 x y) = \case
+    FX fx -> x > fx
+    FY fy -> y > fy
+
+day13a :: (TransparentPaper, [Fold]) :~> Int
 day13a = MkSol
-    { sParse = Just
+    { sParse = parseMaybeLenient parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \(ps, fs) -> S.size . applyFold ps <$> fs ^? _head
     }
 
-day13b :: _ :~> _
+day13b :: (TransparentPaper, [Fold]) :~> String
 day13b = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
+    { sParse = parseMaybeLenient parser
+    , sShow  = id
+    , sSolve = parseLettersWith (view _x) (view _y) . uncurry fullyFold
     }

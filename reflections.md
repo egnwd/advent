@@ -21,6 +21,7 @@ Table of Contents
 * [Day 10](#day-10) *(no reflection yet)*
 * [Day 11](#day-11) *(no reflection yet)*
 * [Day 12](#day-12) *(no reflection yet)*
+* [Day 13](#day-13) *(no reflection yet)*
 
 Day 1
 ------
@@ -1207,5 +1208,43 @@ std dev              7.280 ms   (4.029 ms .. 9.361 ms)
 variance introduced by outliers: 16% (moderately inflated)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 13
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day13.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d13p]* / *[Code][d13g]*
+
+[d13p]: https://adventofcode.com/2021/day/13
+[d13g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day13.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 13 Benchmarks
+
+```
+>> Day 13a
+benchmarking...
+time                 9.140 ms   (8.989 ms .. 9.345 ms)
+                     0.997 R²   (0.994 R² .. 0.998 R²)
+mean                 9.202 ms   (9.044 ms .. 9.348 ms)
+std dev              409.6 μs   (306.2 μs .. 579.2 μs)
+variance introduced by outliers: 18% (moderately inflated)
+
+>> Day 13b
+benchmarking...
+time                 6.140 ms   (5.671 ms .. 6.795 ms)
+                     0.957 R²   (0.915 R² .. 0.998 R²)
+mean                 5.750 ms   (5.637 ms .. 6.009 ms)
+std dev              507.0 μs   (187.8 μs .. 935.5 μs)
+variance introduced by outliers: 54% (severely inflated)
 ```
 
