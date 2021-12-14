@@ -11,6 +11,7 @@
 
 module AOC.Common (
                     (!?)
+                  , (-?)
                   , CharParser
                   , Parser
                   , pSpace
@@ -23,6 +24,7 @@ module AOC.Common (
                   , parseLinesOrError
                   , fixedPoint
                   , loopEither
+                  , foldMapKeysWith
                   , freqs
                   , lookupFreq
                   , odds
@@ -43,6 +45,7 @@ import           Data.Traversable
 import           Data.Void
 import           AOC.Util
 import           Control.Monad.State
+import           Control.Applicative
 import           Linear
 import           AOC.Common.Point           as AOC
 import qualified Data.Map                   as M
@@ -58,6 +61,9 @@ import qualified Data.Text                  as T
 []     !? _ = Nothing
 (x:_ ) !? 0 = Just x
 (x:xs) !? n = x `seq` (xs !? (n - 1))
+
+(-?) :: (Applicative f, Num c) => f c -> f c -> f c
+(-?) = liftA2 (-)
 
 type CharParser = P.Parsec Void String
 type Parser = P.Parsec Void T.Text
@@ -107,6 +113,9 @@ loopEither f = go
       Left  r  -> r
       Right !y -> go y
 
+
+foldMapKeysWith :: (Ord k2) => (a -> a -> a) -> (k -> [k2]) -> M.Map k a -> M.Map k2 a
+foldMapKeysWith fWith f = M.fromListWith fWith . foldMap (\(k,a) -> map (,a) . f $ k) . M.toList
 
 -- | Build a frequency map
 freqs :: (Foldable f, Ord a) => f a -> Map a Int

@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day14
@@ -8,36 +7,64 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 14.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 14.
 
 module AOC.Challenge.Day14 (
-    -- day14a
-  -- , day14b
+    day14a
+  , day14b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver ((:~>)(..), dyno_)
+import AOC.Common (parseMaybeLenient, (!?), (-?), freqs, foldMapKeysWith, CharParser)
+import Control.Lens (maximumOf, minimumOf)
+import Text.Megaparsec (many, (<|>), takeWhile1P, anySingle, eof)
+import Control.Monad ((<=<), void)
+import Text.Megaparsec.Char (newline)
+import qualified Data.Map as M
 
-day14a :: _ :~> _
+type Element = Char
+type FormulaMapping = M.Map (Element, Element) Element
+type FormulaFrequencies a = M.Map a Int
+
+parser :: CharParser (String, FormulaMapping)
+parser = (,) <$> (formulaP <* newline <* newline) <*> (M.fromList <$> many (mapping <* trailing))
+    where
+       formulaP = takeWhile1P Nothing (/= '\n')
+       lhs = (,) <$> anySingle <*> anySingle
+       rhs = anySingle
+       mapping = (,) <$> (lhs <* " -> ") <*> rhs
+       trailing = void newline <|> eof
+
+generateFormula :: Int -> String -> FormulaMapping -> Maybe (FormulaFrequencies (Element, Element))
+generateFormula n formula m = (!? n) . iterate substitute $ formula'
+    where
+        formula' = freqs . pairwise $ formula
+        pairwise ls = zip ls (tail ls)
+        substitute = foldMapKeysWith (+) new
+        new k@(a,b) = case M.lookup k m of { Just c -> [(a,c), (c,b)]; Nothing -> [k] }
+
+formulaFrequencies :: FormulaFrequencies (Element, Element) -> FormulaFrequencies Element
+formulaFrequencies = M.mapKeysWith (+) snd
+
+scoreFormula :: (Num n, Ord n) => M.Map a n -> Maybe n
+scoreFormula f = mx -? mn
+    where
+        mx = maximumOf traverse f
+        mn = minimumOf traverse f
+
+solve :: Int -> (String, FormulaMapping) -> Maybe Int
+solve n = scoreFormula . formulaFrequencies <=< uncurry (generateFormula n)
+
+day14a :: (String, FormulaMapping) :~> Int
 day14a = MkSol
-    { sParse = Just
+    { sParse = parseMaybeLenient parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = solve (dyno_ "steps" 10)
     }
 
-day14b :: _ :~> _
+day14b :: (String, FormulaMapping) :~> Int
 day14b = MkSol
-    { sParse = Just
+    { sParse = parseMaybeLenient parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = solve (dyno_ "steps" 40)
     }
