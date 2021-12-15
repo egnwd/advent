@@ -48,6 +48,7 @@ import           Control.Monad.State
 import           Control.Applicative
 import           Linear
 import           AOC.Common.Point           as AOC
+import           AOC.Common.Search          as AOC
 import qualified Data.Map                   as M
 import qualified Data.Set                   as S
 import qualified Text.Megaparsec            as P

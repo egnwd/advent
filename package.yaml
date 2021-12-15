@@ -100,6 +100,7 @@ library:
   - pandoc
   - parser-combinators
   - profunctors
+  - psqueues
   - recursion-schemes
   - scientific
   - semigroupoids
