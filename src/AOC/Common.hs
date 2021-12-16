@@ -24,6 +24,7 @@ module AOC.Common (
                   , parseLinesOrError
                   , hexDigit
                   , binDigit
+                  , hexToBin
                   , fixedPoint
                   , loopEither
                   , foldMapKeysWith
@@ -113,6 +114,30 @@ baseDigit = prism' _to _from
     _from c
       | isHexDigit c = Just (finite (fromIntegral (digitToInt c)))
       | otherwise    = Nothing
+
+hexToBin :: String -> Maybe String
+hexToBin = fmap (map (review binDigit) . concat) . traverse hexToBin' <=< traverse (preview hexDigit)
+  where
+    hexToBin' :: Finite 16 -> Maybe [Finite 2]
+    hexToBin' = traverse packFinite <=< toBinDigits
+    toBinDigits = \case
+      0  -> pure [0,0,0,0]
+      1  -> pure [0,0,0,1]
+      2  -> pure [0,0,1,0]
+      3  -> pure [0,0,1,1]
+      4  -> pure [0,1,0,0]
+      5  -> pure [0,1,0,1]
+      6  -> pure [0,1,1,0]
+      7  -> pure [0,1,1,1]
+      8  -> pure [1,0,0,0]
+      9  -> pure [1,0,0,1]
+      10 -> pure [1,0,1,0]
+      11 -> pure [1,0,1,1]
+      12 -> pure [1,1,0,0]
+      13 -> pure [1,1,0,1]
+      14 -> pure [1,1,1,0]
+      15 -> pure [1,1,1,1]
+      _  -> Nothing
 
 
 -- | Repeat a function until you get the same result twice in a row
