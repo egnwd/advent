@@ -16,22 +16,24 @@ module AOC.Challenge.Day16 (
 
 import AOC.Solver               ((:~>)(..))
 import AOC.Common               (hexToBin, parseMaybeLenient, parseOrFail, CharParser)
-import Control.Lens             (preview)
+import Control.Lens             (preview, (<&>))
 import Control.Monad            ((<=<))
 import Data.Finite              (Finite, finite)
 import Data.Functor.Foldable    (cata)
 import Data.Functor.Foldable.TH (makeBaseFunctor)
 import Data.Maybe               (fromMaybe)
 import Numeric.Lens             (binary)
-import Text.Megaparsec          (anySingle, takeP, count, getOffset, setOffset, many)
+import Text.Megaparsec          (anySingle, takeP, count, many, (<|>))
+import Text.Megaparsec.Char     (char)
 
-data PacketValue a = L Integer | Op [a] deriving (Show, Eq, Functor, Traversable, Foldable)
+data PacketValue a = L Integer | Op [a] deriving (Functor, Traversable, Foldable)
 
 data Packet = Packet
     { _pVersion :: !Int
-    , _pId :: !(Finite 8)
-    , _pValue :: PacketValue Packet
-    } deriving (Show, Eq)
+    , _pId      :: !(Finite 8)
+    , _pValue   :: PacketValue Packet
+    }
+
 makeBaseFunctor ''Packet
 
 toBinOrZero :: (Integral a) => String -> a
@@ -47,29 +49,19 @@ parsePacket = do
     pure $ Packet v typ val
 
 parseLiteral :: CharParser Integer
-parseLiteral = getOffset >>= fmap toBinOrZero . parseLiteral'
+parseLiteral = toBinOrZero <$> parseLiteral'
     where
-        parseLiteral' :: Int -> CharParser String
-        parseLiteral' start = do
+        parseLiteral' :: CharParser String
+        parseLiteral' = do
             f <- anySingle
             d <- takeP (Just "Literal") 4
-            rest <- if f == '0' then pure [] else parseLiteral' start
+            rest <- if f == '0' then pure [] else parseLiteral'
             pure (d++rest)
 
 parseOperator :: CharParser [Packet]
-parseOperator = do
-    i <- anySingle
-    if i == '0' then parse15Operator else parse11Operator
-
+parseOperator = (char '0' *> parse15Operator) <|> (char '1' *> parse11Operator)
     where
-        parse15Operator :: CharParser [Packet]
-        parse15Operator = do
-            len <- toBinOrZero <$> takeP (Just "Length of subpackets") 15
-            subpackets <- parseOrFail (many parsePacket) <$> takeP (Just "subpackets") len
-            getOffset >>= setOffset . (+len)
-            pure subpackets
-
-        parse11Operator :: CharParser [Packet]
+        parse15Operator = takeP (Just "Length of subpackets") 15 >>= (takeP (Just "subpackets") . toBinOrZero) <&> parseOrFail (many parsePacket)
         parse11Operator = takeP (Just "Count of subpackets") 11 >>= (`count` parsePacket) . toBinOrZero
 
 getVersionSum :: PacketF Int -> Int
