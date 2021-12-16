@@ -1,7 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE OverloadedStrings, TypeFamilies #-}
 
 -- |
 -- Module      : AOC.Challenge.Day16
@@ -10,32 +7,23 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 16.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 16.
 
 module AOC.Challenge.Day16 (
     day16a
   , day16b
-                           , PacketF(..)
   ) where
 
-import           AOC.Prelude hiding (many)
-import Numeric.Lens
-import Control.Lens
-import Data.Finite
-import Text.Megaparsec
-import Data.Functor.Foldable.TH
-import Data.Functor.Foldable
+import AOC.Solver               ((:~>)(..))
+import AOC.Common               (hexToBin, parseMaybeLenient, parseOrFail, CharParser)
+import Control.Lens             (preview)
+import Control.Monad            ((<=<))
+import Data.Finite              (Finite, finite)
+import Data.Functor.Foldable    (cata)
+import Data.Functor.Foldable.TH (makeBaseFunctor)
+import Data.Maybe               (fromMaybe)
+import Numeric.Lens             (binary)
+import Text.Megaparsec          (anySingle, takeP, count, getOffset, setOffset, many)
 
 data PacketValue a = L Integer | Op [a] deriving (Show, Eq, Functor, Traversable, Foldable)
 
