@@ -22,6 +22,8 @@ module AOC.Common (
                   , parseOrFail
                   , parseLines
                   , parseLinesOrError
+                  , hexDigit
+                  , binDigit
                   , fixedPoint
                   , loopEither
                   , foldMapKeysWith
@@ -47,6 +49,10 @@ import           AOC.Util
 import           Control.Monad.State
 import           Control.Applicative
 import           Linear
+import           GHC.TypeNats
+import           Numeric.Lens
+import           Control.Lens
+import           Data.Finite
 import           AOC.Common.Point           as AOC
 import           AOC.Common.Search          as AOC
 import qualified Data.Map                   as M
@@ -93,6 +99,21 @@ parseLines p = Just . mapMaybe (parseMaybeLenient p) . lines
 
 parseLinesOrError :: P.Parsec Void String a -> String -> Maybe [a]
 parseLinesOrError p = Just . map (parseOrFail p) . lines
+
+hexDigit :: Prism' Char (Finite 16)
+hexDigit = baseDigit
+
+binDigit :: Prism' Char (Finite 2)
+binDigit = baseDigit
+
+baseDigit :: (KnownNat n) => Prism' Char (Finite (n :: Nat))
+baseDigit = prism' _to _from
+  where
+    _to              = intToDigit . fromIntegral
+    _from c
+      | isHexDigit c = Just (finite (fromIntegral (digitToInt c)))
+      | otherwise    = Nothing
+
 
 -- | Repeat a function until you get the same result twice in a row
 fixedPoint :: Eq a => (a -> a) -> a -> a
