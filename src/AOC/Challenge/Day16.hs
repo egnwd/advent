@@ -18,35 +18,54 @@ import AOC.Solver               ((:~>)(..))
 import AOC.Common               (hexToBin, parseMaybeLenient, parseOrFail, CharParser)
 import Control.Lens             (preview, (<&>))
 import Control.Monad            ((<=<))
-import Data.Finite              (Finite, finite)
 import Data.Functor.Foldable    (cata)
 import Data.Functor.Foldable.TH (makeBaseFunctor)
 import Data.Maybe               (fromMaybe)
 import Numeric.Lens             (binary)
-import Text.Megaparsec          (anySingle, takeP, count, many, (<|>))
+import Text.Megaparsec          (anySingle, takeP, count, many, (<|>), failure, ErrorItem(Tokens))
 import Text.Megaparsec.Char     (char)
+import qualified Data.Set as S
+import qualified Data.List.NonEmpty as NE
 
-data PacketValue a = L Integer | Op [a] deriving (Functor, Traversable, Foldable)
+data Packet
+    = Literal !Int Integer
+    | Operator !Int Operator [Packet]
 
-data Packet = Packet
-    { _pVersion :: !Int
-    , _pId      :: !(Finite 8)
-    , _pValue   :: PacketValue Packet
-    }
+data Operator
+    = OpSum
+    | OpProd
+    | OpMin
+    | OpMax
+    | OpGT
+    | OpLT
+    | OpEQ
 
 makeBaseFunctor ''Packet
+
+-- ^ Parsing
 
 toBinOrZero :: (Integral a) => String -> a
 toBinOrZero = fromMaybe 0 . preview binary
 
+toOp :: Int -> CharParser (Maybe Operator)
+toOp = \case
+    0 -> pure $ Just OpSum
+    1 -> pure $ Just OpProd
+    2 -> pure $ Just OpMin
+    3 -> pure $ Just OpMax
+    4 -> pure   Nothing
+    5 -> pure $ Just OpGT
+    6 -> pure $ Just OpLT
+    7 -> pure $ Just OpEQ
+    n -> failure (Tokens <$> NE.nonEmpty (show n)) (S.singleton (Tokens . NE.fromList $ "Packet Type (0-7)"))
+
 parsePacket :: CharParser Packet
 parsePacket = do
     v   <- toBinOrZero <$> takeP (Just "Version") 3
-    typ <- finite . toBinOrZero <$> takeP (Just "Operator") 3
-    val <- case typ of
-        4 -> L <$> parseLiteral
-        _ -> Op <$> parseOperator
-    pure $ Packet v typ val
+    typ <- toOp . toBinOrZero =<< takeP (Just "Operator") 3
+    case typ of
+      Nothing -> Literal v <$> parseLiteral
+      Just op -> Operator v op <$> parseOperator
 
 parseLiteral :: CharParser Integer
 parseLiteral = toBinOrZero <$> parseLiteral'
@@ -64,21 +83,29 @@ parseOperator = (char '0' *> parse15Operator) <|> (char '1' *> parse11Operator)
         parse15Operator = takeP (Just "Length of subpackets") 15 >>= (takeP (Just "subpackets") . toBinOrZero) <&> parseOrFail (many parsePacket)
         parse11Operator = takeP (Just "Count of subpackets") 11 >>= (`count` parsePacket) . toBinOrZero
 
+-- ^ Main Functions
+
 getVersionSum :: PacketF Int -> Int
-getVersionSum (PacketF v _ (L _)) = v
-getVersionSum (PacketF v _ (Op ps)) = v + sum ps
+getVersionSum (LiteralF v _) = v
+getVersionSum (OperatorF v _ ps) = v + sum ps
 
 calculate :: PacketF Integer -> Integer
-calculate (PacketF _  0 (Op ps))    = sum ps
-calculate (PacketF _  1 (Op ps))    = product ps
-calculate (PacketF _  2 (Op ps))    = minimum ps
-calculate (PacketF _  3 (Op ps))    = maximum ps
-calculate (PacketF _  4 (L  l))     = l
-calculate (PacketF _  5 (Op [a,b])) = if a >  b then 1 else 0
-calculate (PacketF _  6 (Op [a,b])) = if a <  b then 1 else 0
-calculate (PacketF _  7 (Op [a,b])) = if a == b then 1 else 0
-calculate _                         = error "Invalid calculation"
+calculate (LiteralF _ l)     = l
+calculate (OperatorF _ op ps) = getOp op ps
+    where
+        binOp f = \case
+            [a,b] -> if a `f` b then 1 else 0
+            _     -> 0
+        getOp = \case
+            OpSum  -> sum
+            OpProd -> product
+            OpMin  -> minimum
+            OpMax  -> maximum
+            OpGT   -> binOp (>)
+            OpLT   -> binOp (<)
+            OpEQ   -> binOp (==)
 
+-- ^ Solutions
 
 day16a :: Packet :~> Int
 day16a = MkSol
