@@ -13,7 +13,7 @@ module AOC.Challenge.Day12 (
   ) where
 
 import           AOC.Solver           ((:~>)(..))
-import           AOC.Common           (CharParser, parseLines)
+import           AOC.Common           (CharParser, parseLines, lookupFreq)
 import           Control.Lens         ((^.), _3)
 import           Control.Monad        (guard)
 import           Data.Bifunctor       (second)
@@ -27,9 +27,9 @@ import qualified Data.Map as M
 type Cave = String
 type GraphNeighbours = Cave -> (Bool, Cave, [Cave])
 type EnterCavePredicate
-    =  M.Map String Int -- | Cave -> Number of times visited
-    -> Cave             -- | Cave name
-    -> Bool             -- | True when the cave is large
+    =  M.Map String Int -- ^ Cave -> Number of times visited
+    -> Cave             -- ^ Cave name
+    -> Bool             -- ^ True when the cave is large
     -> Bool
 
 parser :: CharParser (String, String)
@@ -55,20 +55,19 @@ findPaths canEnterCave getNode = sum $ findPaths' M.empty start
             let seen' = if large then seen else M.alter (pure . maybe 1 succ) n seen
             findPaths' seen' ns'
 
-partaPredicate, partbPredicate :: EnterCavePredicate
-partaPredicate seen a large = large || a `M.notMember` seen
-partbPredicate seen a large = large || maybe True (\s -> s < 2 && all (<2) seen) (M.lookup a seen)
+part1Predicate, part2Predicate :: EnterCavePredicate
+part1Predicate seen a large = large || lookupFreq a seen == 0
+part2Predicate seen a large = large || (\s -> s == 0 || s == 1 && all (<2) seen) (lookupFreq a seen)
+
+day12 :: EnterCavePredicate -> GraphNeighbours :~> Int
+day12 p = MkSol
+    { sParse = fmap buildGraph . parseLines parser
+    , sShow  = show
+    , sSolve = Just . findPaths p
+    }
 
 day12a :: GraphNeighbours :~> Int
-day12a = MkSol
-    { sParse = fmap buildGraph . parseLines parser
-    , sShow  = show
-    , sSolve = Just . findPaths partaPredicate
-    }
+day12a = day12 part1Predicate
 
 day12b :: GraphNeighbours :~> Int
-day12b = MkSol
-    { sParse = fmap buildGraph . parseLines parser
-    , sShow  = show
-    , sSolve = Just . findPaths partbPredicate
-    }
+day12b = day12 part2Predicate
