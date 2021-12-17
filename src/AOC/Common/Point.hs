@@ -51,12 +51,12 @@ pastBoundingBox
     => V2 (V2 a)
     -> V2 a
     -> Bool
-pastBoundingBox b x = or $ go <$> x <*> p
+pastBoundingBox b p = or $ go <$> p <*> maxB
   where
     V2 xs ys = sequence b
-    p = floor <$> maximumBy dist [V2 (fromIntegral x) (fromIntegral y) | x <- toList xs, y <- toList ys]
-    dist :: V2 Float -> V2 Float -> Ordering
-    dist = compare `on` (distanceA (V2 0 0))
+    maxB = floor <$> maximumBy (dist @Double) [V2 (fromIntegral x) (fromIntegral y) | x <- toList xs, y <- toList ys]
+    dist :: forall a. (Floating a, Ord a) => V2 a -> V2 a -> Ordering
+    dist = compare `on` distanceA (V2 0 0)
     go x' mx' = if mx' < 0 then x' < mx' else x' > mx'
 
 parseAsciiMap

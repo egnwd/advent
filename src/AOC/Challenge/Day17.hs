@@ -9,27 +9,21 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 17.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 17.
 
 module AOC.Challenge.Day17 (
     day17a
   , day17b
   ) where
 
-import           AOC.Prelude
-import Control.Lens
-import Linear
+import AOC.Solver     ((:~>)(..))
+import AOC.Common     (parseMaybeLenient, CharParser, pDecimal, Point, inBoundingBox, pastBoundingBox)
+import Data.Semigroup (Max(Max), getMax)
+import Data.Foldable  (fold)
+import Data.Maybe     (mapMaybe)
+import Data.List      (find)
+import Control.Lens   ((%~), view)
+import Linear         (V2(..), _x, _y)
 
 type Velocity = V2 Int
 type Region = V2 Point
@@ -63,7 +57,10 @@ positions :: Point -> Velocity -> [Point]
 positions p0 = scanl (+) p0 . velocities
 
 velocities :: Velocity -> [Point]
-velocities = iterate (\(V2 vx vy) -> V2 (signum vx * (abs vx - 1)) (vy - 1))
+velocities = iterate ((_x %~ dragX) . (_y %~ dragY))
+    where
+        dragX vx = signum vx * (abs vx - 1)
+        dragY vy = vy - 1
 
 day17a :: Region :~> Int
 day17a = MkSol

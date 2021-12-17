@@ -25,6 +25,7 @@ Table of Contents
 * [Day 14](#day-14) *(no reflection yet)*
 * [Day 15](#day-15) *(no reflection yet)*
 * [Day 16](#day-16) *(no reflection yet)*
+* [Day 17](#day-17) *(no reflection yet)*
 
 Day 1
 ------
@@ -1474,5 +1475,47 @@ time                 4.776 ms   (4.175 ms .. 5.842 ms)
 mean                 5.463 ms   (4.979 ms .. 6.146 ms)
 std dev              1.895 ms   (1.401 ms .. 2.578 ms)
 variance introduced by outliers: 97% (severely inflated)
+```
+
+
+
+Day 17
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day17.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d17p]* / *[Code][d17g]*
+
+[d17p]: https://adventofcode.com/2021/day/17
+[d17g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day17.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 17 Benchmarks
+
+```
+>> Day 17a
+benchmarking...
+time                 226.0 ms   (206.0 ms .. 246.2 ms)
+                     0.996 R²   (0.984 R² .. 1.000 R²)
+mean                 231.5 ms   (225.1 ms .. 240.3 ms)
+std dev              10.02 ms   (6.635 ms .. 14.64 ms)
+variance introduced by outliers: 14% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 17b
+benchmarking...
+time                 222.7 ms   (216.3 ms .. 234.3 ms)
+                     0.999 R²   (0.997 R² .. 1.000 R²)
+mean                 214.3 ms   (210.2 ms .. 218.9 ms)
+std dev              6.650 ms   (4.401 ms .. 8.155 ms)
+variance introduced by outliers: 14% (moderately inflated)
+
+* parsing and formatting times excluded
 ```
 
