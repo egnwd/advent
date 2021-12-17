@@ -51,7 +51,6 @@ import           Control.Monad.State
 import           Control.Applicative
 import           Linear
 import           GHC.TypeNats
-import           Numeric.Lens
 import           Control.Lens
 import           Data.Finite
 import           AOC.Common.Point           as AOC

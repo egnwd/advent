@@ -2,6 +2,7 @@ module AOC.Common.Point
   ( Point
   , boundingBox
   , inBoundingBox
+  , pastBoundingBox
   , parseAsciiSet
   , parseAsciiMap
   , asciiGrid
@@ -11,12 +12,16 @@ module AOC.Common.Point
   , allNeighbours
   ) where
 
+import           Data.List
+import           Data.Foldable (toList)
+import           Data.Function
 import           Data.Monoid
 import           Data.Semigroup
 import           Data.Semigroup.Foldable
 import           Data.Map (Map)
 import           Data.Set (Set)
 import           Linear
+import           Linear.Affine (distanceA)
 import           Control.Lens
 import           Data.Set.Lens
 import           Data.Map.Lens
@@ -40,6 +45,19 @@ inBoundingBox
 inBoundingBox (V2 mn mx) x = and $ go <$> x <*> mn <*> mx
   where
     go x' mn' mx' = x' >= mn' && x' <= mx'
+
+pastBoundingBox
+    :: (Integral a)
+    => V2 (V2 a)
+    -> V2 a
+    -> Bool
+pastBoundingBox b x = or $ go <$> x <*> p
+  where
+    V2 xs ys = sequence b
+    p = floor <$> maximumBy dist [V2 (fromIntegral x) (fromIntegral y) | x <- toList xs, y <- toList ys]
+    dist :: V2 Float -> V2 Float -> Ordering
+    dist = compare `on` (distanceA (V2 0 0))
+    go x' mx' = if mx' < 0 then x' < mx' else x' > mx'
 
 parseAsciiMap
     :: (Char -> Maybe a)
