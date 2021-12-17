@@ -33,10 +33,10 @@ step = fmap reset . snd . fixedPoint (uncurry next) . ((1 <$) &&& id)
             where
                 keys' = (`M.restrictKeys` M.keysSet didn'tFlash) . freqs . concatMap allNeighbours . M.keys $ flashed
                 (flashed, didn'tFlash) = M.partition snd os'
-                os' = M.mapWithKey (step' keys) os
+                os' = M.mapWithKey (boost keys) os
 
-step' :: Octopuses -> Point -> Int -> (Int, Bool)
-step' ks k o | k `M.member` ks && o < 10 = let o' = o + lookupFreq k ks in (o', o' > 9)
+boost :: Octopuses -> Point -> Int -> (Int, Bool)
+boost ks k o | k `M.member` ks && o < 10 = let o' = o + lookupFreq k ks in (o', o' > 9)
              | otherwise   = (o, False)
 
 solveb :: Octopuses -> Maybe Int
