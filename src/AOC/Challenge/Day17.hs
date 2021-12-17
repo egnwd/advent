@@ -14,6 +14,7 @@
 module AOC.Challenge.Day17 (
     day17a
   , day17b
+                           , validRange
   ) where
 
 import AOC.Solver     ((:~>)(..))
@@ -33,16 +34,18 @@ parser = sequence <$> (V2 <$> ("target area: " *> "x=" *> parseRange <* ", ") <*
     where
         parseRange = V2 <$> pDecimal <*> (".." *> pDecimal)
 
-validRange :: [Velocity]
-validRange = [V2 x y | x <- [1..251], y <- [-105..125]]
+validRange :: Region -> [Velocity]
+validRange (V2 (V2 _ mny) (V2 mxx _)) = sequence $ V2 [1..mxx] [mny..maxY]
+    where
+        maxY = head . dropWhile (<0) . map (sum . take mxx . iterate (subtract 1)) $ [1..]
 
 highestY :: Region -> Int
-highestY targ = getMax . fold . mapMaybe ((\t -> findMaxHeight t <$ findCollision targ t) . trajectory targ) $ validRange
+highestY targ = getMax . fold . mapMaybe ((\t -> findMaxHeight t <$ findCollision targ t) . trajectory targ) $ validRange targ
     where
         findMaxHeight = foldMap (Max . view _y)
 
 numberVelocities :: Region -> Int
-numberVelocities targ = length . mapMaybe (findCollision targ . trajectory targ) $ validRange
+numberVelocities targ = length . mapMaybe (findCollision targ . trajectory targ) $ validRange targ
 
 findCollision :: Region -> [Point] -> Maybe Point
 findCollision targ = find (inBoundingBox targ)
