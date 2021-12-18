@@ -26,6 +26,7 @@ Table of Contents
 * [Day 15](#day-15) *(no reflection yet)*
 * [Day 16](#day-16) *(no reflection yet)*
 * [Day 17](#day-17) *(no reflection yet)*
+* [Day 18](#day-18) *(no reflection yet)*
 
 Day 1
 ------
@@ -1856,5 +1857,43 @@ std dev              76.42 ms   (3.305 ms .. 93.54 ms)
 variance introduced by outliers: 47% (moderately inflated)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 18
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day18.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d18p]* / *[Code][d18g]*
+
+[d18p]: https://adventofcode.com/2021/day/18
+[d18g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day18.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 18 Benchmarks
+
+```
+>> Day 18a
+benchmarking...
+time                 197.0 ms   (39.59 ms .. 422.4 ms)
+                     0.873 R²   (0.744 R² .. 1.000 R²)
+mean                 413.0 ms   (305.6 ms .. 511.0 ms)
+std dev              116.7 ms   (82.00 ms .. 141.2 ms)
+variance introduced by outliers: 72% (severely inflated)
+
+>> Day 18b
+benchmarking...
+time                 3.349 s    (3.255 s .. 3.440 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 3.483 s    (3.421 s .. 3.595 s)
+std dev              107.8 ms   (3.432 ms .. 129.1 ms)
+variance introduced by outliers: 19% (moderately inflated)
 ```
 
