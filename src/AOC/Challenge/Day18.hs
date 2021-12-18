@@ -19,13 +19,14 @@ import AOC.Common               (parseLines, CharParser, fixedPoint, pDecimal)
 import Control.Applicative      ((<|>))
 import Control.Comonad          (extract)
 import Control.Comonad.Cofree   (Cofree(..))
-import Control.Monad            ((<=<), guard, ap)
+import Control.Monad            ((<=<), guard)
 import Data.Foldable            (asum, toList)
 import Data.Functor.Foldable    (histo, para, cata)
 import Data.Functor.Foldable.TH (makeBaseFunctor)
 import Data.List                (tails)
 import Data.List.NonEmpty       (NonEmpty(..), nonEmpty)
 import Data.Maybe               (fromMaybe)
+import Data.Semigroup           (Max(..), getMax)
 import Text.Megaparsec          (between)
 
 -- ^ Snail Number Types & Instances
@@ -58,7 +59,7 @@ parseSnail = parseNumber <|> parsePair
 (@+) :: SnailNum -> SnailNum -> SnailNum
 a @+ b = fixedPoint applySnailRules $ SP a b
     where
-        applySnailRules n = fromMaybe n . asum . ap [explode, split] . pure $ n
+        applySnailRules n = fromMaybe n (asum [explode n, split n])
 
 -- ^ Add @n@ onto the leftmost element
 (^@+) :: Int -> SnailNum -> SnailNum
@@ -75,7 +76,6 @@ a @+ b = fixedPoint applySnailRules $ SP a b
         go :: SnailNumF (SnailNum, SnailNum) -> SnailNum
         go (SNF sn) = SN (sn+n)
         go (SPF (l, _) (_, r)) = SP l r
-
 
 explode :: SnailNum -> Maybe SnailNum
 explode inN = snd <$> histo go inN 0
@@ -109,8 +109,8 @@ magnitude = cata go
         go (SNF n) = n
         go (SPF l r) = (3 * l) + (2 * r)
 
-magnitudes :: NonEmpty SnailNum -> Maybe (NonEmpty Int)
-magnitudes ns = fmap magnitude <$> nonEmpty do
+maxMagnitude :: NonEmpty SnailNum -> Int
+maxMagnitude ns = getMax . foldMap (Max . magnitude) $ do
     (x:ys) <- tails (toList ns)
     y <- ys
     [x @+ y, y @+ x]
@@ -122,9 +122,9 @@ day18a = MkSol
     , sSolve = Just . magnitude . foldl1 (@+)
     }
 
-day18b :: NonEmpty SnailNum :~> Int
+day18b :: NonEmpty SnailNum :~> _
 day18b = MkSol
     { sParse = nonEmpty <=< parseLines parsePair
     , sShow  = show
-    , sSolve = fmap maximum . magnitudes
+    , sSolve = Just . maxMagnitude
     }
