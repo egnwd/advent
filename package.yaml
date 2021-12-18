@@ -79,6 +79,7 @@ library:
   - barbies
   - bytestring
   - containers
+  - comonad
   - criterion
   - cryptohash-md5
   - data-default-class
@@ -86,6 +87,7 @@ library:
   - directory
   - filepath
   - finite-typelits
+  - free
   - haskeline
   - haskell-names
   - haskell-src-exts
