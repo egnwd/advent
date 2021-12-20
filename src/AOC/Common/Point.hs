@@ -10,6 +10,7 @@ module AOC.Common.Point
   , displayAsciiSet
   , neighbours
   , allNeighbours
+  , manhattan
   -- * D24
   , D24(..)
   , orientPoint
@@ -127,6 +128,8 @@ neighbours k = (k +) <$> [V2 0 (-1), V2 1 0, V2 0 1, V2 (-1) 0]
 allNeighbours :: Point -> [Point]
 allNeighbours k = [k + k' | k' <- sequence (pure [-1, 0, 1]), k' /= pure 0]
 
+manhattan :: (Foldable t, Num c, Num (t c)) => t c -> t c -> c
+manhattan x y = sum . abs $ x - y
 
 -- ^ 24 3D Orientations
 
@@ -178,7 +181,6 @@ instance Group Dir where
                    West  -> East
     pow = flip stimes
 
-
 data Axis = ZAxis | YAxis | XAxis
   deriving (Show, Eq, Ord, Generic, Enum)
 
@@ -194,25 +196,12 @@ data D24 = D24 { d24Rot :: !Dir, d24Axis :: !Axis, d24Flip :: !Bool }
 instance Hashable D24
 instance NFData D24
 
--- instance Semigroup D24 where
-    -- D24 x1 a1 False <> D24 x2 a2 f = D24 (x1 <> x2) a1 f
-    -- D24 x1 a1 True  <> D24 x2 a2 f = D24 (x1 <> invert x2) a1 (not f)
-
--- mulD24 = :: D24 -> D24 -> D24
--- mulD24 D24 x1 ZAxis False = \D24 x2 a f -> D24 (x1 <> x2) a f
--- mulD24 D24 x1 ZAxis True  = \D24 x2 a f -> D24 (x1 <> invert x2) a (not f)
--- mulD24 D24 x1 YAxis False = 
-
--- instance Monoid D24 where
-    -- mempty = D24 North ZAxis False
-
 allD24 :: NonEmpty D24
 allD24 = D24 <$> allDir <*> allAxes <*> (False :| [ True ])
 
 allD24Set :: NESet D24
 allD24Set = NES.fromDistinctAscList allD24
 
--- | Rotate and flip a point by a 'D24'
 orientPoint :: Num a => D24 -> V3 a -> V3 a
 orientPoint = \case
     D24 North XAxis False -> \(V3 x y z) -> V3   z     y (-x)

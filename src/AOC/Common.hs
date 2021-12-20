@@ -33,6 +33,7 @@ module AOC.Common (
                   , revFreq
                   , odds
                   , evens
+                  , sequenceTuple
                   , countTrue
                   , pickUnique
                   , lineTo
@@ -192,6 +193,10 @@ odds (x:xs) = x:evens xs
 evens :: [a] -> [a]
 evens [] = []
 evens (_:xs) = odds xs
+
+sequenceTuple :: (Maybe a, Maybe b) -> Maybe (a,b)
+sequenceTuple (Just a, Just b) = Just (a, b)
+sequenceTuple _ = Nothing
 
 -- | Count the number of items in a container where the predicate is true.
 countTrue :: Foldable f => (a -> Bool) -> f a -> Int

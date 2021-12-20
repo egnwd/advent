@@ -15,7 +15,7 @@ module AOC.Challenge.Day20 (
   ) where
 
 import           AOC.Solver        ((:~>)(..))
-import           AOC.Common        (parseAsciiMap, countTrue, Point, boundingBox)
+import           AOC.Common        (parseAsciiMap, countTrue, Point, boundingBox, sequenceTuple)
 import           Control.Lens      ((^.))
 import           Data.IntMap       (IntMap)
 import           Data.Map.NonEmpty (NEMap)
@@ -46,10 +46,7 @@ parseInitialImage :: String -> Maybe Image
 parseInitialImage = NEM.nonEmptyMap . parseAsciiMap lightOrDark
 
 parse :: [String] -> Maybe (EnhanceAlgorithm, Image)
-parse [a,b]
-  = case (parseEnhanceAlgorithm a, parseInitialImage b) of
-        (Just a', Just b') -> Just (a',b')
-        _                  -> Nothing
+parse [a,b] = sequenceTuple (parseEnhanceAlgorithm a, parseInitialImage b)
 parse _     = Nothing
 
 binToDec :: [Pixel] -> Int
