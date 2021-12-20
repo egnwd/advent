@@ -179,7 +179,7 @@ instance Group Dir where
     pow = flip stimes
 
 
-data Axis = XAxis | YAxis | ZAxis
+data Axis = ZAxis | YAxis | XAxis
   deriving (Show, Eq, Ord, Generic, Enum)
 
 instance Hashable Axis
