@@ -30,6 +30,7 @@ module AOC.Common (
                   , foldMapKeysWith
                   , freqs
                   , lookupFreq
+                  , revFreq
                   , odds
                   , evens
                   , countTrue
@@ -41,10 +42,14 @@ module AOC.Common (
 import           Data.Char
 import           Data.Foldable
 import           Data.Map (Map)
+import           Data.IntMap (IntMap)
 import           Data.Set (Set)
+import           Data.Set.NonEmpty (NESet)
 import           Data.List
 import           Data.Maybe
 import           Data.Traversable
+import           Data.Tuple
+import           Data.Bifunctor
 import           Data.Void
 import           AOC.Util
 import           Control.Monad.State
@@ -56,7 +61,9 @@ import           Data.Finite
 import           AOC.Common.Point           as AOC
 import           AOC.Common.Search          as AOC
 import qualified Data.Map                   as M
+import qualified Data.IntMap                as IM
 import qualified Data.Set                   as S
+import qualified Data.Set.NonEmpty          as NES
 import qualified Text.Megaparsec            as P
 import qualified Text.Megaparsec.Char       as P
 import qualified Text.Megaparsec.Char.Lexer as PL
@@ -171,6 +178,12 @@ freqs = M.fromListWith (+) . map (,1) . toList
 -- not found
 lookupFreq :: Ord a => a -> Map a Int -> Int
 lookupFreq = M.findWithDefault 0
+
+revFreq :: (Foldable f, Ord a) => f a -> IntMap (NESet a)
+revFreq = IM.fromListWith (<>)
+        . map (swap . first NES.singleton)
+        . M.toList
+        . freqs
 
 odds :: [a] -> [a]
 odds [] = []

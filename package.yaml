@@ -88,9 +88,11 @@ library:
   - filepath
   - finite-typelits
   - free
+  - groups
   - haskeline
   - haskell-names
   - haskell-src-exts
+  - hashable
   - hpack
   - lens
   - linear

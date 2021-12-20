@@ -10,24 +10,46 @@ module AOC.Common.Point
   , displayAsciiSet
   , neighbours
   , allNeighbours
+  -- * D24
+  , D24(..)
+  , orientPoint
+  , allD24
+  , allD24Set
+  -- * Axis
+  , Axis(..)
+  , allAxes
+  -- * Dir
+  , Dir(..)
+  , allDir
+  , allDirSet
+  -- * 3D Points
+  , Point3D
+  , Vector3D
   ) where
 
-import           Data.List
-import           Data.Foldable (toList)
+import           Control.DeepSeq
+import           Control.Lens
+import           Data.Foldable           (toList)
 import           Data.Function
+import           Data.Group
+import           Data.Hashable
+import           Data.List
+import           Data.List.NonEmpty      (NonEmpty(..))
+import           Data.Map                (Map)
+import           Data.Map.Lens
 import           Data.Monoid
 import           Data.Semigroup
 import           Data.Semigroup.Foldable
-import           Data.Map (Map)
-import           Data.Set (Set)
-import           Linear
-import           Linear.Affine (distanceA)
-import           Control.Lens
+import           Data.Set                (Set)
 import           Data.Set.Lens
-import           Data.Map.Lens
+import           Data.Set.NonEmpty       (NESet)
 import           Data.Tuple.Strict
-import qualified Data.Map.NonEmpty          as NEM
-import qualified Data.Map                   as M
+import           GHC.Generics
+import           Linear
+import           Linear.Affine           (distanceA)
+import qualified Data.Map                as M
+import qualified Data.Map.NonEmpty       as NEM
+import qualified Data.Set.NonEmpty       as NES
 
 -- Some fns from: https://github.com/mstksg/advent-of-code-2020/blob/165461e51f991ac44bc9f8acc5c4e17caf83c13b/src/AOC/Common/Point.hs
 
@@ -104,4 +126,122 @@ neighbours k = (k +) <$> [V2 0 (-1), V2 1 0, V2 0 1, V2 (-1) 0]
 
 allNeighbours :: Point -> [Point]
 allNeighbours k = [k + k' | k' <- sequence (pure [-1, 0, 1]), k' /= pure 0]
+
+
+-- ^ 24 3D Orientations
+
+type Point3D = V3 Int
+type Vector3D = V3 Int
+
+data Dir = North | East | South | West
+  deriving (Show, Eq, Ord, Generic, Enum)
+
+instance Hashable Dir
+instance NFData Dir
+
+mulDir :: Dir -> Dir -> Dir
+mulDir North = id
+mulDir East  = \case North -> East
+                     East  -> South
+                     South -> West
+                     West  -> North
+mulDir South = \case North -> South
+                     East  -> West
+                     South -> North
+                     West  -> East
+mulDir West  = \case North -> West
+                     East  -> North
+                     South -> East
+                     West  -> South
+
+allDir :: NonEmpty Dir
+allDir = North :| [ East .. ]
+
+allDirSet :: NESet Dir
+allDirSet = NES.fromDistinctAscList allDir
+
+instance Semigroup Dir where
+    (<>) = mulDir
+    stimes n x = case n `mod` 4 of
+      1 -> x
+      2 -> x <> x
+      3 -> invert x
+      _ -> North
+
+instance Monoid Dir where
+    mempty = North
+
+instance Group Dir where
+    invert = \case North -> North
+                   East  -> West
+                   South -> South
+                   West  -> East
+    pow = flip stimes
+
+
+data Axis = XAxis | YAxis | ZAxis
+  deriving (Show, Eq, Ord, Generic, Enum)
+
+instance Hashable Axis
+instance NFData Axis
+
+allAxes :: NonEmpty Axis
+allAxes = XAxis :| [ YAxis, ZAxis ]
+
+data D24 = D24 { d24Rot :: !Dir, d24Axis :: !Axis, d24Flip :: !Bool }
+  deriving (Show, Eq, Ord, Generic)
+
+instance Hashable D24
+instance NFData D24
+
+-- instance Semigroup D24 where
+    -- D24 x1 a1 False <> D24 x2 a2 f = D24 (x1 <> x2) a1 f
+    -- D24 x1 a1 True  <> D24 x2 a2 f = D24 (x1 <> invert x2) a1 (not f)
+
+-- mulD24 = :: D24 -> D24 -> D24
+-- mulD24 D24 x1 ZAxis False = \D24 x2 a f -> D24 (x1 <> x2) a f
+-- mulD24 D24 x1 ZAxis True  = \D24 x2 a f -> D24 (x1 <> invert x2) a (not f)
+-- mulD24 D24 x1 YAxis False = 
+
+-- instance Monoid D24 where
+    -- mempty = D24 North ZAxis False
+
+allD24 :: NonEmpty D24
+allD24 = D24 <$> allDir <*> allAxes <*> (False :| [ True ])
+
+allD24Set :: NESet D24
+allD24Set = NES.fromDistinctAscList allD24
+
+-- | Rotate and flip a point by a 'D24'
+orientPoint :: Num a => D24 -> V3 a -> V3 a
+orientPoint = \case
+    D24 North XAxis False -> \(V3 x y z) -> V3   z     y (-x)
+    D24 East  XAxis False -> \(V3 x y z) -> V3   z  (-x) (-y)
+    D24 West  XAxis False -> \(V3 x y z) -> V3   z    x    y
+    D24 South XAxis False -> \(V3 x y z) -> V3   z  (-y)   x
+
+    D24 North XAxis True  -> \(V3 x y z) -> V3 (-z)   y    x
+    D24 East  XAxis True  -> \(V3 x y z) -> V3 (-z) (-x)   y
+    D24 West  XAxis True  -> \(V3 x y z) -> V3 (-z)   x  (-y)
+    D24 South XAxis True  -> \(V3 x y z) -> V3 (-z) (-y) (-x)
+
+    D24 North YAxis False -> \(V3 x y z) -> V3   x  (-z)   y
+    D24 East  YAxis False -> \(V3 x y z) -> V3 (-y) (-z)   x
+    D24 West  YAxis False -> \(V3 x y z) -> V3   y  (-z) (-x)
+    D24 South YAxis False -> \(V3 x y z) -> V3 (-x) (-z) (-y)
+
+    D24 North YAxis True  -> \(V3 x y z) -> V3   x    z  (-y)
+    D24 East  YAxis True  -> \(V3 x y z) -> V3   y    z    x
+    D24 West  YAxis True  -> \(V3 x y z) -> V3 (-y)   z  (-x)
+    D24 South YAxis True  -> \(V3 x y z) -> V3 (-x)   z    y
+
+    D24 North ZAxis False -> \(V3 x y z) -> V3   x    y    z
+    D24 East  ZAxis False -> \(V3 x y z) -> V3   y  (-x)   z
+    D24 West  ZAxis False -> \(V3 x y z) -> V3 (-y)   x    z
+    D24 South ZAxis False -> \(V3 x y z) -> V3 (-x) (-y)   z
+
+    D24 North ZAxis True  -> \(V3 x y z) -> V3 (-x)   y  (-z)
+    D24 East  ZAxis True  -> \(V3 x y z) -> V3   y    x  (-z)
+    D24 West  ZAxis True  -> \(V3 x y z) -> V3 (-y) (-x) (-z)
+    D24 South ZAxis True  -> \(V3 x y z) -> V3   x  (-y) (-z)
 
