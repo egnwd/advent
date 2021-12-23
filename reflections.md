@@ -30,6 +30,7 @@ Table of Contents
 * [Day 19](#day-19) *(no reflection yet)*
 * [Day 20](#day-20) *(no reflection yet)*
 * [Day 21](#day-21) *(no reflection yet)*
+* [Day 22](#day-22) *(no reflection yet)*
 
 Day 1
 ------
@@ -2019,5 +2020,43 @@ std dev              11.73 ms   (4.875 ms .. 16.32 ms)
 variance introduced by outliers: 19% (moderately inflated)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 22
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day22.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d22p]* / *[Code][d22g]*
+
+[d22p]: https://adventofcode.com/2021/day/22
+[d22g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day22.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 22 Benchmarks
+
+```
+>> Day 22a
+benchmarking...
+time                 11.00 ms   (10.81 ms .. 11.17 ms)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 11.01 ms   (10.85 ms .. 11.14 ms)
+std dev              423.8 μs   (299.7 μs .. 618.8 μs)
+variance introduced by outliers: 16% (moderately inflated)
+
+>> Day 22b
+benchmarking...
+time                 328.2 ms   (322.2 ms .. 330.5 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 328.8 ms   (327.3 ms .. 329.7 ms)
+std dev              1.504 ms   (944.6 μs .. 2.174 ms)
+variance introduced by outliers: 16% (moderately inflated)
 ```
 

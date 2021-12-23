@@ -85,6 +85,8 @@ library:
   - data-default-class
   - deepseq
   - directory
+  - distributive
+  - extended-reals
   - filepath
   - finite-typelits
   - free
@@ -95,6 +97,7 @@ library:
   - hashable
   - heredoc
   - hpack
+  - data-interval
   - lens
   - linear
   - matrix
@@ -127,6 +130,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -O2
     dependencies:
     - ansi-terminal
     - aoc2021
