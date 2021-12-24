@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 -- |
 -- Module      : AOC.Challenge.Day23
@@ -24,15 +25,18 @@
 module AOC.Challenge.Day23 (
     day23a
   , day23b
+                           , example
   ) where
 
 import           AOC.Prelude
 import Linear
+import Text.Heredoc
 import Data.Functor.Foldable
 import qualified Data.Map as M
 import qualified Data.Set as S
 
-data Amphipod = Amber | Bronze | Copper | Desert deriving (Ord, Eq)
+data Amphipod = Amber | Bronze | Copper | Desert deriving (Ord, Eq, Generic)
+instance NFData Amphipod
 
 instance Show Amphipod where
     show Amber  = "A"
@@ -40,10 +44,15 @@ instance Show Amphipod where
     show Copper = "C"
     show Desert = "D"
 
-type Maze = Map Point (Maybe Amphipod)
+newtype Maze = Maze { unMaze :: Map Point (Maybe Amphipod) } deriving (Eq, Ord, Generic)
+
+instance NFData Maze
+
+instance Show Maze where
+    show = displayMaze
 
 parser :: String -> Maze
-parser = parseAsciiMap fn
+parser = Maze . parseAsciiMap fn
     where
         fn :: Char -> Maybe (Maybe Amphipod)
         fn 'A' = Just (Just Amber)
@@ -125,48 +134,59 @@ isBurrowTerminal a  (V2 c _) = burrow a == c
 isBurrow _  _ (V2 _ 1) = True
 isBurrow a  _ (V2 c _) = burrow a == c
 
-solve = aStar' allLegalMoves totalTravelHome allAmphipodsHome
+solve g = aStar' (allLegalMoves g) totalTravelHome allAmphipodsHome
 
-totalTravelHome = const 0
--- totalTravelHome = sum . map (\(V2 c _, a) -> maybe 0 (\a' -> energy a' * abs (burrow a' - c)) a) . M.toList
+-- totalTravelHome = const 0
+totalTravelHome (Maze mz) = sum . map (\(p, a) -> maybe 0 (travelHome p) a) . M.toList $ mz
+    where
+        travelHome (V2 c r) a = undefined
 
-allAmphipodsHome = M.null . M.filterWithKey (\(V2 c _) a -> maybe False (\a' -> burrow a' /= c) a)
+allAmphipodsHome = M.null . M.filterWithKey (\(V2 c _) a -> maybe False (\a' -> burrow a' /= c) a) . unMaze
 
-allLegalMoves :: Maze -> Map Maze Int
-allLegalMoves mz = M.unions . map getLegalMoves . M.toList $ mz
+allLegalMoves :: Map Point (Map Point Int) -> Maze -> Map Maze Int
+allLegalMoves g mz = M.unions . map getLegalMoves . M.toList . unMaze $ mz
     where
         getLegalMoves :: (Point, Maybe Amphipod) -> Map Maze Int
         getLegalMoves (_, Nothing) = M.empty
-        getLegalMoves (from, Just a) = updateBurrows from (Just a) $ legalMoves mz a from
-        updateBurrows from a = M.mapKeys (\to -> M.update (const (Just a)) to . M.update (const (Just Nothing)) from $ mz)
+        getLegalMoves (from, Just a) = updateBurrows from (Just a) $ legalMoves g mz a from
+        updateBurrows from a = M.mapKeys (\to -> Maze . M.update (const (Just a)) to . M.update (const (Just Nothing)) from . unMaze $ mz)
 
-legalMoves :: Maze -> Amphipod -> Point -> Map Point Int
-legalMoves mz a p@(V2 c r)
-  | r > 1 = evalState (go isHallway isHallwayTerminal p 0) (S.singleton p)
-  | otherwise = evalState (go (isBurrow a) (isBurrowTerminal a) p 0) (S.singleton p)
+legalMoves :: Map Point (Map Point Int) -> Maze -> Amphipod -> Point -> Map Point Int
+legalMoves g (Maze mz) a p@(V2 c r)
+  | r > 1 = (*energy a) <$> evalState (go isHallway isHallwayTerminal p 0) (S.singleton p)
+  | otherwise = (*energy a) <$> evalState (go (isBurrow a) (isBurrowTerminal a) p 0) (S.singleton p)
   where
       go :: _ -> _ -> Point -> Int -> State (Set Point) (Map Point Int)
       go pd pdt curr weight = do
           seen <- get
           let f next = isNothing (mz M.! next) && pd curr next && S.notMember next seen
-          let queue = M.filterWithKey (const . f) $ part1Graph M.! curr
+          let queue = M.filterWithKey (const . f) $ g M.! curr
           modify (S.union (M.keysSet queue))
           let keeps = M.filterWithKey (const . pdt) queue
-          fmap (M.map ((*energy a) . (+weight)) . M.union keeps . M.unions) . traverse (uncurry (go pd pdt)) . M.toList $ queue
+          fmap (M.map (+weight) . M.union keeps . M.unions) . traverse (uncurry (go pd pdt)) . M.toList $ queue
 
 day23a :: _ :~> _
 day23a = MkSol
     { sParse = Just . parser
     , sShow  = show -- ("\n" ++) . intercalate "\n" . map displayMaze
-    , sSolve = fmap fst . solve
+    , sSolve = fmap fst . solve part1Graph
     }
 
 day23b :: _ :~> _
 day23b = MkSol
-    { sParse = Just
+    { sParse = Just . parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap fst . solve part2Graph
     }
 
 displayMaze :: Maze -> String
-displayMaze = displayAsciiMap ' ' . fmap (maybe '.' (head . show))
+displayMaze = ("\n" ++) . displayAsciiMap ' ' . fmap (maybe '.' (head . show)) . unMaze
+
+example = drop 1 [here|
+#############
+#...........#
+###B#C#B#D###
+  #D#C#B#A#
+  #D#B#A#C#
+  #A#D#C#A#
+  #########|]
