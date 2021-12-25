@@ -31,6 +31,7 @@ Table of Contents
 * [Day 20](#day-20) *(no reflection yet)*
 * [Day 21](#day-21) *(no reflection yet)*
 * [Day 22](#day-22) *(no reflection yet)*
+* [Day 25](#day-25) *(no reflection yet)*
 
 Day 1
 ------
@@ -2058,5 +2059,47 @@ time                 328.2 ms   (322.2 ms .. 330.5 ms)
 mean                 328.8 ms   (327.3 ms .. 329.7 ms)
 std dev              1.504 ms   (944.6 μs .. 2.174 ms)
 variance introduced by outliers: 16% (moderately inflated)
+```
+
+
+
+Day 25
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day25.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d25p]* / *[Code][d25g]*
+
+[d25p]: https://adventofcode.com/2021/day/25
+[d25g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day25.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 25 Benchmarks
+
+```
+>> Day 25a
+benchmarking...
+time                 14.19 s    (14.03 s .. 14.32 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 14.17 s    (14.13 s .. 14.19 s)
+std dev              36.83 ms   (17.89 ms .. 51.73 ms)
+variance introduced by outliers: 19% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 25b
+benchmarking...
+time                 76.44 ns   (76.16 ns .. 76.78 ns)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 76.55 ns   (76.32 ns .. 76.87 ns)
+std dev              887.2 ps   (686.2 ps .. 1.196 ns)
+variance introduced by outliers: 11% (moderately inflated)
+
+* parsing and formatting times excluded
 ```
 

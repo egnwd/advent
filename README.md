@@ -53,7 +53,7 @@ Check out the [reflections][] --- more info below!
 | Day 22    |             | [x][d22g] | [x][d22b]  |
 | Day 23    |             |           |            |
 | Day 24    |             |           |            |
-| Day 25    |             |           |            |
+| Day 25    |             | [x][d25g] | [x][d25b]  |
 
 [reflections]: https://github.com/egnwd/advent/blob/main/reflections.md
 
@@ -335,3 +335,5 @@ All networking features are powered by *[advent-of-code-api][]*.
 [d21b]: https://github.com/egnwd/advent/blob/2021/reflections.md#day-21-benchmarks
 [d22g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day22.hs
 [d22b]: https://github.com/egnwd/advent/blob/2021/reflections.md#day-22-benchmarks
+[d25g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day25.hs
+[d25b]: https://github.com/egnwd/advent/blob/2021/reflections.md#day-25-benchmarks

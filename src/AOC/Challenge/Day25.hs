@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day25
 -- License     : BSD3
@@ -8,71 +5,50 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 25.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 25.
 
 module AOC.Challenge.Day25 (
     day25a
   , day25b
   ) where
 
-import           AOC.Prelude
-import Linear
-import Control.Arrow
-import qualified Data.Map as M
-import qualified Data.Set as S
-import qualified Data.List.NonEmpty as NE
+import           AOC.Solver ((:~>)(..))
+import           AOC.Common (indexedFixedPoint, parseAsciiMap, Dir(..), Point, dirVec)
+import           Data.Map.NonEmpty (NEMap)
+import qualified Data.Map.NonEmpty as M
+import qualified Data.Set.NonEmpty as S
 
+parseDir :: Char -> Maybe Dir
 parseDir '>' = Just East
 parseDir 'v' = Just South
 parseDir _   = Nothing
 
-idxFixedPoint :: Eq a => (a -> a) -> a -> (Int, a)
-idxFixedPoint f = go 1
-  where
-    go idx !x
-        | x == y    = (idx, x)
-        | otherwise = go (idx+1) y
-      where
-        y = f x
+solve :: NEMap Point Dir -> Int
+solve mp = fst . indexedFixedPoint (step mx) $ mp
+    where
+        (mx, _)  = M.findMax mp
 
-solve mp = fst . idxFixedPoint (step (boundingBox (NE.fromList . M.keys $ mp))) $ mp
-
-step :: V2 Point -> Map Point Dir -> Map Point Dir
+step :: Point -> NEMap Point Dir -> NEMap Point Dir
 step bounds = stepDir South . stepDir East
     where
-        stepDir :: Dir -> Map Point Dir -> Map Point Dir
+        stepDir :: Dir -> NEMap Point Dir -> NEMap Point Dir
         stepDir dir mp = M.mapKeys moveCuke mp
             where
-                dirs = M.keysSet . M.filter (==dir) $ mp
-                v :: Point
-                v = dirVec dir
-                nextP :: Point -> Point
-                nextP p | inBoundingBox bounds (p + v) = p + v
-                        | otherwise = setEdge bounds (p + v) (dir <> South)
-                moveCuke :: Point -> Point
-                moveCuke p = let p' = nextP p in if p `S.member` dirs && p' `M.notMember` mp then p' else p
+                dirs = fmap M.keysSet . M.nonEmptyMap . M.filter (==dir) $ mp
+                moveCuke p = let p' = mod <$> p + dirVec dir <*> bounds
+                                 isDir = maybe False (S.member p) dirs
+                              in if isDir && p' `M.notMember` mp then p' else p
 
-day25a :: _ :~> _
+day25a :: NEMap Point Dir :~> Int
 day25a = MkSol
-    { sParse = Just . parseAsciiMap parseDir
+    { sParse = M.nonEmptyMap . parseAsciiMap parseDir
     , sShow  = show
     , sSolve = Just . solve
     }
 
-day25b :: _ :~> _
+day25b :: String :~> String
 day25b = MkSol
     { sParse = Just
-    , sShow  = show
-    , sSolve = Just
+    , sShow  = id
+    , sSolve = Just . const "Christmas saved!"
     }

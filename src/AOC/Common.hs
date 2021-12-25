@@ -26,6 +26,7 @@ module AOC.Common (
                   , binDigit
                   , hexToBin
                   , fixedPoint
+                  , indexedFixedPoint
                   , loopEither
                   , foldMapKeysWith
                   , freqs
@@ -154,6 +155,15 @@ fixedPoint f = go
     go !x
         | x == y    = x
         | otherwise = go y
+      where
+        y = f x
+
+indexedFixedPoint :: Eq a => (a -> a) -> a -> (Int, a)
+indexedFixedPoint f = go 1
+  where
+    go idx !x
+        | x == y    = (idx, x)
+        | otherwise = go (idx+1) y
       where
         y = f x
 
