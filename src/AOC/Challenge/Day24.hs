@@ -89,62 +89,43 @@ emptyMem = ALU 0 0 0 0 []
 
 numberFromDigits = foldl (\n d -> n * 10 + d) 0
 
-eval is = evalStateT (go is) emptyMem
-    where
-        go [] = do
-            valid <- uses z (==0)
-            guard valid
-            numberFromDigits . reverse <$> use inputs
-        go (Inp a:is) = do
-            n <- lift [9,8,7,6,5,4,3,2,1]
-            reg a .= n
-            inputs %= (n:)
-            go is
-        go (Add a b:is) = runOp (+) a b >> go is
-        go (Mul a b:is) = runOp (*) a b >> go is
-        go (Div a b:is) = runOp div a b >> go is
-        go (Mod a b:is) = runOp mod a b >> go is
-        go (Eql a b:is) = runOp intEql a b >> go is
-
 hardcodedEval = evalStateT go emptyMem
     where
         loop i d a b = do
-            n <- lift [i]
-            w .= n
+            -- n <- lift [i]
+            n <- lift [9,8,7,6,5,4,3,2,1]
             inputs %= (n:)
             z' <- use z
-            x' <- x <.= (z' `mod` 26) + a
             z %= (`div` d)
-            traceShowM (x', a, b)
-            unless (x' == n) (z *= 26 >> z += n + b)
-            traceShowM =<< use z
+            -- traceShowM (z' `mod` 26, a, b)
+            unless ((z' `mod` 26) + a == n) (z *= 26 >> z += n + b)
+            -- traceShowM =<< use z
         go = do
-            loop 2 1 16 14
-            loop 9 1 11 3
-            loop 8 1 12 2
-            loop 11 1 11 7
-            loop (-10) 26 (-10) 13
-            loop 15 1 15 6
-            loop (-14) 26 (-14) 10
-            loop 10 1 10 11
-            loop (-4) 26 (-4) 6
-            loop (-3) 26 (-3) 5
-            loop 13 1 13 11
-            loop (-3) 26 (-3) 4
-            loop (-9) 26 (-9) 4
-            loop (-12) 26 (-12) 6
+            loop 7 1 14 16          -- z * 26 + (w + 16)
+            loop 9 1 11 3           -- z * 26 + (w + 11)
+            loop 9 1 12 2           -- z * 26 + (w + 12)
+            loop 9 1 11 7           -- z * 26 + (w + 11)
+            notTooHigh3 <- uses z (< 451488)
+            guard notTooHigh3
+            loop 6 26 (-10) 13      --
+            loop 9 1 15 6           -- z * 26 + (w + 11)
+            notTooHigh2 <- uses z (< 451832)
+            guard notTooHigh2
+            loop 1 26 (-14) 10      -- f(x) = 15
+            loop 2 1 10 11          -- z * 26 + (w + 10)
+            notTooHigh1 <- uses z (< 452103)
+            guard notTooHigh1
+            loop 9 26 (-4) 6        --
+            loop 8 26 (-3) 5        --
+            loop 1 1 13 11          -- z * 26 + (w + 13)
+            notTooHigh <- uses z (< 17575)
+            guard notTooHigh
+            loop 9 26 (-3) 4        --
+            loop 3 26 (-9) 4        --
+            loop 9 26 (-12) 6       --
             valid <- uses z (==0)
-            -- guard valid
-            -- traceShowM . numberFromDigits . reverse =<< use inputs
-            -- error "Done"
-            pure 1
-
-intEql a b = if a == b then 0 else 1
-
-runOp op a b = ((reg a %=) . flip op) =<< ref b
-ref :: Term -> StateT ALUState [] Int
-ref (Val n) = pure n
-ref (Var v) = use (reg v)
+            guard valid
+            numberFromDigits . reverse <$> use inputs
 
 reg :: Variable -> Lens' ALUState Int
 reg = \case
@@ -157,12 +138,12 @@ day24a :: _ :~> _
 day24a = MkSol
     { sParse = parseLines parser
     , sShow  = show
-    , sSolve = Just . const hardcodedEval
+    , sSolve = Just . maximum . const hardcodedEval
     }
 
 day24b :: _ :~> _
 day24b = MkSol
     { sParse = Just
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . minimum . const hardcodedEval
     }
