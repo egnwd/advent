@@ -106,6 +106,39 @@ eval is = evalStateT (go is) emptyMem
         go (Mod a b:is) = runOp mod a b >> go is
         go (Eql a b:is) = runOp intEql a b >> go is
 
+hardcodedEval = evalStateT go emptyMem
+    where
+        loop i d a b = do
+            n <- lift [i]
+            w .= n
+            inputs %= (n:)
+            z' <- use z
+            x' <- x <.= (z' `mod` 26) + a
+            z %= (`div` d)
+            traceShowM (x', a, b)
+            unless (x' == n) (z *= 26 >> z += n + b)
+            traceShowM =<< use z
+        go = do
+            loop 2 1 16 14
+            loop 9 1 11 3
+            loop 8 1 12 2
+            loop 11 1 11 7
+            loop (-10) 26 (-10) 13
+            loop 15 1 15 6
+            loop (-14) 26 (-14) 10
+            loop 10 1 10 11
+            loop (-4) 26 (-4) 6
+            loop (-3) 26 (-3) 5
+            loop 13 1 13 11
+            loop (-3) 26 (-3) 4
+            loop (-9) 26 (-9) 4
+            loop (-12) 26 (-12) 6
+            valid <- uses z (==0)
+            -- guard valid
+            -- traceShowM . numberFromDigits . reverse =<< use inputs
+            -- error "Done"
+            pure 1
+
 intEql a b = if a == b then 0 else 1
 
 runOp op a b = ((reg a %=) . flip op) =<< ref b
@@ -124,7 +157,7 @@ day24a :: _ :~> _
 day24a = MkSol
     { sParse = parseLines parser
     , sShow  = show
-    , sSolve = Just . maximum . eval
+    , sSolve = Just . const hardcodedEval
     }
 
 day24b :: _ :~> _
