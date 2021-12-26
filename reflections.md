@@ -23,7 +23,7 @@ Table of Contents
 * [Day 12](#day-12)
 * [Day 13](#day-13)
 * [Day 14](#day-14)
-* [Day 15](#day-15) *(no reflection yet)*
+* [Day 15](#day-15)
 * [Day 16](#day-16) *(no reflection yet)*
 * [Day 17](#day-17) *(no reflection yet)*
 * [Day 18](#day-18) *(no reflection yet)*
@@ -1809,7 +1809,9 @@ that file instead!
 [d15p]: https://adventofcode.com/2021/day/15
 [d15g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day15.hs
 
-*Reflection not yet written -- please check back later!*
+Today was an execellent [A* problem](https://en.wikipedia.org/wiki/A*_search_algorithm), we start at the origin and aim for the bottom right corner.
+The cost to travel is the risk, and the hueristic is the manhattan distance to the corner.
+
 
 ### Day 15 Benchmarks
 
