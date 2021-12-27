@@ -15,7 +15,7 @@ module AOC.Challenge.Day18 (
   ) where
 
 import AOC.Solver               ((:~>)(..))
-import AOC.Common               (parseLines, CharParser, fixedPoint, pDecimal)
+import AOC.Common               (parseLines, CharParser, pDecimal)
 import Control.Applicative      ((<|>))
 import Control.Comonad          (extract)
 import Control.Comonad.Cofree   (Cofree(..))
@@ -25,7 +25,6 @@ import Data.Functor.Foldable    (histo, para, cata)
 import Data.Functor.Foldable.TH (makeBaseFunctor)
 import Data.List                (tails)
 import Data.List.NonEmpty       (NonEmpty(..), nonEmpty)
-import Data.Maybe               (fromMaybe)
 import Data.Semigroup           (Max(..), getMax)
 import Text.Megaparsec          (between)
 
@@ -57,9 +56,9 @@ parseSnail = parseNumber <|> parsePair
 -- ^ Snail Maths
 
 (@+) :: SnailNum -> SnailNum -> SnailNum
-a @+ b = fixedPoint applySnailRules $ SP a b
+a @+ b = applySnailRules (SP a b)
     where
-        applySnailRules n = fromMaybe n (asum [explode n, split n])
+        applySnailRules n = maybe n applySnailRules (asum [explode n, split n])
 
 -- ^ Add @n@ onto the leftmost element
 (^@+) :: Int -> SnailNum -> SnailNum
@@ -85,7 +84,7 @@ explode inN = snd <$> histo go inN 0
         go (SNF _) _ = Nothing
         go (SPF (nl :@: nr) r) 3 = Just (PlaceLeft nl, SP (SN 0) (nr ^@+ out r))
         go (SPF l (nl :@: nr)) 3 = Just (PlaceRight nr, SP (nl @+^ out l) (SN 0))
-        go (SPF l r) d = asum $ zipWith (\f sn -> f <$> extract sn (d+1)) [explodeLeft, explodeRight] [l,r]
+        go (SPF l r) d = asum [explodeLeft <$> extract l (d+1), explodeRight <$> extract r (d+1)]
               where
                 explodeLeft (PlaceRight nr, sn) = (NoWork, SP sn (nr ^@+ out r))
                 explodeLeft (todo, sn) = (todo, SP sn (out r))
@@ -101,7 +100,7 @@ split = histo go
             guard $ n >= 10
             let n' = (fromIntegral n / 2) :: Double
             pure $ SN (floor n') `SP` SN (ceiling n')
-        go (SPF l r) = asum $ zipWith (\f sn -> f <$> extract sn) [(`SP` out r), SP (out l)] [l, r]
+        go (SPF l r) = asum [(`SP` out r) <$> extract l, SP (out l) <$> extract r]
 
 magnitude :: SnailNum -> Int
 magnitude = cata go
