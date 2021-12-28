@@ -22,9 +22,9 @@ import qualified Data.Text as T
 parser :: String -> Maybe [Int]
 parser = traverse (readMaybe . T.unpack) . T.splitOn "," . T.pack
 
-parta, partb :: Int -> Int
-parta = id
-partb x = (x * (x+1)) `div` 2
+linear, triangular :: Int -> Int
+linear = id
+triangular x = (x * (x+1)) `div` 2
 
 score :: (Int -> Int) -> [Int] -> Int -> Int
 score f cs c = sum . map (f . abs . subtract c) $ cs
@@ -32,16 +32,15 @@ score f cs c = sum . map (f . abs . subtract c) $ cs
 solve :: (Int -> Int) -> [Int] -> Maybe Int
 solve f cs = fmap getMin . foldMap (Just . Min . score f cs) $ [minimum cs .. maximum cs]
 
-day07a :: [Int] :~> Int
-day07a = MkSol
+day07 :: (Int -> Int) -> [Int] :~> Int
+day07 scorer = MkSol
     { sParse = parser
     , sShow  = show
-    , sSolve = solve parta
+    , sSolve = solve scorer
     }
 
+day07a :: [Int] :~> Int
+day07a = day07 linear
+
 day07b :: [Int] :~> Int
-day07b = MkSol
-    { sParse = parser
-    , sShow  = show
-    , sSolve = solve partb
-    }
+day07b = day07 triangular
