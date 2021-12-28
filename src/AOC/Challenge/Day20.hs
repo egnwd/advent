@@ -61,8 +61,9 @@ solve n enhanceAlg img0 = snd . (!! n) $ iterate (\(p, mp) -> (flipPixel p, enha
 enhance :: Pixel -> EnhanceAlgorithm -> Image -> Image
 enhance p alg img0 = img1
     where
-        V2 (V2 mnx mxx) (V2 mny mxy) = sequence $ boundingBox (NEM.keys img0)
-        keys = NE.fromList [ V2 x y | x <- [mnx-1..mxx+1], y <- [mny-1..mxy+1] ]
+        V2 (V2 mnx mxx) (V2 mny mxy) = relax <$> sequence (boundingBox (NEM.keys img0))
+        relax (V2 mn mx) = V2 (pred mn) (succ mx)
+        keys = NE.fromList [V2 x y | x <- [mnx..mxx], y <- [mny..mxy]]
         Just img1 = fmap NEM.fromList . forM keys $ \k -> do
             let n = binToDec [NEM.findWithDefault p (k + (k' ^. _yx)) img0 | k' <- sequence (pure [-1, 0, 1]) :: [Point]]
             (k,) <$> IM.lookup n alg
