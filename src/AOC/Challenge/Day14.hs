@@ -55,16 +55,16 @@ scoreFormula f = mx -? mn
 solve :: Int -> (String, FormulaMapping) -> Maybe Int
 solve n = scoreFormula . formulaFrequencies <=< uncurry (generateFormula n)
 
-day14a :: (String, FormulaMapping) :~> Int
-day14a = MkSol
+day14 :: Int -> (String, FormulaMapping) :~> Int
+day14 n = MkSol
     { sParse = parseMaybeLenient parser
     , sShow  = show
-    , sSolve = solve (dyno_ "steps" 10)
+    , sSolve = solve (dyno_ "steps" n)
     }
 
+
+day14a :: (String, FormulaMapping) :~> Int
+day14a = day14 10
+
 day14b :: (String, FormulaMapping) :~> Int
-day14b = MkSol
-    { sParse = parseMaybeLenient parser
-    , sShow  = show
-    , sSolve = solve (dyno_ "steps" 40)
-    }
+day14b = day14 40
