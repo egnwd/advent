@@ -32,10 +32,10 @@ type EnterCavePredicate
     -> Bool             -- ^ True when the cave is large
     -> Bool
 
-parser :: CharParser (String, String)
+parser :: CharParser (Cave, Cave)
 parser = (,) <$> many letterChar <* char '-' <*> many letterChar
 
-buildGraph :: [(String, String)] -> GraphNeighbours
+buildGraph :: [(Cave, Cave)] -> GraphNeighbours
 buildGraph paths = maybe (False, "end", []) nodeFromVertex . vertexFromKey
     where
         (_, nodeFromVertex, vertexFromKey) = G.graphFromEdges . map createNode . adjs . fixGraphStartEnd $ paths ++ paths'
