@@ -121,7 +121,7 @@ day18a = MkSol
     , sSolve = Just . magnitude . foldl1 (@+)
     }
 
-day18b :: NonEmpty SnailNum :~> _
+day18b :: NonEmpty SnailNum :~> Int
 day18b = MkSol
     { sParse = nonEmpty <=< parseLines parsePair
     , sShow  = show
