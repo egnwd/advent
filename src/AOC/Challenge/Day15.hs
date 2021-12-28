@@ -13,7 +13,7 @@ module AOC.Challenge.Day15 (
   ) where
 
 import           AOC.Solver ((:~>)(..))
-import           AOC.Common (parseAsciiMap, aStar, neighbours, boundingBox, Point)
+import           AOC.Common (parseAsciiMap, aStar, neighbours, boundingBox, Point, manhattan)
 import           Data.Char  (digitToInt)
 import           Linear
 import qualified Data.Map as M
@@ -27,8 +27,7 @@ findPath m = fst <$> go
     where
         (mx, _) = M.findMax m
         ns = M.mapWithKey (\k _ -> (M.restrictKeys m . S.fromList . neighbours) k) m
-        mannDistToBottomRight a = sum . abs $ mx - a
-        go = aStar ns mannDistToBottomRight (== mx) (V2 0 0)
+        go = aStar ns (manhattan mx) (== mx) (V2 0 0)
 
 extendMap :: Cave -> Cave
 extendMap m = M.unions tiles
