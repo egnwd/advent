@@ -21,8 +21,8 @@ import qualified Data.Map as M
 
 type Octopuses = M.Map Point Int
 
-solvea :: Int -> Octopuses -> Maybe Int
-solvea n = (!? n) . scanl1 (+) . map (countTrue (==0)) . iterate step
+parser :: String -> Octopuses
+parser = parseAsciiMap (pure . digitToInt)
 
 step :: Octopuses -> Octopuses
 step = fmap reset . snd . fixedPoint (uncurry next) . ((1 <$) &&& id)
@@ -39,19 +39,22 @@ boost :: Octopuses -> Point -> Int -> (Int, Bool)
 boost ks k o | k `M.member` ks && o < 10 = let o' = o + lookupFreq k ks in (o', o' > 9)
              | otherwise   = (o, False)
 
+solvea :: Int -> Octopuses -> Maybe Int
+solvea n = (!? n) . scanl1 (+) . map (countTrue (==0)) . iterate step
+
 solveb :: Octopuses -> Maybe Int
-solveb = preview (_head._1) . dropWhile (not . all (==0) . snd) . zip [0..] . iterate step
+solveb = preview (_head . _1) . dropWhile (not . all (==0) . snd) . zip [0..] . iterate step
 
 day11a :: Octopuses :~> Int
 day11a = MkSol
-    { sParse = Just . parseAsciiMap (pure . digitToInt)
+    { sParse = Just . parser
     , sShow  = show
     , sSolve = solvea (dyno_ "days" 100)
     }
 
 day11b :: Octopuses :~> Int
 day11b = MkSol
-    { sParse = Just . parseAsciiMap (pure . digitToInt)
+    { sParse = Just . parser
     , sShow  = show
     , sSolve = solveb
     }
