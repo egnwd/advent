@@ -21,10 +21,10 @@ parser :: String -> Maybe [Int]
 parser = traverse readMaybe . lines
 
 solve :: [Int] -> Int
-solve = countTrue (>0) . (zipWith subtract <$> id <*> tail)
+solve = countTrue (>0) . (zipWith subtract <*> tail)
 
 summedSlidingWindows :: (Num a) => [a] -> [a]
-summedSlidingWindows = map sum . (zipWith3 V3 <$> id <*> drop 1 <*> drop 2)
+summedSlidingWindows = map sum . (zipWith3 V3 <*> drop 1 <*> drop 2)
 
 day01a :: [Int] :~> Int
 day01a = MkSol
