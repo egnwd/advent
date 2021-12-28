@@ -32,7 +32,7 @@ score :: Int -> Sum Int
 score n = Sum (1+n)
 
 solvea :: Landscape -> Int
-solvea = getSum . M.foldMapWithKey (const score) . findLowPoints
+solvea = getSum . foldMap score . findLowPoints
 
 findLowPoints :: Landscape -> Landscape
 findLowPoints nss = M.filterWithKey isLowest nss
