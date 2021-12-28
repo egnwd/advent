@@ -31,14 +31,7 @@ data Packet
     = Literal !Int Integer
     | Operator !Int Operator [Packet]
 
-data Operator
-    = OpSum
-    | OpProd
-    | OpMin
-    | OpMax
-    | OpGT
-    | OpLT
-    | OpEQ
+type Operator = [Integer] -> Integer
 
 makeBaseFunctor ''Packet
 
@@ -49,15 +42,19 @@ toBinOrZero = fromMaybe 0 . preview binary
 
 toOp :: Int -> CharParser (Maybe Operator)
 toOp = \case
-    0 -> pure $ Just OpSum
-    1 -> pure $ Just OpProd
-    2 -> pure $ Just OpMin
-    3 -> pure $ Just OpMax
+    0 -> pure $ Just sum
+    1 -> pure $ Just product
+    2 -> pure $ Just minimum
+    3 -> pure $ Just maximum
     4 -> pure   Nothing
-    5 -> pure $ Just OpGT
-    6 -> pure $ Just OpLT
-    7 -> pure $ Just OpEQ
+    5 -> pure $ Just $ binOp (>)
+    6 -> pure $ Just $ binOp (<)
+    7 -> pure $ Just $ binOp (==)
     n -> failure (Tokens <$> NE.nonEmpty (show n)) (S.singleton (Tokens . NE.fromList $ "Packet Type (0-7)"))
+    where
+        binOp f = \case
+            [a,b] -> if a `f` b then 1 else 0
+            _     -> 0
 
 parsePacket :: CharParser Packet
 parsePacket = do
@@ -83,27 +80,15 @@ parseOperator = (char '0' *> parse15Operator) <|> (char '1' *> parse11Operator)
         parse15Operator = takeP (Just "Length of subpackets") 15 >>= (takeP (Just "subpackets") . toBinOrZero) <&> parseOrFail (many parsePacket)
         parse11Operator = takeP (Just "Count of subpackets") 11 >>= (`count` parsePacket) . toBinOrZero
 
--- ^ Main Functions
+-- ^ Solving Functions
 
 getVersionSum :: PacketF Int -> Int
 getVersionSum (LiteralF v _) = v
 getVersionSum (OperatorF v _ ps) = v + sum ps
 
 calculate :: PacketF Integer -> Integer
-calculate (LiteralF _ l)     = l
-calculate (OperatorF _ op ps) = getOp op ps
-    where
-        binOp f = \case
-            [a,b] -> if a `f` b then 1 else 0
-            _     -> 0
-        getOp = \case
-            OpSum  -> sum
-            OpProd -> product
-            OpMin  -> minimum
-            OpMax  -> maximum
-            OpGT   -> binOp (>)
-            OpLT   -> binOp (<)
-            OpEQ   -> binOp (==)
+calculate (LiteralF _ l)      = l
+calculate (OperatorF _ op ps) = op ps
 
 -- ^ Solutions
 
