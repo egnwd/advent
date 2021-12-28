@@ -20,17 +20,15 @@ import Linear
 import qualified Data.Map as M
 
 parser :: CharParser (V2 Point)
-parser = do
-    (x1,y1) <- pTok ((,) <$> pDecimal <* "," <*> pDecimal)
-    pTok "->"
-    (x2,y2) <- pTok ((,) <$> pDecimal <* "," <*> pDecimal)
-    pure $ V2 (V2 x1 y1) (V2 x2 y2)
+parser = V2 <$> coord <* pTok "->" <*> coord
+    where
+        coord = pTok (V2 <$> pDecimal <* "," <*> pDecimal)
 
 solve :: [V2 Point] -> Int
 solve = M.size . M.filter (>1) . freqs . concatMap lineTo
 
-isHV :: V2 Point -> Bool
-isHV (V2 (V2 x1 y1) (V2 x2 y2)) = x1 == x2 || y1 == y2
+isHV :: (Foldable t, Applicative t, Eq a) => V2 (t a) -> Bool
+isHV (V2 start end) = or $ (==) <$> start <*> end
 
 day05a :: [V2 Point] :~> Int
 day05a = MkSol
