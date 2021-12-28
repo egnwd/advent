@@ -48,7 +48,7 @@ numberVelocities :: Region -> Int
 numberVelocities targ = length . mapMaybe (findCollision targ . trajectory targ) $ validRange targ
 
 findCollision :: Region -> [Point] -> Maybe Point
-findCollision targ = find (inBoundingBox targ)
+findCollision = find . inBoundingBox
 
 trajectory :: Region -> Velocity -> [Point]
 trajectory targ = takeWhile (not . pastBoundingBox targ) . positions zero
