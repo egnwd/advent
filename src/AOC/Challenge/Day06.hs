@@ -40,16 +40,15 @@ resetFish       = finite 6
 babyFish        = finite 8
 reproducingFish = finite 0
 
-day06a :: [Fish] :~> Int
-day06a = MkSol
+day06 :: Int -> [Fish] :~> Int
+day06 n = MkSol
     { sParse = parseMaybeLenient parser
     , sShow  = show
-    , sSolve = solve (dyno_ "days" 80)
+    , sSolve = solve (dyno_ "days" n)
     }
 
+day06a :: [Fish] :~> Int
+day06a = day06 80
+
 day06b :: [Fish] :~> Int
-day06b = MkSol
-    { sParse = parseMaybeLenient parser
-    , sShow  = show
-    , sSolve = solve (dyno_ "days" 256)
-    }
+day06b = day06 256
