@@ -77,7 +77,7 @@ day03a = MkSol
     , sSolve = Just . solvea
     }
 
-day03b :: [Bits] :~> _
+day03b :: [Bits] :~> Int
 day03b = MkSol
     { sParse = parser
     , sShow  = show
