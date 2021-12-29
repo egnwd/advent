@@ -1,7 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-{-# LANGUAGE QuasiQuotes #-}
-
 -- |
 -- Module      : AOC.Challenge.Day23
 -- License     : BSD3
@@ -9,40 +5,36 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 23.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 23.
 
 module AOC.Challenge.Day23 (
     day23a
   , day23b
-                           , example
   ) where
 
-import           AOC.Prelude
-import Linear
-import Text.Heredoc
-import Data.Functor.Foldable
+import           AOC.Solver      ((:~>)(..))
+import           AOC.Common      (Point, parseAsciiMap, displayAsciiMap, floydWarshall, aStar', manhattan)
+import           Control.DeepSeq (NFData)
+import           Control.Monad   (join)
+import           Data.Bifunctor  (second)
+import           Data.Map        (Map)
+import           Data.Maybe      (isNothing)
+import           Data.Semigroup  (Max(..), getMax)
+import           GHC.Generics    (Generic)
+import           Linear          (V2(..))
 import qualified Data.Map as M
-import qualified Data.Set as S
 
 data Amphipod = Amber | Bronze | Copper | Desert deriving (Ord, Eq, Generic)
 instance NFData Amphipod
 
 instance Show Amphipod where
-    show Amber  = "A"
-    show Bronze = "B"
-    show Copper = "C"
-    show Desert = "D"
+    show a  = [showAmphipod a]
+
+showAmphipod :: Amphipod -> Char
+showAmphipod Amber  = 'A'
+showAmphipod Bronze = 'B'
+showAmphipod Copper = 'C'
+showAmphipod Desert = 'D'
 
 newtype Maze = Maze { unMaze :: Map Point (Maybe Amphipod) } deriving (Eq, Ord, Generic)
 
@@ -50,6 +42,8 @@ instance NFData Maze
 
 instance Show Maze where
     show = displayMaze
+
+-- ^ Parsing
 
 parser :: String -> Maze
 parser = Maze . parseAsciiMap fn
@@ -60,6 +54,19 @@ parser = Maze . parseAsciiMap fn
         fn 'C' = Just (Just Copper)
         fn 'D' = Just (Just Desert)
         fn _   = Just Nothing
+
+insertExtraBurrows :: Maze -> Maze
+insertExtraBurrows = Maze . M.union extraBurrows . M.mapKeys pushDown . unMaze
+    where
+        pushDown (V2 c 3) = V2 c 5
+        pushDown p = p
+        extraBurrows
+          = M.fromList . map (second Just)
+          $ [ (V2 3 3, Desert), (V2 5 3, Copper), (V2 7 3, Bronze), (V2 9 3, Amber)
+            , (V2 3 4, Desert), (V2 5 4, Bronze), (V2 7 4, Amber), (V2 9 4, Copper)
+            ]
+
+-- ^ Helpers
 
 energy :: Amphipod -> Int
 energy = \case
@@ -74,9 +81,6 @@ burrow = \case
     Bronze -> 5
     Copper -> 7
     Desert -> 9
-
-burrowDoor :: Int
-burrowDoor = 2
 
 part1Graph :: Map Point (Map Point Int)
 part1Graph = M.mapWithKey (\k -> M.fromList . map (\k' -> (k', manhattan k k'))) . M.fromList $
@@ -124,69 +128,62 @@ part2Graph = M.mapWithKey (\k -> M.fromList . map (\k' -> (k', manhattan k k')))
     ,(V2 9 5,  [V2 9 4])
     ]
 
-isHallwayTerminal (V2 _ r) = r < burrowDoor
+isHallwayTerminal :: Point -> Bool
+isHallwayTerminal (V2 _ r) = r < 2
 
-isHallway _ (V2 _ 1) = True
-isHallway (V2 c1 r1) (V2 c2 r2) = c1 == c2 && r1 > r2
+isBurrowTerminal :: Amphipod -> Point -> Bool
+isBurrowTerminal a (V2 c _) = burrow a == c
 
-isBurrowTerminal a  (V2 c _) = burrow a == c
-
-isBurrow _  _ (V2 _ 1) = True
-isBurrow a  _ (V2 c _) = burrow a == c
-
-solve g = aStar' (allLegalMoves g) totalTravelHome allAmphipodsHome
-
--- totalTravelHome = const 0
-totalTravelHome (Maze mz) = sum . map (\(p, a) -> maybe 0 (travelHome p) a) . M.toList $ mz
+solve :: Map Point (Map Point Int) -> Maze -> Maybe (Int, [Maze])
+solve g = aStar' (allLegalMoves paths) totalTravelHome allAmphipodsHome
     where
-        travelHome (V2 c r) a = undefined
+        paths = floydWarshall g
 
+totalTravelHome :: Maze -> Int
+totalTravelHome = sum . map (\(p, a) -> maybe 0 (travelHome p) a) . M.toList . unMaze
+    where
+        travelHome p@(V2 c _) a = if burrow a == c then 0 else manhattan p (V2 (burrow a) 1)
+
+allAmphipodsHome :: Maze -> Bool
 allAmphipodsHome = M.null . M.filterWithKey (\(V2 c _) a -> maybe False (\a' -> burrow a' /= c) a) . unMaze
 
-allLegalMoves :: Map Point (Map Point Int) -> Maze -> Map Maze Int
-allLegalMoves g mz = M.unions . map getLegalMoves . M.toList . unMaze $ mz
+allLegalMoves :: Map Point (Map Point (Maybe (Int, [Point]))) -> Maze -> Map Maze Int
+allLegalMoves paths mz@(Maze mp) = M.unions . map getLegalMoves . M.toList $ mp
     where
+        !freePaths = M.filter (maybe False (allEmpty . snd)) <$> paths
+        allEmpty = all (isNothing . join . flip M.lookup mp)
+        outPaths = M.filterWithKey (const . isHallwayTerminal) . (freePaths M.!)
+        inPaths a = M.filterWithKey (const . isBurrowTerminal a) . (freePaths M.!)
+        inPaths' a from = let mx' = mx a from in M.filter ((mx' ==) . pathLength) . inPaths a $ from
+        pathLength = maybe 0 (length . snd)
+        mx a = getMax . foldMap (Max . pathLength) . inPaths a
+
         getLegalMoves :: (Point, Maybe Amphipod) -> Map Maze Int
         getLegalMoves (_, Nothing) = M.empty
-        getLegalMoves (from, Just a) = updateBurrows from (Just a) $ legalMoves g mz a from
-        updateBurrows from a = M.mapKeys (\to -> Maze . M.update (const (Just a)) to . M.update (const (Just Nothing)) from . unMaze $ mz)
+        getLegalMoves (from@(V2 c r), Just a)
+          | burrow a == c && allOf c a = M.empty
+          | r > 1 = updateBurrows from (Just a) $ newMap a (outPaths from)
+          | otherwise = updateBurrows from (Just a) $ newMap a (inPaths' a from)
 
-legalMoves :: Map Point (Map Point Int) -> Maze -> Amphipod -> Point -> Map Point Int
-legalMoves g (Maze mz) a p@(V2 c r)
-  | r > 1 = (*energy a) <$> evalState (go isHallway isHallwayTerminal p 0) (S.singleton p)
-  | otherwise = (*energy a) <$> evalState (go (isBurrow a) (isBurrowTerminal a) p 0) (S.singleton p)
-  where
-      go :: _ -> _ -> Point -> Int -> State (Set Point) (Map Point Int)
-      go pd pdt curr weight = do
-          seen <- get
-          let f next = isNothing (mz M.! next) && pd curr next && S.notMember next seen
-          let queue = M.filterWithKey (const . f) $ g M.! curr
-          modify (S.union (M.keysSet queue))
-          let keeps = M.filterWithKey (const . pdt) queue
-          fmap (M.map (+weight) . M.union keeps . M.unions) . traverse (uncurry (go pd pdt)) . M.toList $ queue
+        updateBurrows from a = M.mapKeys (\to -> Maze . M.insert to a . M.insert from Nothing . unMaze $ mz)
+        newMap a = M.foldrWithKey (\k c -> M.alter (const ((*energy a) . fst <$> c)) k) M.empty
+        allOf c a = all p [2..5]
+            where
+                p r = maybe True (==a) . join $ M.lookup (V2 c r) mp
 
 day23a :: _ :~> _
 day23a = MkSol
     { sParse = Just . parser
-    , sShow  = show -- ("\n" ++) . intercalate "\n" . map displayMaze
-    , sSolve = fmap fst . solve part1Graph
+    , sShow  = show
+    , sSolve = solve part1Graph
     }
 
 day23b :: _ :~> _
 day23b = MkSol
-    { sParse = Just . parser
+    { sParse = Just . insertExtraBurrows . parser
     , sShow  = show
-    , sSolve = fmap fst . solve part2Graph
+    , sSolve = solve part2Graph
     }
 
 displayMaze :: Maze -> String
 displayMaze = ("\n" ++) . displayAsciiMap ' ' . fmap (maybe '.' (head . show)) . unMaze
-
-example = drop 1 [here|
-#############
-#...........#
-###B#C#B#D###
-  #D#C#B#A#
-  #D#B#A#C#
-  #A#D#C#A#
-  #########|]
