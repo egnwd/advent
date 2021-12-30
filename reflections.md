@@ -13,6 +13,7 @@ Table of Contents
 * [Day 2](#day-2) *(no reflection yet)*
 * [Day 3](#day-3) *(no reflection yet)*
 * [Day 4](#day-4) *(no reflection yet)*
+* [Day 6](#day-6) *(no reflection yet)*
 
 Day 1
 ------
@@ -175,6 +176,48 @@ time                 5.179 ms   (5.049 ms .. 5.273 ms)
 mean                 5.028 ms   (4.973 ms .. 5.093 ms)
 std dev              189.8 μs   (164.8 μs .. 224.4 μs)
 variance introduced by outliers: 18% (moderately inflated)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 6
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day06.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d06p]* / *[Code][d06g]*
+
+[d06p]: https://adventofcode.com/2016/day/6
+[d06g]: https://github.com/egnwd/advent/blob/2016/src/AOC/Challenge/Day06.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 6 Benchmarks
+
+```
+>> Day 06a
+benchmarking...
+time                 816.5 μs   (798.0 μs .. 835.6 μs)
+                     0.995 R²   (0.993 R² .. 0.998 R²)
+mean                 800.3 μs   (788.6 μs .. 818.4 μs)
+std dev              47.70 μs   (38.66 μs .. 62.55 μs)
+variance introduced by outliers: 50% (severely inflated)
+
+* parsing and formatting times excluded
+
+>> Day 06b
+benchmarking...
+time                 824.5 μs   (797.1 μs .. 851.7 μs)
+                     0.992 R²   (0.981 R² .. 0.998 R²)
+mean                 799.1 μs   (789.3 μs .. 820.8 μs)
+std dev              47.24 μs   (29.95 μs .. 80.71 μs)
+variance introduced by outliers: 49% (moderately inflated)
 
 * parsing and formatting times excluded
 ```
