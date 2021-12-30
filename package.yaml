@@ -112,6 +112,7 @@ library:
   - recursion-schemes
   - scientific
   - semigroupoids
+  - split
   - strict-tuple
   - template-haskell
   - text
