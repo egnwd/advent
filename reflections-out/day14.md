@@ -10,28 +10,28 @@ that file instead!
 *[all][reflections]* / *[1][day01]* / *[2][day02]* / *[3][day03]* / *[4][day04]* / *[5][day05]* / *[6][day06]* / *[7][day07]* / *[8][day08]* / *[9][day09]* / *[10][day10]* / *[11][day11]* / *[12][day12]* / *[13][day13]* / *14* / *[15][day15]* / *[16][day16]* / *[17][day17]* / *[18][day18]* / *[25][day25]*
 
 [reflections]: https://github.com/egnwd/advent/blob/main/reflections.md
-[day01]: https://github.com/egnwd/advent/blob/2021/reflections-out/day01.md
-[day02]: https://github.com/egnwd/advent/blob/2021/reflections-out/day02.md
-[day03]: https://github.com/egnwd/advent/blob/2021/reflections-out/day03.md
-[day04]: https://github.com/egnwd/advent/blob/2021/reflections-out/day04.md
-[day05]: https://github.com/egnwd/advent/blob/2021/reflections-out/day05.md
-[day06]: https://github.com/egnwd/advent/blob/2021/reflections-out/day06.md
-[day07]: https://github.com/egnwd/advent/blob/2021/reflections-out/day07.md
-[day08]: https://github.com/egnwd/advent/blob/2021/reflections-out/day08.md
-[day09]: https://github.com/egnwd/advent/blob/2021/reflections-out/day09.md
-[day10]: https://github.com/egnwd/advent/blob/2021/reflections-out/day10.md
-[day11]: https://github.com/egnwd/advent/blob/2021/reflections-out/day11.md
-[day12]: https://github.com/egnwd/advent/blob/2021/reflections-out/day12.md
-[day13]: https://github.com/egnwd/advent/blob/2021/reflections-out/day13.md
-[day15]: https://github.com/egnwd/advent/blob/2021/reflections-out/day15.md
-[day16]: https://github.com/egnwd/advent/blob/2021/reflections-out/day16.md
-[day17]: https://github.com/egnwd/advent/blob/2021/reflections-out/day17.md
-[day18]: https://github.com/egnwd/advent/blob/2021/reflections-out/day18.md
-[day25]: https://github.com/egnwd/advent/blob/2021/reflections-out/day25.md
+[day01]: https://github.com/egnwd/advent/blob/2016/reflections-out/day01.md
+[day02]: https://github.com/egnwd/advent/blob/2016/reflections-out/day02.md
+[day03]: https://github.com/egnwd/advent/blob/2016/reflections-out/day03.md
+[day04]: https://github.com/egnwd/advent/blob/2016/reflections-out/day04.md
+[day05]: https://github.com/egnwd/advent/blob/2016/reflections-out/day05.md
+[day06]: https://github.com/egnwd/advent/blob/2016/reflections-out/day06.md
+[day07]: https://github.com/egnwd/advent/blob/2016/reflections-out/day07.md
+[day08]: https://github.com/egnwd/advent/blob/2016/reflections-out/day08.md
+[day09]: https://github.com/egnwd/advent/blob/2016/reflections-out/day09.md
+[day10]: https://github.com/egnwd/advent/blob/2016/reflections-out/day10.md
+[day11]: https://github.com/egnwd/advent/blob/2016/reflections-out/day11.md
+[day12]: https://github.com/egnwd/advent/blob/2016/reflections-out/day12.md
+[day13]: https://github.com/egnwd/advent/blob/2016/reflections-out/day13.md
+[day15]: https://github.com/egnwd/advent/blob/2016/reflections-out/day15.md
+[day16]: https://github.com/egnwd/advent/blob/2016/reflections-out/day16.md
+[day17]: https://github.com/egnwd/advent/blob/2016/reflections-out/day17.md
+[day18]: https://github.com/egnwd/advent/blob/2016/reflections-out/day18.md
+[day25]: https://github.com/egnwd/advent/blob/2016/reflections-out/day25.md
 
 *[Prompt][d14p]* / *[Code][d14g]*
 
-[d14p]: https://adventofcode.com/2021/day/14
+[d14p]: https://adventofcode.com/2016/day/14
 [d14g]: https://github.com/egnwd/advent/blob/main/src/AOC/Challenge/Day14.hs
 
 Another growth issue to contend with, but we can solve it in a similar manner to the lanternfish,
@@ -86,26 +86,11 @@ We then roll up the frequencies into another frequency map.
 `n` steps later and we have the answer!
 
 
-*[Back to all reflections for 2021][reflections]*
+*[Back to all reflections for 2016][reflections]*
 
 ## Day 14 Benchmarks
 
 ```
->> Day 14a
-benchmarking...
-time                 370.5 μs   (369.6 μs .. 371.4 μs)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 370.8 μs   (369.8 μs .. 372.0 μs)
-std dev              3.501 μs   (2.784 μs .. 4.635 μs)
-
-* parsing and formatting times excluded
-
->> Day 14b
-benchmarking...
-time                 2.060 ms   (2.051 ms .. 2.070 ms)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 2.057 ms   (2.050 ms .. 2.067 ms)
-std dev              29.20 μs   (18.66 μs .. 43.78 μs)
-
-* parsing and formatting times excluded
+[ERROR]
+Day not yet avaiable: 14
 ```

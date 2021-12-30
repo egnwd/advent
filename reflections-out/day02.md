@@ -10,28 +10,28 @@ that file instead!
 *[all][reflections]* / *[1][day01]* / *2* / *[3][day03]* / *[4][day04]* / *[5][day05]* / *[6][day06]* / *[7][day07]* / *[8][day08]* / *[9][day09]* / *[10][day10]* / *[11][day11]* / *[12][day12]* / *[13][day13]* / *[14][day14]* / *[15][day15]* / *[16][day16]* / *[17][day17]* / *[18][day18]* / *[25][day25]*
 
 [reflections]: https://github.com/egnwd/advent/blob/main/reflections.md
-[day01]: https://github.com/egnwd/advent/blob/2021/reflections-out/day01.md
-[day03]: https://github.com/egnwd/advent/blob/2021/reflections-out/day03.md
-[day04]: https://github.com/egnwd/advent/blob/2021/reflections-out/day04.md
-[day05]: https://github.com/egnwd/advent/blob/2021/reflections-out/day05.md
-[day06]: https://github.com/egnwd/advent/blob/2021/reflections-out/day06.md
-[day07]: https://github.com/egnwd/advent/blob/2021/reflections-out/day07.md
-[day08]: https://github.com/egnwd/advent/blob/2021/reflections-out/day08.md
-[day09]: https://github.com/egnwd/advent/blob/2021/reflections-out/day09.md
-[day10]: https://github.com/egnwd/advent/blob/2021/reflections-out/day10.md
-[day11]: https://github.com/egnwd/advent/blob/2021/reflections-out/day11.md
-[day12]: https://github.com/egnwd/advent/blob/2021/reflections-out/day12.md
-[day13]: https://github.com/egnwd/advent/blob/2021/reflections-out/day13.md
-[day14]: https://github.com/egnwd/advent/blob/2021/reflections-out/day14.md
-[day15]: https://github.com/egnwd/advent/blob/2021/reflections-out/day15.md
-[day16]: https://github.com/egnwd/advent/blob/2021/reflections-out/day16.md
-[day17]: https://github.com/egnwd/advent/blob/2021/reflections-out/day17.md
-[day18]: https://github.com/egnwd/advent/blob/2021/reflections-out/day18.md
-[day25]: https://github.com/egnwd/advent/blob/2021/reflections-out/day25.md
+[day01]: https://github.com/egnwd/advent/blob/2016/reflections-out/day01.md
+[day03]: https://github.com/egnwd/advent/blob/2016/reflections-out/day03.md
+[day04]: https://github.com/egnwd/advent/blob/2016/reflections-out/day04.md
+[day05]: https://github.com/egnwd/advent/blob/2016/reflections-out/day05.md
+[day06]: https://github.com/egnwd/advent/blob/2016/reflections-out/day06.md
+[day07]: https://github.com/egnwd/advent/blob/2016/reflections-out/day07.md
+[day08]: https://github.com/egnwd/advent/blob/2016/reflections-out/day08.md
+[day09]: https://github.com/egnwd/advent/blob/2016/reflections-out/day09.md
+[day10]: https://github.com/egnwd/advent/blob/2016/reflections-out/day10.md
+[day11]: https://github.com/egnwd/advent/blob/2016/reflections-out/day11.md
+[day12]: https://github.com/egnwd/advent/blob/2016/reflections-out/day12.md
+[day13]: https://github.com/egnwd/advent/blob/2016/reflections-out/day13.md
+[day14]: https://github.com/egnwd/advent/blob/2016/reflections-out/day14.md
+[day15]: https://github.com/egnwd/advent/blob/2016/reflections-out/day15.md
+[day16]: https://github.com/egnwd/advent/blob/2016/reflections-out/day16.md
+[day17]: https://github.com/egnwd/advent/blob/2016/reflections-out/day17.md
+[day18]: https://github.com/egnwd/advent/blob/2016/reflections-out/day18.md
+[day25]: https://github.com/egnwd/advent/blob/2016/reflections-out/day25.md
 
 *[Prompt][d02p]* / *[Code][d02g]*
 
-[d02p]: https://adventofcode.com/2021/day/2
+[d02p]: https://adventofcode.com/2016/day/2
 [d02g]: https://github.com/egnwd/advent/blob/main/src/AOC/Challenge/Day02.hs
 
 Moving around a 2D map, another AoC classic challenge.
@@ -95,24 +95,11 @@ where `loc` gets the vector from the `Submarine` akin to `getSum` getting the ve
 Submarine successfully piloted!
 
 
-*[Back to all reflections for 2021][reflections]*
+*[Back to all reflections for 2016][reflections]*
 
 ## Day 2 Benchmarks
 
 ```
->> Day 02a
-benchmarking...
-time                 3.811 ms   (3.759 ms .. 3.889 ms)
-                     0.997 R²   (0.995 R² .. 0.999 R²)
-mean                 3.781 ms   (3.721 ms .. 3.821 ms)
-std dev              164.2 μs   (126.4 μs .. 240.8 μs)
-variance introduced by outliers: 25% (moderately inflated)
-
->> Day 02b
-benchmarking...
-time                 2.332 ms   (2.310 ms .. 2.357 ms)
-                     0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 2.345 ms   (2.330 ms .. 2.363 ms)
-std dev              54.61 μs   (42.35 μs .. 69.57 μs)
-variance introduced by outliers: 10% (moderately inflated)
+[ERROR]
+Day not yet avaiable: 2
 ```

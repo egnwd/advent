@@ -10,28 +10,28 @@ that file instead!
 *[all][reflections]* / *[1][day01]* / *[2][day02]* / *[3][day03]* / *[4][day04]* / *[5][day05]* / *[6][day06]* / *[7][day07]* / *[8][day08]* / *9* / *[10][day10]* / *[11][day11]* / *[12][day12]* / *[13][day13]* / *[14][day14]* / *[15][day15]* / *[16][day16]* / *[17][day17]* / *[18][day18]* / *[25][day25]*
 
 [reflections]: https://github.com/egnwd/advent/blob/main/reflections.md
-[day01]: https://github.com/egnwd/advent/blob/2021/reflections-out/day01.md
-[day02]: https://github.com/egnwd/advent/blob/2021/reflections-out/day02.md
-[day03]: https://github.com/egnwd/advent/blob/2021/reflections-out/day03.md
-[day04]: https://github.com/egnwd/advent/blob/2021/reflections-out/day04.md
-[day05]: https://github.com/egnwd/advent/blob/2021/reflections-out/day05.md
-[day06]: https://github.com/egnwd/advent/blob/2021/reflections-out/day06.md
-[day07]: https://github.com/egnwd/advent/blob/2021/reflections-out/day07.md
-[day08]: https://github.com/egnwd/advent/blob/2021/reflections-out/day08.md
-[day10]: https://github.com/egnwd/advent/blob/2021/reflections-out/day10.md
-[day11]: https://github.com/egnwd/advent/blob/2021/reflections-out/day11.md
-[day12]: https://github.com/egnwd/advent/blob/2021/reflections-out/day12.md
-[day13]: https://github.com/egnwd/advent/blob/2021/reflections-out/day13.md
-[day14]: https://github.com/egnwd/advent/blob/2021/reflections-out/day14.md
-[day15]: https://github.com/egnwd/advent/blob/2021/reflections-out/day15.md
-[day16]: https://github.com/egnwd/advent/blob/2021/reflections-out/day16.md
-[day17]: https://github.com/egnwd/advent/blob/2021/reflections-out/day17.md
-[day18]: https://github.com/egnwd/advent/blob/2021/reflections-out/day18.md
-[day25]: https://github.com/egnwd/advent/blob/2021/reflections-out/day25.md
+[day01]: https://github.com/egnwd/advent/blob/2016/reflections-out/day01.md
+[day02]: https://github.com/egnwd/advent/blob/2016/reflections-out/day02.md
+[day03]: https://github.com/egnwd/advent/blob/2016/reflections-out/day03.md
+[day04]: https://github.com/egnwd/advent/blob/2016/reflections-out/day04.md
+[day05]: https://github.com/egnwd/advent/blob/2016/reflections-out/day05.md
+[day06]: https://github.com/egnwd/advent/blob/2016/reflections-out/day06.md
+[day07]: https://github.com/egnwd/advent/blob/2016/reflections-out/day07.md
+[day08]: https://github.com/egnwd/advent/blob/2016/reflections-out/day08.md
+[day10]: https://github.com/egnwd/advent/blob/2016/reflections-out/day10.md
+[day11]: https://github.com/egnwd/advent/blob/2016/reflections-out/day11.md
+[day12]: https://github.com/egnwd/advent/blob/2016/reflections-out/day12.md
+[day13]: https://github.com/egnwd/advent/blob/2016/reflections-out/day13.md
+[day14]: https://github.com/egnwd/advent/blob/2016/reflections-out/day14.md
+[day15]: https://github.com/egnwd/advent/blob/2016/reflections-out/day15.md
+[day16]: https://github.com/egnwd/advent/blob/2016/reflections-out/day16.md
+[day17]: https://github.com/egnwd/advent/blob/2016/reflections-out/day17.md
+[day18]: https://github.com/egnwd/advent/blob/2016/reflections-out/day18.md
+[day25]: https://github.com/egnwd/advent/blob/2016/reflections-out/day25.md
 
 *[Prompt][d09p]* / *[Code][d09g]*
 
-[d09p]: https://adventofcode.com/2021/day/9
+[d09p]: https://adventofcode.com/2016/day/9
 [d09g]: https://github.com/egnwd/advent/blob/main/src/AOC/Challenge/Day09.hs
 
 Part 1 today was simple enough.
@@ -129,26 +129,11 @@ solveb land = product . largest 3 . map getBasinSize $ lowPointSeeds
 And there we are!
 
 
-*[Back to all reflections for 2021][reflections]*
+*[Back to all reflections for 2016][reflections]*
 
 ## Day 9 Benchmarks
 
 ```
->> Day 09a
-benchmarking...
-time                 16.80 ms   (16.69 ms .. 16.90 ms)
-                     1.000 R²   (0.999 R² .. 1.000 R²)
-mean                 16.82 ms   (16.76 ms .. 16.90 ms)
-std dev              170.5 μs   (115.6 μs .. 283.9 μs)
-
-* parsing and formatting times excluded
-
->> Day 09b
-benchmarking...
-time                 42.39 ms   (42.21 ms .. 42.52 ms)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 42.62 ms   (42.48 ms .. 42.87 ms)
-std dev              362.9 μs   (216.1 μs .. 577.9 μs)
-
-* parsing and formatting times excluded
+[ERROR]
+Day not yet avaiable: 9
 ```

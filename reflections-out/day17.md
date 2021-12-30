@@ -10,28 +10,28 @@ that file instead!
 *[all][reflections]* / *[1][day01]* / *[2][day02]* / *[3][day03]* / *[4][day04]* / *[5][day05]* / *[6][day06]* / *[7][day07]* / *[8][day08]* / *[9][day09]* / *[10][day10]* / *[11][day11]* / *[12][day12]* / *[13][day13]* / *[14][day14]* / *[15][day15]* / *[16][day16]* / *17* / *[18][day18]* / *[25][day25]*
 
 [reflections]: https://github.com/egnwd/advent/blob/main/reflections.md
-[day01]: https://github.com/egnwd/advent/blob/2021/reflections-out/day01.md
-[day02]: https://github.com/egnwd/advent/blob/2021/reflections-out/day02.md
-[day03]: https://github.com/egnwd/advent/blob/2021/reflections-out/day03.md
-[day04]: https://github.com/egnwd/advent/blob/2021/reflections-out/day04.md
-[day05]: https://github.com/egnwd/advent/blob/2021/reflections-out/day05.md
-[day06]: https://github.com/egnwd/advent/blob/2021/reflections-out/day06.md
-[day07]: https://github.com/egnwd/advent/blob/2021/reflections-out/day07.md
-[day08]: https://github.com/egnwd/advent/blob/2021/reflections-out/day08.md
-[day09]: https://github.com/egnwd/advent/blob/2021/reflections-out/day09.md
-[day10]: https://github.com/egnwd/advent/blob/2021/reflections-out/day10.md
-[day11]: https://github.com/egnwd/advent/blob/2021/reflections-out/day11.md
-[day12]: https://github.com/egnwd/advent/blob/2021/reflections-out/day12.md
-[day13]: https://github.com/egnwd/advent/blob/2021/reflections-out/day13.md
-[day14]: https://github.com/egnwd/advent/blob/2021/reflections-out/day14.md
-[day15]: https://github.com/egnwd/advent/blob/2021/reflections-out/day15.md
-[day16]: https://github.com/egnwd/advent/blob/2021/reflections-out/day16.md
-[day18]: https://github.com/egnwd/advent/blob/2021/reflections-out/day18.md
-[day25]: https://github.com/egnwd/advent/blob/2021/reflections-out/day25.md
+[day01]: https://github.com/egnwd/advent/blob/2016/reflections-out/day01.md
+[day02]: https://github.com/egnwd/advent/blob/2016/reflections-out/day02.md
+[day03]: https://github.com/egnwd/advent/blob/2016/reflections-out/day03.md
+[day04]: https://github.com/egnwd/advent/blob/2016/reflections-out/day04.md
+[day05]: https://github.com/egnwd/advent/blob/2016/reflections-out/day05.md
+[day06]: https://github.com/egnwd/advent/blob/2016/reflections-out/day06.md
+[day07]: https://github.com/egnwd/advent/blob/2016/reflections-out/day07.md
+[day08]: https://github.com/egnwd/advent/blob/2016/reflections-out/day08.md
+[day09]: https://github.com/egnwd/advent/blob/2016/reflections-out/day09.md
+[day10]: https://github.com/egnwd/advent/blob/2016/reflections-out/day10.md
+[day11]: https://github.com/egnwd/advent/blob/2016/reflections-out/day11.md
+[day12]: https://github.com/egnwd/advent/blob/2016/reflections-out/day12.md
+[day13]: https://github.com/egnwd/advent/blob/2016/reflections-out/day13.md
+[day14]: https://github.com/egnwd/advent/blob/2016/reflections-out/day14.md
+[day15]: https://github.com/egnwd/advent/blob/2016/reflections-out/day15.md
+[day16]: https://github.com/egnwd/advent/blob/2016/reflections-out/day16.md
+[day18]: https://github.com/egnwd/advent/blob/2016/reflections-out/day18.md
+[day25]: https://github.com/egnwd/advent/blob/2016/reflections-out/day25.md
 
 *[Prompt][d17p]* / *[Code][d17g]*
 
-[d17p]: https://adventofcode.com/2021/day/17
+[d17p]: https://adventofcode.com/2016/day/17
 [d17g]: https://github.com/egnwd/advent/blob/main/src/AOC/Challenge/Day17.hs
 
 My day 17 is not the fastest thing in the world, but it's a fairly neat and readable solution this time.
@@ -150,28 +150,11 @@ We just omit calculating the max height and count the number of valid collisions
 Part 2 done!
 
 
-*[Back to all reflections for 2021][reflections]*
+*[Back to all reflections for 2016][reflections]*
 
 ## Day 17 Benchmarks
 
 ```
->> Day 17a
-benchmarking...
-time                 396.7 ms   (350.5 ms .. 444.6 ms)
-                     0.997 R²   (0.997 R² .. 1.000 R²)
-mean                 415.6 ms   (404.4 ms .. 423.7 ms)
-std dev              11.62 ms   (5.644 ms .. 16.26 ms)
-variance introduced by outliers: 19% (moderately inflated)
-
-* parsing and formatting times excluded
-
->> Day 17b
-benchmarking...
-time                 319.2 ms   (254.2 ms .. 391.5 ms)
-                     0.991 R²   (0.990 R² .. 1.000 R²)
-mean                 413.6 ms   (370.0 ms .. 492.9 ms)
-std dev              76.42 ms   (3.305 ms .. 93.54 ms)
-variance introduced by outliers: 47% (moderately inflated)
-
-* parsing and formatting times excluded
+[ERROR]
+Day not yet avaiable: 17
 ```

@@ -10,28 +10,28 @@ that file instead!
 *[all][reflections]* / *[1][day01]* / *[2][day02]* / *[3][day03]* / *[4][day04]* / *[5][day05]* / *6* / *[7][day07]* / *[8][day08]* / *[9][day09]* / *[10][day10]* / *[11][day11]* / *[12][day12]* / *[13][day13]* / *[14][day14]* / *[15][day15]* / *[16][day16]* / *[17][day17]* / *[18][day18]* / *[25][day25]*
 
 [reflections]: https://github.com/egnwd/advent/blob/main/reflections.md
-[day01]: https://github.com/egnwd/advent/blob/2021/reflections-out/day01.md
-[day02]: https://github.com/egnwd/advent/blob/2021/reflections-out/day02.md
-[day03]: https://github.com/egnwd/advent/blob/2021/reflections-out/day03.md
-[day04]: https://github.com/egnwd/advent/blob/2021/reflections-out/day04.md
-[day05]: https://github.com/egnwd/advent/blob/2021/reflections-out/day05.md
-[day07]: https://github.com/egnwd/advent/blob/2021/reflections-out/day07.md
-[day08]: https://github.com/egnwd/advent/blob/2021/reflections-out/day08.md
-[day09]: https://github.com/egnwd/advent/blob/2021/reflections-out/day09.md
-[day10]: https://github.com/egnwd/advent/blob/2021/reflections-out/day10.md
-[day11]: https://github.com/egnwd/advent/blob/2021/reflections-out/day11.md
-[day12]: https://github.com/egnwd/advent/blob/2021/reflections-out/day12.md
-[day13]: https://github.com/egnwd/advent/blob/2021/reflections-out/day13.md
-[day14]: https://github.com/egnwd/advent/blob/2021/reflections-out/day14.md
-[day15]: https://github.com/egnwd/advent/blob/2021/reflections-out/day15.md
-[day16]: https://github.com/egnwd/advent/blob/2021/reflections-out/day16.md
-[day17]: https://github.com/egnwd/advent/blob/2021/reflections-out/day17.md
-[day18]: https://github.com/egnwd/advent/blob/2021/reflections-out/day18.md
-[day25]: https://github.com/egnwd/advent/blob/2021/reflections-out/day25.md
+[day01]: https://github.com/egnwd/advent/blob/2016/reflections-out/day01.md
+[day02]: https://github.com/egnwd/advent/blob/2016/reflections-out/day02.md
+[day03]: https://github.com/egnwd/advent/blob/2016/reflections-out/day03.md
+[day04]: https://github.com/egnwd/advent/blob/2016/reflections-out/day04.md
+[day05]: https://github.com/egnwd/advent/blob/2016/reflections-out/day05.md
+[day07]: https://github.com/egnwd/advent/blob/2016/reflections-out/day07.md
+[day08]: https://github.com/egnwd/advent/blob/2016/reflections-out/day08.md
+[day09]: https://github.com/egnwd/advent/blob/2016/reflections-out/day09.md
+[day10]: https://github.com/egnwd/advent/blob/2016/reflections-out/day10.md
+[day11]: https://github.com/egnwd/advent/blob/2016/reflections-out/day11.md
+[day12]: https://github.com/egnwd/advent/blob/2016/reflections-out/day12.md
+[day13]: https://github.com/egnwd/advent/blob/2016/reflections-out/day13.md
+[day14]: https://github.com/egnwd/advent/blob/2016/reflections-out/day14.md
+[day15]: https://github.com/egnwd/advent/blob/2016/reflections-out/day15.md
+[day16]: https://github.com/egnwd/advent/blob/2016/reflections-out/day16.md
+[day17]: https://github.com/egnwd/advent/blob/2016/reflections-out/day17.md
+[day18]: https://github.com/egnwd/advent/blob/2016/reflections-out/day18.md
+[day25]: https://github.com/egnwd/advent/blob/2016/reflections-out/day25.md
 
 *[Prompt][d06p]* / *[Code][d06g]*
 
-[d06p]: https://adventofcode.com/2021/day/6
+[d06p]: https://adventofcode.com/2016/day/6
 [d06g]: https://github.com/egnwd/advent/blob/main/src/AOC/Challenge/Day06.hs
 
 For part 1 today I started with the most naïve approach where I simply generate all the fish and then count them,
@@ -84,26 +84,11 @@ _`maybe 8 weaken . unshift` represents wrapping the numbers around, 6 -> 5, 2 ->
 To me it makes more sense to think about the fish resetting to `8` and new fish coming in at `6`, just so the wrapping and insertion keeps the fish the same... but that's just me.
 
 
-*[Back to all reflections for 2021][reflections]*
+*[Back to all reflections for 2016][reflections]*
 
 ## Day 6 Benchmarks
 
 ```
->> Day 06a
-benchmarking...
-time                 120.8 μs   (120.6 μs .. 121.1 μs)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 120.9 μs   (120.6 μs .. 121.3 μs)
-std dev              1.187 μs   (932.3 ns .. 1.760 μs)
-
-* parsing and formatting times excluded
-
->> Day 06b
-benchmarking...
-time                 402.4 μs   (400.9 μs .. 404.4 μs)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 400.2 μs   (399.0 μs .. 401.9 μs)
-std dev              4.823 μs   (3.643 μs .. 6.416 μs)
-
-* parsing and formatting times excluded
+[ERROR]
+Day not yet avaiable: 6
 ```

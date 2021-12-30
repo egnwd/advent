@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 -- |
 -- Module      : AOC.Challenge.Day09
 -- License     : BSD3
@@ -5,72 +8,36 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 9.
+-- Day 9.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day09 (
-    day09a
-  , day09b
+    -- day09a
+  -- , day09b
   ) where
 
-import           AOC.Solver            ((:~>)(..))
-import           AOC.Common            (parseAsciiMap, neighbours, Point)
-import           Data.Char             (digitToInt)
-import           Data.Functor.Foldable (apo, ListF(..))
-import           Data.List             (sortOn)
-import           Data.Monoid           (Sum(Sum), getSum)
-import           Data.Maybe            (fromMaybe)
-import           Control.Monad         (mfilter)
-import qualified Data.Map as M
-import qualified Data.Set as S
+import           AOC.Prelude
 
-type Landscape = M.Map Point Int
-
-parse :: String -> Landscape
-parse = parseAsciiMap (mfilter (<9) . pure . digitToInt)
-
-score :: Int -> Sum Int
-score n = Sum (1+n)
-
-solvea :: Landscape -> Int
-solvea = getSum . foldMap score . findLowPoints
-
-findLowPoints :: Landscape -> Landscape
-findLowPoints nss = M.filterWithKey isLowest nss
-    where
-        isLowest k h = all (maybe True (h <) . (`M.lookup` nss)) (neighbours k)
-
-solveb :: Landscape -> Int
-solveb land = product . largest 3 . map getBasinSize $ lowPointSeeds
-    where
-        largest n = take n . sortOn negate
-        getBasinSize = sum . apo (buildBasin allNeighbours land)
-        allNeighbours = M.mapWithKey (const . S.fromList . neighbours) land
-        lowPointSeeds = map (\l -> (S.empty, S.singleton l)) . M.keys . findLowPoints $ land
-
-buildBasin
-    :: M.Map Point (S.Set Point)                           -- | Map from point to neighbouring values
-    -> Landscape                                           -- | Original grid
-    -> (S.Set Point, S.Set Point)                          -- | Seen points, and next points
-    -> ListF Int (Either [Int] (S.Set Point, S.Set Point)) -- | ListF of current region sizes over the next regions to visit
-buildBasin ns land (seen, next) = Cons (S.size next) go
-    where
-        neighbouringBasinLocations = M.keysSet . M.restrictKeys land . S.unions . S.map (fromMaybe S.empty . (`M.lookup` ns))
-        next' = neighbouringBasinLocations next `S.difference` seen
-        seen' = S.union seen next
-        go = if null next'
-                then Left []
-                else Right (seen', next')
-
-day09a :: Landscape :~> Int
+day09a :: _ :~> _
 day09a = MkSol
-    { sParse = Just . parse
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . solvea
+    , sSolve = Just
     }
 
-day09b :: Landscape :~> Int
+day09b :: _ :~> _
 day09b = MkSol
-    { sParse = Just . parse
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . solveb
+    , sSolve = Just
     }

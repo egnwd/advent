@@ -25,11 +25,11 @@ import qualified Data.Text.Lazy                         as TL
 
 -- CONSTANTS
 year :: Integer
-year = 2021
+year = 2016
 github :: String
 github = "egnwd"
 otherYears :: S.Set Integer
-otherYears = S.fromList [2015, 2020, 2021]
+otherYears = S.fromList [2015, 2016, 2020, 2021]
 
 ctx0 :: M.Map Text Text
 ctx0 = M.fromList [
@@ -66,9 +66,9 @@ standaloneReflectionPath d = "reflections-out" </> printf "day%02d.md" d
 main :: IO ()
 main = shakeArgs opts $ do
     action $ do
-          rd <- S.toList <$> reflectionDays
-          need $ ["README.md", "reflections.md"]
-              ++ map standaloneReflectionPath rd
+         rd <- S.toList <$> reflectionDays
+         need $ ["README.md", "reflections.md"]
+             ++ map standaloneReflectionPath rd
 
     "reflections.md" %> \fp -> do
         days   <- getDays

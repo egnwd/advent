@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 -- |
 -- Module      : AOC.Challenge.Day11
 -- License     : BSD3
@@ -5,56 +8,36 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 11.
+-- Day 11.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day11 (
-    day11a
-  , day11b
+    -- day11a
+  -- , day11b
   ) where
 
-import AOC.Solver ((:~>)(..), dyno_)
-import AOC.Common (Point, (!?), lookupFreq, freqs, countTrue, fixedPoint, parseAsciiMap, allNeighbours)
-import Data.Char (digitToInt)
-import Control.Arrow ((&&&))
-import Control.Lens (preview, _head, _1)
-import qualified Data.Map as M
+import           AOC.Prelude
 
-type Octopuses = M.Map Point Int
-
-parser :: String -> Octopuses
-parser = parseAsciiMap (pure . digitToInt)
-
-step :: Octopuses -> Octopuses
-step = fmap reset . snd . fixedPoint (uncurry next) . ((1 <$) &&& id)
-    where
-        reset o = if o > 9 then 0 else o
-        next :: M.Map Point Int -> Octopuses -> (M.Map Point Int, Octopuses)
-        next keys os = (keys', fst <$> os')
-            where
-                keys' = (`M.restrictKeys` M.keysSet didn'tFlash) . freqs . concatMap allNeighbours . M.keys $ flashed
-                (flashed, didn'tFlash) = M.partition snd os'
-                os' = M.mapWithKey (boost keys) os
-
-boost :: Octopuses -> Point -> Int -> (Int, Bool)
-boost ks k o | k `M.member` ks && o < 10 = let o' = o + lookupFreq k ks in (o', o' > 9)
-             | otherwise   = (o, False)
-
-solvea :: Int -> Octopuses -> Maybe Int
-solvea n = (!? n) . scanl1 (+) . map (countTrue (==0)) . iterate step
-
-solveb :: Octopuses -> Maybe Int
-solveb = preview (_head . _1) . dropWhile (not . all (==0) . snd) . zip [0..] . iterate step
-
-day11a :: Octopuses :~> Int
+day11a :: _ :~> _
 day11a = MkSol
-    { sParse = Just . parser
+    { sParse = Just
     , sShow  = show
-    , sSolve = solvea (dyno_ "days" 100)
+    , sSolve = Just
     }
 
-day11b :: Octopuses :~> Int
+day11b :: _ :~> _
 day11b = MkSol
-    { sParse = Just . parser
+    { sParse = Just
     , sShow  = show
-    , sSolve = solveb
+    , sSolve = Just
     }

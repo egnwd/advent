@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 -- |
 -- Module      : AOC.Challenge.Day03
 -- License     : BSD3
@@ -5,81 +8,36 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 3.
+-- Day 3.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day03 (
-    day03a
-  , day03b
+    -- day03a
+  -- , day03b
   ) where
 
-import AOC.Solver            ((:~>)(..))
-import Data.List             (transpose)
-import Data.Char             (digitToInt)
-import Data.Bifunctor        (first, second)
-import Data.Finite           (Finite, finite, packFinite)
-import Data.Functor.Foldable (ListF(..), apo)
-import Control.Arrow         ((&&&))
-import Linear.V2             (V2(V2))
+import           AOC.Prelude
 
-type Bit = Finite 2
-type Bits = [Bit]
-
-zero, one :: Bit
-zero = finite 0
-one  = finite 1
-
-parser :: String -> Maybe [Bits]
-parser = traverse (traverse (packFinite . fromIntegral . digitToInt)) . lines
-
-mostAndLeastCommonBit :: Bits -> (Bit, Bit)
-mostAndLeastCommonBit bs = let b = mostCommonBit bs in (b, 1-b)
-
-leastCommonBit, mostCommonBit :: Bits -> Bit
-leastCommonBit = (1-) . mostCommonBit
-mostCommonBit bs = if ones >= zeros then one else zero
-    where
-        (zeros, ones) = foldr go (0,0) bs
-        go :: Bit -> (Int, Int) -> (Int, Int)
-        go 0 = first succ
-        go 1 = second succ
-        go _ = id
-
-binToDec :: Bits -> Int
-binToDec = foldl (\a -> (+) (2*a) . fromEnum . (== 1)) 0
-
-binaryProduct :: (Bits, Bits) -> Int
-binaryProduct = product . fmap binToDec . uncurry V2
-
-solvea :: [Bits] -> Int
-solvea = binaryProduct . unzip . map mostAndLeastCommonBit . transpose
-
-solveb :: [Bits] -> Int
-solveb = binaryProduct . (apo oxygen &&& apo co2)
-
-oxygen, co2 :: [Bits] -> ListF Bit (Either Bits [Bits])
-oxygen = criteria mostCommonBit
-co2    = criteria leastCommonBit
-
-criteria :: (Bits -> Bit) -> [Bits] -> ListF Bit (Either Bits [Bits])
-criteria f bs = go
-    where
-        b = (f . map head) bs
-        ns = filter ((==b) . head) bs
-        go = case ns of
-              []  -> Nil
-              [n] -> Cons b (Left (tail n))
-              _   -> Cons b (Right (map tail ns))
-
-day03a :: [Bits] :~> Int
+day03a :: _ :~> _
 day03a = MkSol
-    { sParse = parser
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . solvea
+    , sSolve = Just
     }
 
-day03b :: [Bits] :~> Int
+day03b :: _ :~> _
 day03b = MkSol
-    { sParse = parser
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . solveb
+    , sSolve = Just
     }
