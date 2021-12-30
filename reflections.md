@@ -31,6 +31,7 @@ Table of Contents
 * [Day 20](#day-20) *(no reflection yet)*
 * [Day 21](#day-21) *(no reflection yet)*
 * [Day 22](#day-22) *(no reflection yet)*
+* [Day 23](#day-23) *(no reflection yet)*
 * [Day 24](#day-24) *(no reflection yet)*
 * [Day 25](#day-25)
 
@@ -2544,6 +2545,25 @@ std dev              1.504 ms   (944.6 μs .. 2.174 ms)
 variance introduced by outliers: 16% (moderately inflated)
 ```
 
+Day 23
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day23.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d23p]* / *[Code][d23g]*
+
+[d23p]: https://adventofcode.com/2021/day/23
+[d23g]: https://github.com/egnwd/advent/blob/2021/src/AOC/Challenge/Day23.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 23 Benchmarks
+
+*Not benchmarked yet -- please check back later!*
 
 
 Day 24
