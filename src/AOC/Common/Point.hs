@@ -22,6 +22,7 @@ module AOC.Common.Point
   -- * Dir
   , Dir(..)
   , dirVec
+  , dirVec'
   , setEdge
   , allDir
   , allDirSet
@@ -143,6 +144,13 @@ data Dir = North | East | South | West
 
 dirVec :: Num a => Dir -> V2 a
 dirVec = \case
+    North -> V2   0   1
+    East  -> V2   1   0
+    South -> V2   0 (-1)
+    West  -> V2 (-1)  0
+
+dirVec' :: Num a => Dir -> V2 a
+dirVec' = \case
     North -> V2   0 (-1)
     East  -> V2   1   0
     South -> V2   0   1

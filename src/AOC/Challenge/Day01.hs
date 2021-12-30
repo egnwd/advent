@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day01
@@ -8,36 +7,54 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 1.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 1.
 
 module AOC.Challenge.Day01 (
-    -- day01a
-  -- , day01b
+    day01a
+  , day01b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver      ((:~>)(..))
+import           AOC.Common      (CharParser, pDecimal, parseMaybeLenient, dirVec, Point, Dir(..), lineTo)
+import           Data.List       (find)
+import           Linear          (V2(..), (^*), zero)
+import           Text.Megaparsec (many, (<|>), optional)
+import           Text.Megaparsec.Char
+import qualified Data.Set as S
 
-day01a :: _ :~> _
+parser :: CharParser [(Dir, Int)]
+parser = many (parseInstr <* optional ", ")
+    where
+        parseDir = (East <$ char 'R') <|> (West <$ char 'L')
+        parseInstr = (,) <$> parseDir <*> pDecimal
+
+solve :: [(Dir, Int)] -> Point
+solve = snd . foldl (\(h,p) (d,l) -> (h<>d, p + dirVec (h<>d) ^* l)) (North, zero)
+
+solveb :: [(Dir, Int)] -> Maybe Point
+solveb = solve' S.empty (North, zero)
+    where
+        solve' _    _      [] = Nothing
+        solve' seen (h, p) ((d,l):rest)
+          = case find (`S.member` seen) ps of
+              Nothing -> solve' seen' (h',p') rest
+              Just x -> Just x
+            where
+                ps = init $ lineTo (V2 p p')
+                seen' = foldr S.insert seen ps
+                h' = h<>d
+                p' = p + dirVec h' ^* l
+
+day01a :: [(Dir, Int)] :~> Int
 day01a = MkSol
-    { sParse = Just
+    { sParse = parseMaybeLenient parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . abs . solve
     }
 
-day01b :: _ :~> _
+day01b :: [(Dir, Int)] :~> Int
 day01b = MkSol
-    { sParse = Just
+    { sParse = parseMaybeLenient parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap (sum . abs) . solveb
     }
