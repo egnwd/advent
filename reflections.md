@@ -16,6 +16,7 @@ Table of Contents
 * [Day 6](#day-6) *(no reflection yet)*
 * [Day 7](#day-7) *(no reflection yet)*
 * [Day 8](#day-8) *(no reflection yet)*
+* [Day 9](#day-9) *(no reflection yet)*
 
 Day 1
 ------
@@ -302,5 +303,46 @@ time                 2.130 ms   (2.091 ms .. 2.184 ms)
 mean                 2.263 ms   (2.207 ms .. 2.461 ms)
 std dev              331.0 μs   (183.7 μs .. 610.8 μs)
 variance introduced by outliers: 83% (severely inflated)
+```
+
+
+
+Day 9
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day09.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d09p]* / *[Code][d09g]*
+
+[d09p]: https://adventofcode.com/2016/day/9
+[d09g]: https://github.com/egnwd/advent/blob/2016/src/AOC/Challenge/Day09.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 9 Benchmarks
+
+```
+>> Day 09a
+benchmarking...
+time                 787.9 μs   (770.2 μs .. 804.5 μs)
+                     0.984 R²   (0.958 R² .. 0.997 R²)
+mean                 903.5 μs   (852.4 μs .. 996.5 μs)
+std dev              265.1 μs   (136.9 μs .. 452.6 μs)
+variance introduced by outliers: 97% (severely inflated)
+
+* parsing and formatting times excluded
+
+>> Day 09b
+benchmarking...
+time                 8.197 ms   (8.129 ms .. 8.291 ms)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 8.144 ms   (8.094 ms .. 8.188 ms)
+std dev              139.4 μs   (107.1 μs .. 185.4 μs)
+
+* parsing and formatting times excluded
 ```
 
