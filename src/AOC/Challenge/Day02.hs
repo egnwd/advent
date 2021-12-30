@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 -- |
 -- Module      : AOC.Challenge.Day02
@@ -8,36 +7,62 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 2.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 2.
 
 module AOC.Challenge.Day02 (
-    -- day02a
-  -- , day02b
+    day02a
+  , day02b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver           ((:~>)(..))
+import           AOC.Common           (CharParser, parseLines, parseAsciiMap, dirVec', Dir(..), Point)
+import           Control.Monad        (when, guard)
+import           Control.Monad.State  (get, gets, put, evalState)
+import           Data.Char            (isAlphaNum)
+import           Data.Foldable        (fold)
+import           Data.Functor         (($>))
+import           Data.Map             (Map, (!), member)
+import           Linear               (V2(..))
+import           Text.Heredoc         (here)
+import           Text.Megaparsec      (choice, many)
+import           Text.Megaparsec.Char (char)
 
-day02a :: _ :~> _
-day02a = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
+normalKeypad :: Map Point String
+normalKeypad = parseAsciiMap (\x -> guard (isAlphaNum x) $> [x]) . drop 1 $ [here|
+123
+456
+789|]
+
+commiteeKeypad :: Map Point String
+commiteeKeypad = parseAsciiMap (\x -> guard (isAlphaNum x) $> [x]) . drop 1 $ [here|
+  1
+ 234
+56789
+ ABC
+  D|]
+
+parser :: CharParser [V2 Int]
+parser = many (dirVec' <$> choice [North <$ char 'U', West <$ char 'L', South <$ char 'D', East <$ char 'R'])
+
+solve :: Map Point String -> Point -> [[V2 Int]] -> [String]
+solve keypad start iss = evalState (traverse go iss) start
+    where
+        go [] = gets (keypad !)
+        go (i:is) = do
+            p <- get
+            let p' = p + i
+            when (p' `member` keypad) (put p')
+            go is
+
+day02 :: Map Point String -> Point -> [[V2 Int]] :~> [String]
+day02 keypad start = MkSol
+    { sParse = parseLines parser
+    , sShow  = fold
+    , sSolve = Just . solve keypad start
     }
 
-day02b :: _ :~> _
-day02b = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
-    }
+day02a :: [[V2 Int]] :~> [String]
+day02a = day02 normalKeypad (V2 1 1)
+
+day02b :: [[V2 Int]] :~> [String]
+day02b = day02 commiteeKeypad (V2 0 2)
