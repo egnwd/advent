@@ -12,16 +12,19 @@ module AOC.Challenge.Day05 (
   , day05b
   ) where
 
-import           AOC.Prelude
-import Crypto.Hash.MD5
-import Numeric.Lens
-import Control.Lens
-import Data.Bits
-import Data.Word
-import Data.ByteString as B (unpack)
-import Data.ByteString.UTF8 as BS (ByteString, fromString)
-import Data.ByteString.Char8 as BC (pack)
-import qualified Data.IntMap as M
+import           AOC.Common            (loopEither, (!?))
+import           AOC.Solver            ((:~>) (..), dyno_)
+import           Control.Lens
+import           Control.Monad         ((<=<))
+import           Crypto.Hash.MD5
+import           Data.Bits
+import           Data.ByteString       as B (unpack)
+import           Data.ByteString.Char8 as BC (pack)
+import           Data.ByteString.UTF8  as BS (ByteString, fromString)
+import           Data.IntMap           (IntMap)
+import qualified Data.IntMap           as M
+import           Data.Word
+import           Numeric.Lens
 
 encodeWord8 :: Word8 -> [Word]
 encodeWord8 x = map fromIntegral [ (x .&. 0xF0) `shiftR` 4, x .&. 0xF ]
