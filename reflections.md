@@ -17,6 +17,7 @@ Table of Contents
 * [Day 7](#day-7) *(no reflection yet)*
 * [Day 8](#day-8) *(no reflection yet)*
 * [Day 9](#day-9) *(no reflection yet)*
+* [Day 12](#day-12) *(no reflection yet)*
 
 Day 1
 ------
@@ -344,5 +345,43 @@ mean                 8.144 ms   (8.094 ms .. 8.188 ms)
 std dev              139.4 μs   (107.1 μs .. 185.4 μs)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 12
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day12.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d12p]* / *[Code][d12g]*
+
+[d12p]: https://adventofcode.com/2016/day/12
+[d12g]: https://github.com/egnwd/advent/blob/2016/src/AOC/Challenge/Day12.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 12 Benchmarks
+
+```
+>> Day 12a
+benchmarking...
+time                 149.8 ms   (148.7 ms .. 151.6 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 149.4 ms   (148.1 ms .. 150.9 ms)
+std dev              2.018 ms   (1.206 ms .. 3.049 ms)
+variance introduced by outliers: 12% (moderately inflated)
+
+>> Day 12b
+benchmarking...
+time                 3.659 s    (3.447 s .. 4.066 s)
+                     0.999 R²   (0.997 R² .. 1.000 R²)
+mean                 3.528 s    (3.485 s .. 3.602 s)
+std dev              70.63 ms   (2.981 ms .. 86.77 ms)
+variance introduced by outliers: 19% (moderately inflated)
 ```
 
