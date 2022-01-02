@@ -22,22 +22,11 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day14 (
-    day14a
-  , day14b
+    -- day14a
+  -- , day14b
   ) where
 
 import           AOC.Prelude
-import Data.Word
-import           Data.ByteString       as B (unpack)
-import           Data.ByteString.Char8 as BC (pack)
-import           Data.ByteString.UTF8  as BS (ByteString, fromString)
-import Data.Bits
-
-encodeWord8 :: Word8 -> [Word]
-encodeWord8 x = map fromIntegral [ (x .&. 0xF0) `shiftR` 4, x .&. 0xF ]
-
-asWords = fmap fromIntegral . encodeWord8 <=< B.unpack
-
 
 day14a :: _ :~> _
 day14a = MkSol
