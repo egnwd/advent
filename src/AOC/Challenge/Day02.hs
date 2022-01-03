@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day02
 -- License     : BSD3
@@ -8,36 +5,36 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 2.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 2.
 
 module AOC.Challenge.Day02 (
-    -- day02a
-  -- , day02b
+    day02a
+  , day02b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver   ((:~>) (..))
+import           Control.Lens ((^?), _head)
+import           Text.Read    (readMaybe)
 
-day02a :: _ :~> _
+parser :: String -> Maybe [[Int]]
+parser = traverse (traverse (readMaybe @ Int) . words) . lines
+
+solve :: [Int] -> Int
+solve = (-) <$> maximum <*> minimum
+
+solveb :: [Int] -> Maybe Int
+solveb xs = [d | a <- xs, b <- xs, a /= b, let (d,m) = a `divMod` b, m == 0] ^? _head
+
+day02a :: [[Int]] :~> Int
 day02a = MkSol
-    { sParse = Just
+    { sParse = parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . map solve
     }
 
-day02b :: _ :~> _
+day02b :: [[Int]] :~> Int
 day02b = MkSol
-    { sParse = Just
+    { sParse = parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap sum . traverse solveb
     }
