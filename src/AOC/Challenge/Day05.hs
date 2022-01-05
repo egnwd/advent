@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day05
 -- License     : BSD3
@@ -8,36 +5,41 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 5.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 5.
 
 module AOC.Challenge.Day05 (
-    -- day05a
-  -- , day05b
+    day05a
+  , day05b
   ) where
 
-import           AOC.Prelude
+import           AOC.Common  (loopMaybe, pDecimal, parseLines)
+import           AOC.Solver  ((:~>) (..))
+import           Data.IntMap (IntMap)
+import qualified Data.IntMap as IM
 
-day05a :: _ :~> _
+parser :: String -> Maybe (IntMap Int)
+parser = fmap (IM.fromList . zip [0..]) . parseLines pDecimal
+
+solve :: (Int -> Int -> Int) -> IntMap Int -> Int
+solve f js0 = fst $ loopMaybe (uncurry go) (0, js0)
+    where
+        go :: Int -> IntMap Int -> Maybe (Int, IntMap Int)
+        go p js = (\j -> (p+j, IM.adjust (f j) p js)) <$> IM.lookup p js
+
+day05a :: IntMap Int :~> Int
 day05a = MkSol
-    { sParse = Just
+    { sParse = parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . solve (const succ)
     }
 
-day05b :: _ :~> _
+day05b :: IntMap Int :~> Int
 day05b = MkSol
-    { sParse = Just
+    { sParse = parser
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . solve adjustJump
     }
+    where
+        adjustJump j
+          | j >= 3 = pred
+          | otherwise = succ

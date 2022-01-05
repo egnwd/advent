@@ -28,6 +28,7 @@ module AOC.Common (
                   , fixedPoint
                   , indexedFixedPoint
                   , loopEither
+                  , loopMaybe
                   , foldMapKeysWith
                   , freqs
                   , lookupFreq
@@ -177,6 +178,15 @@ loopEither f = go
       Left  r  -> r
       Right !y -> go y
 
+loopMaybe
+    :: (a -> Maybe a)
+    -> a
+    -> (Int, a)
+loopMaybe f = go 0
+  where
+    go n !x = case f x of
+      Nothing -> (n, x)
+      Just !y -> go (n+1) y
 
 foldMapKeysWith :: (Ord k2) => (a -> a -> a) -> (k -> [k2]) -> M.Map k a -> M.Map k2 a
 foldMapKeysWith fWith f = M.fromListWith fWith . foldMap (\(k,a) -> map (,a) . f $ k) . M.toList
