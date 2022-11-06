@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 -- |
 -- Module      : AOC.Challenge.Day08
@@ -7,80 +8,36 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 8.
+-- Day 8.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day08 (
-    day08a
-  , day08b
+    -- day08a
+  -- , day08b
   ) where
 
-import           AOC.Solver     ((:~>)(..))
-import           AOC.Common     (countTrue, pickUnique)
-import           Data.Bifunctor (second)
-import           Data.List      (find)
-import           Control.Monad  (zipWithM, (<=<))
-import           Control.Lens   (over, both)
-import qualified Data.Set as S
-import qualified Data.Map as M
+import           AOC.Prelude
 
-type Segments = S.Set Char
-
-data Entry = Entry { signals :: [Segments], outputs :: [Segments] } deriving (Eq, Show)
-
-parser :: String -> [Entry]
-parser = map (uncurry Entry . over both (map S.fromList) . second (drop 1) . break (=="|") . words) . lines
-
-zero, one, two, three, four, five, six, seven, eight, nine :: Segments
-zero  = S.fromList "abcefg"
-one   = S.fromList "cf"
-two   = S.fromList "acdeg"
-three = S.fromList "acdfg"
-four  = S.fromList "bcdf"
-five  = S.fromList "abdfg"
-six   = S.fromList "abdefg"
-seven = S.fromList "acf"
-eight = S.fromList "abcdefg"
-nine  = S.fromList "abcdfg"
-
-digits :: M.Map Segments Int
-digits = M.fromList $ zip [zero, one, two, three, four, five, six, seven, eight, nine] [0..]
-
-solveb :: [Entry] -> Maybe Int
-solveb ds = sum <$> zipWithM (\e -> outputToNumber (outputs e) <=< id) ds translations
-    where
-        outputToNumber o t = numberFromDigits <$> traverse (pickNumber <=< translate t) o
-        translate t        = fmap S.fromList . traverse (`M.lookup` t) . S.toList
-        translations       = map (decodeEntry . signals) ds
-        decodeEntry e = find valid (choices e)
-            where
-                valid m = maybe False (all (`M.member` digits)) . traverse (translate m) $ e
-
-pickNumber :: Segments -> Maybe Int
-pickNumber = flip M.lookup digits
-
-numberFromDigits :: (Foldable t) => t Int -> Int
-numberFromDigits = foldl (\n d -> n * 10 + d) 0
-
-choices :: [Segments] -> [M.Map Char Char]
-choices = pickUnique . M.toList . M.fromListWith S.intersection . concatMap choices'
-    where
-        chooseFrom s n = S.toList . S.map (, n) $ s
-        choices' s | S.size s == 2 = s `chooseFrom` one
-                   | S.size s == 3 = s `chooseFrom` seven
-                   | S.size s == 4 = s `chooseFrom` four
-                   | S.size s == 7 = s `chooseFrom` eight
-                   | otherwise = []
-
-day08a :: [Entry] :~> Int
+day08a :: _ :~> _
 day08a = MkSol
-    { sParse = Just . parser
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . countTrue ((`elem` [2,3,4,7]) . length) . concatMap outputs
+    , sSolve = Just
     }
 
-day08b :: [Entry] :~> Int
+day08b :: _ :~> _
 day08b = MkSol
-    { sParse = Just . parser
+    { sParse = Just
     , sShow  = show
-    , sSolve = solveb
+    , sSolve = Just
     }

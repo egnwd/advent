@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 -- |
 -- Module      : AOC.Challenge.Day17
@@ -7,71 +8,36 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 17.
+-- Day 17.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day17 (
-    day17a
-  , day17b
+    -- day17a
+  -- , day17b
   ) where
 
-import AOC.Solver     ((:~>)(..))
-import AOC.Common     (parseMaybeLenient, CharParser, pDecimal, Point, inBoundingBox, pastBoundingBox)
-import Data.Semigroup (Max(Max), getMax)
-import Data.Foldable  (fold)
-import Data.Maybe     (mapMaybe)
-import Data.List      (find)
-import Control.Lens   ((%~), view)
-import Linear         (V2(..), _x, _y, zero, transpose)
+import           AOC.Prelude
 
-type Velocity = V2 Int
-type Region = V2 Point
-
-parser :: CharParser Region
-parser = transpose <$> (V2 <$> ("target area: " *> "x=" *> parseRange <* ", ") <*> ("y=" *> parseRange))
-    where
-        parseRange = V2 <$> pDecimal <*> (".." *> pDecimal)
-
-validRange :: Region -> [Velocity]
-validRange (V2 (V2 _ mny) (V2 mxx _)) = sequence $ V2 [1..mxx] [mny..(-mny)]
-
-highestY :: Region -> Int
-highestY targ
-  = getMax
-  . fold
-  . mapMaybe ((\t -> findMaxHeight t <$ findCollision targ t) . trajectory targ)
-  . filter ((>0) . view _x)
-  $ validRange targ
-    where
-        findMaxHeight = foldMap (Max . view _y)
-
-numberVelocities :: Region -> Int
-numberVelocities targ = length . mapMaybe (findCollision targ . trajectory targ) $ validRange targ
-
-findCollision :: Region -> [Point] -> Maybe Point
-findCollision = find . inBoundingBox
-
-trajectory :: Region -> Velocity -> [Point]
-trajectory targ = takeWhile (not . pastBoundingBox targ) . positions zero
-
-positions :: Point -> Velocity -> [Point]
-positions p0 = scanl (+) p0 . velocities
-
-velocities :: Velocity -> [Velocity]
-velocities = iterate ((_x %~ dragX) . (_y %~ dragY))
-    where
-        dragX vx = vx - signum vx
-        dragY vy = vy - 1
-
-day17a :: Region :~> Int
+day17a :: _ :~> _
 day17a = MkSol
-    { sParse = parseMaybeLenient parser
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . highestY
+    , sSolve = Just
     }
 
-day17b :: Region :~> Int
+day17b :: _ :~> _
 day17b = MkSol
-    { sParse = parseMaybeLenient parser
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . numberVelocities
+    , sSolve = Just
     }

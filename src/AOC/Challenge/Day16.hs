@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings, TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 -- |
 -- Module      : AOC.Challenge.Day16
@@ -7,101 +8,36 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 16.
+-- Day 16.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day16 (
-    day16a
-  , day16b
+    -- day16a
+  -- , day16b
   ) where
 
-import AOC.Solver               ((:~>)(..))
-import AOC.Common               (hexToBin, parseMaybeLenient, parseOrFail, CharParser)
-import Control.Lens             (preview, (<&>))
-import Control.Monad            ((<=<))
-import Data.Functor.Foldable    (cata)
-import Data.Functor.Foldable.TH (makeBaseFunctor)
-import Data.Maybe               (fromMaybe)
-import Numeric.Lens             (binary)
-import Text.Megaparsec          (anySingle, takeP, count, many, (<|>), failure, ErrorItem(Tokens))
-import Text.Megaparsec.Char     (char)
-import qualified Data.Set as S
-import qualified Data.List.NonEmpty as NE
+import           AOC.Prelude
 
-data Packet
-    = Literal !Int Integer
-    | Operator !Int Operator [Packet]
-
-type Operator = [Integer] -> Integer
-
-makeBaseFunctor ''Packet
-
--- ^ Parsing
-
-toBinOrZero :: (Integral a) => String -> a
-toBinOrZero = fromMaybe 0 . preview binary
-
-toOp :: Int -> CharParser (Maybe Operator)
-toOp = \case
-    0 -> pure $ Just sum
-    1 -> pure $ Just product
-    2 -> pure $ Just minimum
-    3 -> pure $ Just maximum
-    4 -> pure   Nothing
-    5 -> pure $ Just $ binOp (>)
-    6 -> pure $ Just $ binOp (<)
-    7 -> pure $ Just $ binOp (==)
-    n -> failure (Tokens <$> NE.nonEmpty (show n)) (S.singleton (Tokens . NE.fromList $ "Packet Type (0-7)"))
-    where
-        binOp f = \case
-            [a,b] -> if a `f` b then 1 else 0
-            _     -> 0
-
-parsePacket :: CharParser Packet
-parsePacket = do
-    v   <- toBinOrZero <$> takeP (Just "Version") 3
-    typ <- toOp . toBinOrZero =<< takeP (Just "Operator") 3
-    case typ of
-      Nothing -> Literal v <$> parseLiteral
-      Just op -> Operator v op <$> parseOperator
-
-parseLiteral :: CharParser Integer
-parseLiteral = toBinOrZero <$> parseLiteral'
-    where
-        parseLiteral' :: CharParser String
-        parseLiteral' = do
-            f <- anySingle
-            d <- takeP (Just "Literal") 4
-            rest <- if f == '0' then pure [] else parseLiteral'
-            pure (d++rest)
-
-parseOperator :: CharParser [Packet]
-parseOperator = (char '0' *> parse15Operator) <|> (char '1' *> parse11Operator)
-    where
-        parse15Operator = takeP (Just "Length of subpackets") 15 >>= (takeP (Just "subpackets") . toBinOrZero) <&> parseOrFail (many parsePacket)
-        parse11Operator = takeP (Just "Count of subpackets") 11 >>= (`count` parsePacket) . toBinOrZero
-
--- ^ Solving Functions
-
-getVersionSum :: PacketF Int -> Int
-getVersionSum (LiteralF v _) = v
-getVersionSum (OperatorF v _ ps) = v + sum ps
-
-calculate :: PacketF Integer -> Integer
-calculate (LiteralF _ l)      = l
-calculate (OperatorF _ op ps) = op ps
-
--- ^ Solutions
-
-day16a :: Packet :~> Int
+day16a :: _ :~> _
 day16a = MkSol
-    { sParse = parseMaybeLenient parsePacket <=< hexToBin
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . cata getVersionSum
+    , sSolve = Just
     }
 
-day16b :: Packet :~> Integer
+day16b :: _ :~> _
 day16b = MkSol
-    { sParse = parseMaybeLenient parsePacket <=< hexToBin
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . cata calculate
+    , sSolve = Just
     }
