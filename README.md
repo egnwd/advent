@@ -56,7 +56,7 @@ Check out the [reflections][] --- more info below!
 | Day 24    |             |           |            |
 | Day 25    |             |           |            |
 
-[reflections]: https://github.com/egnwd/advent/blob/main/reflections.md
+[reflections]: https://github.com/egnwd/advent/blob/2022/reflections.md
 
 ### `:~>` type
 

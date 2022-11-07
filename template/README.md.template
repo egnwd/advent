@@ -28,7 +28,7 @@ Check out the [reflections][] --- more info below!
 
 ${table}
 
-[reflections]: https://github.com/${github}/advent/blob/main/reflections.md
+[reflections]: https://github.com/${github}/advent/blob/${year}/reflections.md
 
 ### `:~>` type
 
