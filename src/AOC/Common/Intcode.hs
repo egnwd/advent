@@ -2,14 +2,24 @@ module AOC.Common.Intcode
   ( Memory(..)
   , parseMem
   , stepTilTermination
+  , untilFalse
+  , VMErr(..)
+  , IErr(..)
+  , AsVMErr(..)
+  , AsIErr(..)
   ) where
 
 import AOC.Common.Intcode.Memory
 import Control.DeepSeq (NFData)
 import Control.Monad.State
+import Control.Monad.Except
+import Control.Exception
 import Data.List.Split (splitOn)
 import Data.Map (Map)
 import Data.Traversable
+import Data.Typeable
+import Control.Lens.TH
+import Control.Monad.Error.Lens
 import GHC.Generics (Generic)
 import Linear
 import Text.Read (readMaybe)
@@ -27,6 +37,22 @@ instrMap = M.fromList $
 
 instr :: Int -> Maybe Instr
 instr = (`M.lookup` instrMap)
+
+data VMErr = VMEBadMode  Int
+           | VMEBadInstr Int
+           | VMEBadPos   Int
+  deriving (Eq, Ord, Show, Typeable, Generic)
+instance Exception VMErr
+makeClassyPrisms ''VMErr
+
+data IErr = IENoInput
+          | IEVM VMErr
+  deriving (Eq, Ord, Show, Typeable, Generic)
+instance Exception IErr
+makeClassyPrisms ''IErr
+
+instance AsVMErr IErr where
+    _VMErr = _IEVM
 
 parseMem :: String -> Maybe Memory
 parseMem = fmap (Mem 0 . M.fromList . zip [0..])
@@ -50,10 +76,16 @@ intMode :: Int -> Maybe Int
 intMode 0 = Just 0
 intMode _ = Nothing
 
-step :: MonadMem m => m Bool
+-- fillModes :: forall t. (Traversable t, Applicative t) => Maybe (t Int)
+-- fillModes = fmap snd . traverse sequence $ mapAccumL go (0 :: Int) (pure () :: t ())
+  -- where
+    -- go :: Int -> _ -> (Int, Maybe Int)
+    -- go a _ = (a, intMode $ a `mod` 10)
+
+step :: (AsVMErr e, MonadError e m, MonadMem m) => m Bool
 step = do
   x <- mRead
-  i <- maybe (pure Hlt) pure $ instr x
+  i <- maybe (throwing _VMErr (VMEBadInstr x)) pure $ instr x
   res <- case i of
            Add -> withInput $ \(V2 a b) -> pure . IRWrite $ a + b
            Mul -> withInput $ \(V2 a b) -> pure . IRWrite $ a * b
@@ -72,5 +104,5 @@ untilFalse b = go
       False -> pure ()
       True -> go
 
-stepTilTermination :: (Monad m) => Memory -> m Memory
+stepTilTermination :: (AsVMErr e, MonadError e m) => Memory -> m Memory
 stepTilTermination m = execStateT (untilFalse step) m

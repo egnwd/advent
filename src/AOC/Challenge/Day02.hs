@@ -34,7 +34,10 @@ import qualified Data.Map as M
 import Data.List.Split (splitOn)
 
 solvea :: Int -> Int -> Memory -> Maybe Int
-solvea p1 p2 = M.lookup 0 . mRegs <=< stepTilTermination . (_mRegs %~ M.insert 1 p1 . M.insert 2 p2)
+solvea p1 p2
+  = M.lookup 0 . mRegs
+  <=< eitherToMaybe . (stepTilTermination @ IErr)
+  . (_mRegs %~ M.insert 1 p1 . M.insert 2 p2)
 
 solveb m = do
     let goal = 19690720
