@@ -245,17 +245,7 @@ htmlToMarkdown pretty html = first ((:[]) . show) . P.runPure $ do
          . P.disableExtension P.Ext_smart
          $ P.pandocExtensions
 
-
-
-
-
-
 type Parser = MP.Parsec Void String
-
-
-
-
-
 
 data TestMeta = TM { _tmAnswer :: Maybe String
                    , _tmData   :: Map String Dynamic
@@ -287,7 +277,7 @@ parseMeta = do
                <* "\n"
     parseData = do
       MP.string ">>>"
-      sym <- MP.manyTill (MP.try MP.letterChar)   (MP.try (MP.char ':'))
+      sym <- MP.manyTill (MP.try MP.alphaNumChar) (MP.try (MP.char ':'))
       val <- MP.manyTill (MP.try MP.alphaNumChar) (MP.try (MP.char ':'))
       typ <- MP.many     (MP.try MP.letterChar)
       MP.space

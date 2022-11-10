@@ -110,6 +110,7 @@ library:
   - profunctors
   - psqueues
   - recursion-schemes
+  - split
   - scientific
   - semigroupoids
   - strict-tuple
