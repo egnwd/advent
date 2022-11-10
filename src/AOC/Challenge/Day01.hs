@@ -22,17 +22,20 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day01 (
-    -- day01a
-  -- , day01b
+    day01a
+  , day01b
   ) where
 
 import           AOC.Prelude
 
-day01a :: _ :~> _
+fuel i = (i `div` 3) - 2
+solvea = sum . map fuel
+
+day01a :: [Int] :~> _
 day01a = MkSol
-    { sParse = Just
+    { sParse = traverse readMaybe . lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just. solvea
     }
 
 day01b :: _ :~> _
