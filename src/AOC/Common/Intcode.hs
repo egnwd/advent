@@ -5,7 +5,9 @@ module AOC.Common.Intcode
   , parseMem
   , stepTilTermination
   , untilFalse
+  , untilHalt
   , yieldAndDie
+  , yieldAndPass
   , VMErr(..)
   , IErr(..)
   , AsVMErr(..)
@@ -33,6 +35,7 @@ import GHC.Generics (Generic)
 import Linear
 import Text.Read (readMaybe)
 import qualified Data.Map as M
+import qualified Data.Conduino.Combinators as C
 
 -- Learning difficult Haskell via: https://github.com/mstksg/advent-of-code-2019/blob/master/src/AOC/Common/Intcode.hs
 
@@ -161,3 +164,6 @@ stepTilTermination m = execStateP m (untilFalse step)
 
 yieldAndDie :: (MonadError IErr m) => o -> Pipe i o u m a
 yieldAndDie o = yield o *> throwError IENoInput
+
+yieldAndPass :: o -> Pipe o o u m u
+yieldAndPass i = yield i *> C.map id

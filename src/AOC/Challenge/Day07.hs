@@ -22,22 +22,44 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day07 (
-    -- day07a
-  -- , day07b
+    day07a
+  , day07b
   ) where
 
+import AOC.Common.Intcode
 import           AOC.Prelude
+import Data.Conduino
+import qualified Data.Conduino.Combinators as C
+
+amplifiers mem = foldr ((.|) . amp) (C.map id)
+    where
+        -- ^ Pipe that inputs and outputs numbers (amplification amount)
+        -- ^ buts results never terminates nor does the upstream
+        amp :: (MonadError IErr m) => Int -> Pipe Int Int Void m Void
+        amp p = yieldAndPass p .| stepTilTermination mem *> throwError IENoInput
+
+runTrial :: Memory -> [Int] -> Maybe Int
+runTrial mem ps = eitherToMaybe . runPipe
+    $ yieldAndDie 0
+    .| amplifiers mem ps
+    .| awaitSurely
+
+-- ^ Had to look up a lot of this stream nonsense... good learning though
+runFeedbackTrial :: Memory -> [Int] -> Maybe Int
+runFeedbackTrial mem ps = runPipePure
+    $ untilHalt (yieldAndDie 0 .| feedbackPipe (amplifiers mem ps))
+    .| C.last
 
 day07a :: _ :~> _
 day07a = MkSol
-    { sParse = Just
+    { sParse = parseMem
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \m -> fmap getMax . foldMap (fmap Max . runTrial m) $ permutations [0..4]
     }
 
 day07b :: _ :~> _
 day07b = MkSol
-    { sParse = Just
+    { sParse = parseMem
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \m -> fmap getMax . foldMap (fmap Max . runFeedbackTrial m) $ permutations [5..9]
     }
