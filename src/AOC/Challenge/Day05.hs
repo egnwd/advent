@@ -31,9 +31,9 @@ import Data.Conduino
 import qualified Data.Conduino.Combinators as C
 import AOC.Common.Intcode
 
-solvea :: Memory -> Either IErr (Maybe Int)
-solvea m = runPipe
-    $ yieldAndDie 1
+solve :: Int -> Memory -> Either IErr (Maybe Int)
+solve n m = runPipe
+    $ yieldAndDie n
     .| stepTilTermination m
     .| C.last
 
@@ -41,12 +41,12 @@ day05a :: _ :~> _
 day05a = MkSol
     { sParse = parseMem
     , sShow  = show
-    , sSolve = fromRight Nothing . solvea
+    , sSolve = fromRight Nothing . solve 1
     }
 
 day05b :: _ :~> _
 day05b = MkSol
-    { sParse = Just
+    { sParse = parseMem
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fromRight Nothing . solve 5
     }
