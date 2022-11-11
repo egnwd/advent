@@ -9,6 +9,8 @@ import Control.DeepSeq (NFData)
 import GHC.Generics (Generic)
 import Data.Map (Map)
 import Control.Lens
+import Data.Conduino
+import Data.Conduino.Lift
 import           Control.Monad.State
 import qualified Data.Map as M
 
@@ -40,3 +42,10 @@ instance Monad m => MonadMem (StateT Memory m) where
     mPeek i = gets $ M.findWithDefault 0 i . mRegs
     mSeek = assign _mPos
     mWrite i x = _mRegs %= M.insert i x
+
+instance MonadMem m => MonadMem (Pipe i o u m) where
+    mRead = lift mRead
+    mCurr = lift mCurr
+    mPeek = lift . mPeek
+    mSeek = lift . mSeek
+    mWrite i = lift . mWrite i

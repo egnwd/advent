@@ -27,12 +27,21 @@ module AOC.Challenge.Day05 (
   ) where
 
 import           AOC.Prelude
+import Data.Conduino
+import qualified Data.Conduino.Combinators as C
+import AOC.Common.Intcode
+
+solvea :: Memory -> Either IErr (Maybe Int)
+solvea m = runPipe
+    $ yieldAndDie 1
+    .| stepTilTermination m
+    .| C.last
 
 day05a :: _ :~> _
 day05a = MkSol
-    { sParse = Just
+    { sParse = parseMem
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fromRight Nothing . solvea
     }
 
 day05b :: _ :~> _

@@ -29,15 +29,19 @@ module AOC.Challenge.Day02 (
 import           AOC.Prelude
 import AOC.Common.Intcode
 import AOC.Common.Intcode.Memory
+import Data.Conduino
+import qualified Data.Conduino.Combinators as C
 import Control.Lens
 import qualified Data.Map as M
 import Data.List.Split (splitOn)
 
 solvea :: Int -> Int -> Memory -> Maybe Int
-solvea p1 p2
-  = M.lookup 0 . mRegs
-  <=< eitherToMaybe . (stepTilTermination @ IErr)
-  . (_mRegs %~ M.insert 1 p1 . M.insert 2 p2)
+solvea p1 p2 m = do
+  let m' = _mRegs %~ M.insert 1 p1 . M.insert 2 p2 $ m
+  join . eitherToMaybe . runPipe
+    $ throwError IENoInput
+    .| ((M.lookup 0 . mRegs) <$> stepTilTermination m')
+    |. C.sinkNull
 
 solveb m = do
     let goal = 19690720
