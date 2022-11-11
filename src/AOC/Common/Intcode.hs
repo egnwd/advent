@@ -10,10 +10,6 @@ module AOC.Common.Intcode
   , IErr(..)
   , AsVMErr(..)
   , AsIErr(..)
-  , toAsciiVM
-  , preAscii, postAscii
-  , interactVM
-  , interactAsciiVM
   ) where
 
 import AOC.Common.Intcode.Memory
@@ -32,22 +28,15 @@ import Data.List.Split (splitOn)
 import Data.Map (Map)
 import Data.Traversable
 import Data.Typeable
-import Data.Char
-import           Data.Text                 (Text)
 import Data.Void
 import GHC.Generics (Generic)
 import Linear
-import Debug.Trace
 import Text.Read (readMaybe)
-import qualified Data.Conduino.Combinators as C
-import qualified Data.Text                 as T
-import qualified Data.Text.Encoding        as T
 import qualified Data.Map as M
 
 -- Learning difficult Haskell via: https://github.com/mstksg/advent-of-code-2019/blob/master/src/AOC/Common/Intcode.hs
 
 type VM = Pipe Int Int Void
-type AsciiVM = Pipe Text Text Void
 
 data Instr = Add | Mul | Get | Put | Jnz | Jez | Clt | Ceq | Hlt
   deriving (Eq, Ord, Enum, Show, Generic)
@@ -172,30 +161,3 @@ stepTilTermination m = execStateP m (untilFalse step)
 
 yieldAndDie :: (MonadError IErr m) => o -> Pipe i o u m a
 yieldAndDie o = yield o *> throwError IENoInput
-
-preAscii :: Pipe Text Int u m u
-preAscii = C.concatMap $ map ord . T.unpack . (<> "\n")
-
-postAscii :: Monad m => Pipe Int Text u m u
-postAscii = C.map chr .| C.mapAccum go [] .| C.concat
-  where
-    go c xs
-      | c == '\n' = ([], Just (T.pack (reverse xs)))
-      | otherwise = (c:xs, Nothing)
-
-toAsciiVM :: Monad m => VM m a -> AsciiVM m a
-toAsciiVM p = preAscii .| p .| postAscii
-
-interactAsciiVM
-    :: MonadIO m
-    => AsciiVM (ExceptT IErr m) a
-    -> m ()
-interactAsciiVM vm = void . runPipe . untilHalt $
-      (C.stdinLines *> throwError IENoInput)
-   .| C.map T.pack
-   .| vm
-   .| C.map (T.encodeUtf8 . (<> "\n"))
-   .| C.stdout
-
-interactVM :: Memory -> IO ()
-interactVM = interactAsciiVM . toAsciiVM . stepTilTermination
