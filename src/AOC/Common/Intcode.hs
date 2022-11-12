@@ -14,28 +14,28 @@ module AOC.Common.Intcode
   , AsIErr(..)
   ) where
 
-import AOC.Common.Intcode.Memory
-import AOC.Util
-import Data.Bifunctor
-import Control.DeepSeq (NFData)
-import Control.Exception
-import Control.Lens.TH
-import Control.Lens
-import Control.Monad.Error.Lens
-import Control.Monad.Except
-import Control.Monad.State
-import Data.Conduino
-import Data.Conduino.Lift
-import Data.List.Split (splitOn)
-import Data.Map (Map)
-import Data.Traversable
-import Data.Typeable
-import Data.Void
-import GHC.Generics (Generic)
-import Linear
-import Text.Read (readMaybe)
-import qualified Data.Map as M
+import           AOC.Common.Intcode.Memory
+import           AOC.Util
+import           Control.DeepSeq           (NFData)
+import           Control.Exception
+import           Control.Lens
+import           Control.Lens.TH
+import           Control.Monad.Error.Lens
+import           Control.Monad.Except
+import           Control.Monad.State
+import           Data.Bifunctor
+import           Data.Conduino
 import qualified Data.Conduino.Combinators as C
+import           Data.Conduino.Lift
+import           Data.List.Split           (splitOn)
+import           Data.Map                  (Map)
+import qualified Data.Map                  as M
+import           Data.Traversable
+import           Data.Typeable
+import           Data.Void
+import           GHC.Generics              (Generic)
+import           Linear
+import           Text.Read                 (readMaybe)
 
 -- Learning difficult Haskell via: https://github.com/mstksg/advent-of-code-2019/blob/master/src/AOC/Common/Intcode.hs
 
@@ -90,7 +90,7 @@ withInputLazy
     -> m (r, Mode)        -- ^ result of action
 withInputLazy ms f = do
   (lastMode, modes) <- case fillModes ms of
-      Left i -> throwing _VMErr $ VMEBadMode i
+      Left i  -> throwing _VMErr $ VMEBadMode i
       Right x -> pure x
   inp <- for modes $ \m ->
     pure $ case m of
