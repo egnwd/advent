@@ -22,22 +22,30 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day09 (
-    -- day09a
-  -- , day09b
+    day09a
+  , day09b
   ) where
 
+import           AOC.Common.Intcode
 import           AOC.Prelude
+import           Data.Conduino
+
+runProg :: Int -> Memory -> Maybe Int
+runProg i mem = join . eitherToMaybe . runPipe
+    $ yieldAndDie i
+    .| stepTilTermination mem
+    .| await
 
 day09a :: _ :~> _
 day09a = MkSol
-    { sParse = Just
+    { sParse = parseMem
     , sShow  = show
-    , sSolve = Just
+    , sSolve = runProg 1
     }
 
 day09b :: _ :~> _
 day09b = MkSol
-    { sParse = Just
+    { sParse = parseMem
     , sShow  = show
-    , sSolve = Just
+    , sSolve = runProg 2
     }

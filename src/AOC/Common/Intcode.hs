@@ -41,18 +41,18 @@ import           Text.Read                 (readMaybe)
 
 type VM = Pipe Int Int Void
 
-data Instr = Add | Mul | Get | Put | Jnz | Jez | Clt | Ceq | Hlt
+data Instr = Add | Mul | Get | Put | Jnz | Jez | Clt | Ceq | ChB | Hlt
   deriving (Eq, Ord, Enum, Show, Generic)
 instance NFData Instr
 
 instrMap :: Map Int Instr
 instrMap = M.fromList $
-    (99, Hlt) : zip [1 ..] [Add .. Ceq]
+    (99, Hlt) : zip [1 ..] [Add .. ChB]
 
 instr :: Int -> Maybe Instr
 instr = (`M.lookup` instrMap)
 
-data Mode = Pos | Imm
+data Mode = Pos | Imm | Rel
   deriving (Eq, Ord, Enum, Show, Generic)
 instance NFData Mode
 
@@ -73,13 +73,14 @@ instance AsVMErr IErr where
     _VMErr = _IEVM
 
 parseMem :: String -> Maybe Memory
-parseMem = fmap (Mem 0 . M.fromList . zip [0..])
+parseMem = fmap (Mem 0 0 . M.fromList . zip [0..])
          . traverse readMaybe
          . splitOn ","
 
 data InstrRes = IRWrite Int         -- ^ write a value to location at
               | IRNop               -- ^ no op
               | IRJump Int          -- ^ jump
+              | IRShiftBase Int     -- ^ Shift base
               | IRHalt              -- ^ halt
   deriving (Eq, Ord, Show, Generic)
 
@@ -96,6 +97,7 @@ withInputLazy ms f = do
     pure $ case m of
       Pos -> mRead >>= mPeek
       Imm -> mRead
+      Rel -> mRead >>= mWithBase >>= mPeek
   (, lastMode) <$> f inp
 
 withInput
@@ -108,6 +110,7 @@ withInput mo f = withInputLazy mo ((f =<<) . sequenceA)
 intMode :: Int -> Maybe Mode
 intMode = \case 0 -> Just Pos
                 1 -> Just Imm
+                2 -> Just Rel
                 _ -> Nothing
 
 fillModes :: forall t. (Traversable t, Applicative t) => Int -> Either Int (Mode, t Mode)
@@ -131,6 +134,7 @@ step = do
            Jez -> withInput ms $ \(V2 a l) -> pure $ if a == 0 then IRJump l else IRNop
            Clt -> withInput ms $ \(V2 a b) -> pure . IRWrite $ if a < b then 1 else 0
            Ceq -> withInput ms $ \(V2 a b) -> pure . IRWrite $ if a == b then 1 else 0
+           ChB -> withInput ms $ \(V1 a) -> pure . IRShiftBase $ a
            Hlt -> withInput ms $ \V0 -> pure IRHalt
 
   case res of
@@ -142,7 +146,11 @@ step = do
         _ <- mRead
         loc <- mCurr
         True <$ mWrite loc x
+      Rel -> do
+        loc <- mWithBase =<< mRead
+        True <$ mWrite loc x
     IRJump j -> True <$ mSeek j
+    IRShiftBase i -> True <$ mShiftBase i
     IRNop -> pure True
     IRHalt -> pure False
 

@@ -5,17 +5,18 @@ module AOC.Common.Intcode.Memory
   , _mRegs
   ) where
 
-import Control.DeepSeq (NFData)
-import GHC.Generics (Generic)
-import Data.Map (Map)
-import Control.Lens
-import Data.Conduino
-import Data.Conduino.Lift
+import           Control.DeepSeq     (NFData)
+import           Control.Lens
 import           Control.Monad.State
-import qualified Data.Map as M
+import           Data.Conduino
+import           Data.Conduino.Lift
+import           Data.Map            (Map)
+import qualified Data.Map            as M
+import           GHC.Generics        (Generic)
 
 data Memory = Mem
-  { mPos :: Int
+  { mPos  :: Int
+  , mBase :: Int
   , mRegs :: Map Int Int
   }
   deriving (Eq, Ord, Show, Generic)
@@ -23,6 +24,9 @@ instance NFData Memory
 
 _mPos :: Lens' Memory Int
 _mPos = lens mPos (\mem newPos -> mem { mPos = newPos })
+
+_mBase :: Lens' Memory Int
+_mBase = lens mBase (\mem newBase -> mem { mBase = newBase })
 
 _mRegs :: Lens' Memory (Map Int Int)
 _mRegs = lens mRegs (\mem newRegs -> mem { mRegs = newRegs })
@@ -33,6 +37,8 @@ class Monad m => MonadMem m where
     mPeek      :: Int -> m Int
     mSeek      :: Int -> m ()
     mWrite     :: Int -> Int -> m ()
+    mShiftBase :: Int -> m ()
+    mWithBase  :: Int -> m Int
 
 instance Monad m => MonadMem (StateT Memory m) where
     mRead = do
@@ -42,6 +48,8 @@ instance Monad m => MonadMem (StateT Memory m) where
     mPeek i = gets $ M.findWithDefault 0 i . mRegs
     mSeek = assign _mPos
     mWrite i x = _mRegs %= M.insert i x
+    mShiftBase i = _mBase += i
+    mWithBase i = (+i) <$> gets mBase
 
 instance MonadMem m => MonadMem (Pipe i o u m) where
     mRead = lift mRead
@@ -49,3 +57,5 @@ instance MonadMem m => MonadMem (Pipe i o u m) where
     mPeek = lift . mPeek
     mSeek = lift . mSeek
     mWrite i = lift . mWrite i
+    mShiftBase = lift . mShiftBase
+    mWithBase = lift . mWithBase
