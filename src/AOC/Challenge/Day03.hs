@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day03
@@ -22,22 +23,50 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day03 (
-    -- day03a
-  -- , day03b
+    day03a
+  , day03b
   ) where
 
 import           AOC.Prelude
+import Linear.V2
+import qualified Data.Map as M
+import qualified Data.Set as S
+
+parseClaim = do
+    i <- "#" *> pTok pDecimal <* pTok "@"
+    coord <- V2 <$> pDecimal <* "," <*> pDecimal <* pTok ":"
+    size <- V2 <$> pDecimal <* "x" <*> pDecimal
+    return $ Claim i coord size
+
+data Claim = Claim
+    { cId :: Int
+    , cCoord :: Point
+    , cSize :: V2 Int
+    }
+    deriving (Eq, Show)
+
+corners (Claim {..}) = V2 cCoord (cCoord + cSize - 1)
+
+allSquares c = sequence (V2 [xMn..xMx] [yMn..yMx])
+    where
+        V2 (V2 xMn yMn) (V2 xMx yMx) = corners c
+
+findGoodClaim cs = find good cs
+    where
+        good c = let section = S.fromList (allSquares c)
+                  in section `S.isSubsetOf` fabric
+        fabric = M.keysSet . M.filter (== 1) . freqs . concatMap allSquares $ cs
 
 day03a :: _ :~> _
 day03a = MkSol
-    { sParse = Just
+    { sParse = parseLines parseClaim
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . M.size . M.filter (> 1) . freqs . concatMap allSquares
     }
 
 day03b :: _ :~> _
 day03b = MkSol
-    { sParse = Just
+    { sParse = parseLines parseClaim
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap cId . findGoodClaim
     }
