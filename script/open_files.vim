@@ -17,7 +17,7 @@
 " Change s:year below to open test data for a different year
 "
 
-let s:year = 2021
+let s:year = 2018
 
 function! OpenAoC(day)
     let l:daystr  = printf("%02d",a:day)
