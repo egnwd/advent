@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day12
@@ -22,17 +23,45 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day12 (
-    -- day12a
-  -- , day12b
+    day12a
+  , day12b
   ) where
 
 import           AOC.Prelude
+import AOC.Common.Point
+import Linear.V3
+import Control.Lens.TH
+import Control.Lens
+
+data Moon a = Moon
+    { _mLoc :: a
+    , _mVelocity :: a
+    }
+    deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+$(( makeLenses 'Moon ))
+
+parseMoon :: CharParser (Moon Point3D)
+parseMoon = do
+ loc <- V3 <$> ("<x=" *> pDecimal) <*> (", y=" *> pDecimal) <*> (", z=" *> pDecimal) <* ">"
+ return $ Moon loc 0
+
+step :: (Applicative f, Num b, Num (f b), Ord b) => [Moon (f b)] -> [Moon (f b)]
+step ms
+    = map (\m -> m & mLoc +~ (m ^. mVelocity)) -- ^ move the moon
+    . map (\m -> m & mVelocity +~ acc m)       -- ^ apply gravity
+    $ ms
+        where
+            acc m = getSum . foldMap (gravity m) $ ms
+            gravity (Moon m1 _) (Moon m2 _) = Sum . signum $ subtract m1 m2
+
+totalEnergy :: [Moon (V3 Int)] -> Int
+totalEnergy = getSum . foldMap (Sum . product . fmap (sum . abs))
 
 day12a :: _ :~> _
 day12a = MkSol
-    { sParse = Just
+    { sParse = parseLines parseMoon
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap totalEnergy . (!? (dyno_ "steps" 1000)) . iterate step
     }
 
 day12b :: _ :~> _
