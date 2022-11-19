@@ -97,6 +97,7 @@ library:
   - hashable
   - heredoc
   - hpack
+  - IntervalMap
   - data-interval
   - lens
   - linear
