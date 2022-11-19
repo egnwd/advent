@@ -22,22 +22,32 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day05 (
-    -- day05a
-  -- , day05b
+    day05a
+  , day05b
   ) where
 
 import           AOC.Prelude
+
+reduce a (b:x)
+  | toUpper a == toUpper b && a /= b = x
+  | otherwise = a:b:x
+reduce c [] = [c]
+
+options :: String -> [String]
+options x = do
+    m <- ['a'..'z']
+    return $ filter ((/= m) . toLower) x
 
 day05a :: _ :~> _
 day05a = MkSol
     { sParse = Just
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . length . foldr reduce []
     }
 
 day05b :: _ :~> _
 day05b = MkSol
     { sParse = Just
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . getMin . foldMap (Min . length . foldr reduce []) . options . foldr reduce []
     }
