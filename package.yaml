@@ -110,6 +110,7 @@ library:
   - parser-combinators
   - profunctors
   - psqueues
+  - pointedlist
   - recursion-schemes
   - scientific
   - semigroupoids

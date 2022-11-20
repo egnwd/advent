@@ -29,63 +29,35 @@ module AOC.Challenge.Day09 (
 
 import           AOC.Prelude
 import qualified Data.Map as M
-import qualified Data.Vector.Unboxed as V
-import Control.Monad.State
+import qualified Data.List.PointedList.Circular as PL
 import Data.Foldable
 import Control.Lens
-import Control.Lens.TH
-import Control.DeepSeq
 
 parseGame = (,) <$> pTok pDecimal <* pTok "players; last marble is worth" <*> pTok pDecimal <* "points"
 
-data Game = MkGame
-    { _gMarbles :: V.Vector Int
-    , _gCurrent :: Int
-    , _gPlayer :: Int
-    , _gPlayers :: Int
-    } deriving (Show, Generic)
+playRound m marbles
+  | m `mod` 23 == 0 = let marbles' = PL.moveN (-7) marbles
+                          current = marbles' ^. PL.focus
+                       in (m+current, fromJust (PL.delete marbles'))
+  | otherwise = (0, PL.insertLeft m . PL.moveN 2 $ marbles)
 
-instance NFData Game
-$(makeLenses ''Game)
-
-playRound :: Int -> StateT Game Maybe (Map Int Int)
-playRound m = do
-    player <- use gPlayer
-    curr <- use gCurrent
-    size <- uses gMarbles V.length
-    score <- case m `mod` 23 of
-      0 -> do
-          let removedIndex = (curr + (7*size) - 7) `mod` size
-          (before, after) <- uses gMarbles (V.splitAt removedIndex)
-          gMarbles .= before V.++ (V.tail after)
-          gCurrent .= removedIndex
-          return $ M.singleton player (m+(V.head after))
-      _ -> do
-          let nextIndex = ((curr + 1) `mod` size) + 1
-          (before, after) <- uses gMarbles (V.splitAt nextIndex)
-          gMarbles .= before V.++ (m `V.cons` after)
-          gCurrent .= nextIndex
-          return mempty
-    nextPlayer
-    return score
-
-playGame (ps, ms) = evalStateT (foldlM (\s -> fmap (M.unionWith (+) s) . playRound) mempty [1..ms]) (MkGame (V.singleton 0) 0 1 ps)
-
-nextPlayer :: (Monad m) => StateT Game m ()
-nextPlayer = do
-    nPlayers <- use gPlayers
-    gPlayer %= (\p -> (p `mod` nPlayers) + 1)
+playGame :: (Int, Int) -> _
+playGame (ps, ms) = fst $ foldl' go (M.empty, PL.singleton 0) (zip (cycle [1..ps]) [1..ms])
+    where
+        go (!scores, !marbles) (!p, !m) = (M.insertWith (+) p s scores, marbles')
+            where
+                (!s, !marbles') = playRound m marbles
 
 day09a :: _ :~> _
 day09a = MkSol
     { sParse = parseMaybeLenient parseGame
     , sShow  = show
-    , sSolve = fmap maximum . playGame
+    , sSolve = Just . maximum . playGame
     }
 
 day09b :: _ :~> _
 day09b = MkSol
     { sParse = parseMaybeLenient parseGame
     , sShow  = show
-    , sSolve = fmap maximum . playGame . second (*10)
+    , sSolve = Just . maximum . playGame . second (*100)
     }
