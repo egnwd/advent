@@ -33,7 +33,7 @@ Check out the [reflections][] --- more info below!
 | Challenge | Reflections | Code      | Benchmarks |
 | --------- | ----------- | --------- | ---------- |
 | Day  1    |             |           |            |
-| Day  2    |             |           |            |
+| Day  2    |             | [x][d02g] | [x][d02b]  |
 | Day  3    |             |           |            |
 | Day  4    |             |           |            |
 | Day  5    |             |           |            |
@@ -281,4 +281,5 @@ case you change your solution.
 
 All networking features are powered by *[advent-of-code-api][]*.
 
-
+[d02g]: https://github.com/egnwd/advent/blob/2018/src/AOC/Challenge/Day02.hs
+[d02b]: https://github.com/egnwd/advent/blob/2018/reflections.md#day-2-benchmarks
