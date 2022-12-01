@@ -113,6 +113,7 @@ library:
   - scientific
   - semigroupoids
   - strict-tuple
+  - split
   - template-haskell
   - text
   - th-abstraction
