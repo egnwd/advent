@@ -6,8 +6,6 @@
 -- Portability : non-portable
 --
 -- Day 1.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
 
 module AOC.Challenge.Day01 (
     day01a
