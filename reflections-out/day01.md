@@ -62,19 +62,20 @@ and tada! We've started our long journey[^1] into the jungle!
 ```
 >> Day 01a
 benchmarking...
-time                 25.66 μs   (25.62 μs .. 25.69 μs)
+time                 24.49 μs   (24.43 μs .. 24.58 μs)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 25.64 μs   (25.59 μs .. 25.68 μs)
-std dev              143.8 ns   (109.5 ns .. 191.5 ns)
+mean                 24.53 μs   (24.50 μs .. 24.59 μs)
+std dev              158.0 ns   (127.0 ns .. 192.4 ns)
 
 * parsing and formatting times excluded
 
 >> Day 01b
 benchmarking...
-time                 26.61 μs   (26.40 μs .. 26.97 μs)
-                     1.000 R²   (0.999 R² .. 1.000 R²)
-mean                 26.39 μs   (26.31 μs .. 26.54 μs)
-std dev              346.7 ns   (183.7 ns .. 647.3 ns)
+time                 26.14 μs   (25.61 μs .. 27.30 μs)
+                     0.993 R²   (0.982 R² .. 1.000 R²)
+mean                 25.94 μs   (25.72 μs .. 27.12 μs)
+std dev              1.304 μs   (239.6 ns .. 3.152 μs)
+variance introduced by outliers: 58% (severely inflated)
 
 * parsing and formatting times excluded
 ```

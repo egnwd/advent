@@ -15,14 +15,14 @@ module AOC.Challenge.Day01 (
 import Data.List.Split (splitOn)
 import Text.Read       (readMaybe)
 import AOC.Solver      ((:~>)(..))
-import Data.List       (sortBy)
-import Data.Ord        (Down)
+import Data.List       (sortOn)
+import Data.Ord        (Down(..))
 
 type Calories = Int
 type Elf = [Calories]
 
 findTopCalorificElves :: Int -> [Elf] -> Calories
-findTopCalorificElves n = sum . take n . sortBy (comparing Down) . map sum
+findTopCalorificElves n = sum . take n . sortOn Down . map sum
 
 parseElves :: String -> Maybe [Elf]
 parseElves = traverse (traverse readMaybe) . map lines . splitOn "\n\n"
