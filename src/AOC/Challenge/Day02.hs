@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day02
@@ -9,93 +8,77 @@
 -- Portability : non-portable
 --
 -- Day 2.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day02 (
     day02a
   , day02b
   ) where
 
-import           AOC.Prelude
+import           AOC.Common                (CharParser, pSpace, parseLines)
+import           AOC.Solver                ((:~>)(..))
+import           Control.Monad.Combinators ((<|>))
+import           Data.Monoid               (Sum(..))
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+data Outcome = Win | Draw | Lose deriving (Eq, Ord, Show)
 
-data State = Win | Draw | Lose deriving (Eq, Ord, Show)
+data RPS = Rock | Paper | Scissors deriving (Eq, Show)
 
--- A = Rock
--- B = Paper
--- C = Scissors
-
-scoreShape "A" = 1
-scoreShape "B" = 2
-scoreShape "C" = 3
-
-scoreState Win = 6
-scoreState Draw = 3
-scoreState Lose = 0
-
-mapScore "X" = "A"
-mapScore "Y" = "B"
-mapScore "Z" = "C"
-
-mapOutcome "X" = Lose
-mapOutcome "Y" = Draw
-mapOutcome "Z" = Win
-
-getOutcome "B" "A" = Lose
-getOutcome "A" "C" = Lose
-getOutcome "C" "B" = Lose
-getOutcome a b
+plays :: RPS -> RPS -> Outcome
+Paper    `plays` Rock     = Win
+Rock     `plays` Scissors = Win
+Scissors `plays` Paper    = Win
+a        `plays` b
   | a == b = Draw
-  | otherwise = Win
+  | otherwise = Lose
 
-scoreGame a b = scoreShape b + scoreState (getOutcome a b)
+whatToPlay :: RPS -> Outcome -> RPS
+whatToPlay a        Draw = a
+whatToPlay Paper    Win  = Scissors
+whatToPlay Rock     Win  = Paper
+whatToPlay Scissors Win  = Rock
+whatToPlay Paper    Lose = Rock
+whatToPlay Rock     Lose = Scissors
+whatToPlay Scissors Lose = Paper
 
-scoreGame2 a b = let myGo = f b a in scoreShape myGo + scoreState b
+score :: RPS -> Outcome -> Sum Int
+score you out = Sum $ scoreRPS you + scoreOutcome out
     where
-        f Draw a = a
-        f Win  "A" = "B"
-        f Lose "A" = "C"
-        f Win  "B" = "C"
-        f Lose "B" = "A"
-        f Win  "C" = "A"
-        f Lose "C" = "B"
+        scoreRPS :: RPS -> Int
+        scoreRPS = \case
+            Rock     -> 1
+            Paper    -> 2
+            Scissors -> 3
 
-day02a :: [_] :~> _
+        scoreOutcome :: Outcome -> Int
+        scoreOutcome = \case
+            Win  -> 6
+            Draw -> 3
+            Lose -> 0
+
+day02a :: [(RPS, RPS)] :~> Int
 day02a = MkSol
-    { sParse = Just . map (words) . lines
+    { sParse = parseLines parseGame
     , sShow  = show
-    , sSolve = Just . sum . map (\[a,b] -> scoreGame a (mapScore b))
+    , sSolve = Just . getSum . foldMap (\(opp, you) -> score you (you `plays` opp))
     }
 
-day02b :: _ :~> _
+day02b :: [(RPS, Outcome)] :~> Int
 day02b = MkSol
-    { sParse = Just . map (words) . lines
+    { sParse = parseLines parseStrategy
     , sShow  = show
-    , sSolve = Just . sum . map (\[a,b] -> scoreGame2 a (mapOutcome b))
+    , sSolve = Just . getSum . foldMap (\(opp, out) -> score (whatToPlay opp out) out)
     }
+
+parseGame :: CharParser (RPS, RPS)
+parseGame = do
+    opp <- Rock <$ "A" <|> Paper <$ "B" <|> Scissors <$ "C"
+    pSpace
+    you <- Rock <$ "X" <|> Paper <$ "Y" <|> Scissors <$ "Z"
+    return (opp, you)
+
+parseStrategy :: CharParser (RPS, Outcome)
+parseStrategy = do
+    opp <- Rock <$ "A" <|> Paper <$ "B" <|> Scissors <$ "C"
+    pSpace
+    out <- Lose <$ "X" <|> Draw <$ "Y" <|> Win <$ "Z"
+    return (opp, out)
