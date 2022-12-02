@@ -90,6 +90,7 @@ library:
   - filepath
   - finite-typelits
   - free
+  - fgl
   - groups
   - haskeline
   - haskell-names
@@ -107,6 +108,9 @@ library:
   - nonempty-containers
   - pandoc
   - parser-combinators
+  - pointedlist
+  - vector
+  - safe
   - profunctors
   - psqueues
   - recursion-schemes
