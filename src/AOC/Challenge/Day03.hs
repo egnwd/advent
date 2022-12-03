@@ -12,34 +12,32 @@ module AOC.Challenge.Day03 (
   , day03b
   ) where
 
-import           AOC.Common (splitHalf, singleItem)
+import           AOC.Common (splitHalf, singleItem, charFinite, Letter)
 import           AOC.Solver ((:~>)(..))
 import           Control.Lens (preview)
 import           Control.Monad ((<=<))
-import           Data.Char (ord, isUpper)
-import           Data.Finite
-import           Data.List (uncons)
+import           Data.Finite (Finite, getFinite, weakenN)
 import           Data.List.Split (chunksOf)
 import           Data.Set.NonEmpty (NESet)
 import qualified Data.Set.NonEmpty              as NES
 import qualified AOC.Common.Set.NonEmpty        as NES
 
+-- | 53 because [1..52] U [0]
 type Item = Finite 53
 type Rucksack = NESet Item
 
 toPresent :: Char -> Maybe Item
-toPresent = packFinite . fromIntegral . priority
+toPresent = fmap (uncurry priority) . charFinite
 
-priority :: Char -> Int
-priority c
-  | isUpper c = 27 + (((subtract . ord) 'A') . ord) c
-  | otherwise = 1  + (((subtract . ord) 'a') . ord) c
+priority :: Bool -> Letter -> Item
+priority True = (+27) . weakenN
+priority False = (+1) . weakenN
 
 findCommonItem :: (Rucksack, Rucksack) -> Maybe Item
 findCommonItem = preview singleItem . uncurry NES.intersection
 
 findGroupBadge :: [Rucksack] -> Maybe Item
-findGroupBadge = preview singleItem <=< uncurry NES.intersections <=< uncons
+findGroupBadge = preview singleItem <=< NES.intersections
 
 sumBy :: (Traversable t, Applicative f) => (a -> f (Finite n)) -> t a -> f Integer
 sumBy f = fmap sum . traverse (fmap getFinite . f)

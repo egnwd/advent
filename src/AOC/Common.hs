@@ -25,6 +25,8 @@ module AOC.Common (
                   , hexDigit
                   , binDigit
                   , hexToBin
+                  , Letter
+                  , charFinite
                   , clearOut
                   , fixedPoint
                   , indexedFixedPoint
@@ -150,6 +152,16 @@ hexToBin = fmap (map (review binDigit) . concat) . traverse hexToBin' <=< traver
       14 -> pure [1,1,1,0]
       15 -> pure [1,1,1,1]
       _  -> Nothing
+
+type Letter = Finite 26
+
+-- | Parse a letter into a number 0 to 25.  Returns 'False' if lowercase
+-- and 'True' if uppercase.
+charFinite :: Char -> Maybe (Bool, Letter)
+charFinite (ord->c) = asum
+    [ (False,) <$> packFinite (fromIntegral (c - ord 'a'))
+    , (True ,) <$> packFinite (fromIntegral (c - ord 'A'))
+    ]
 
 -- | Clear out characters not matching a predicate
 clearOut :: (Char -> Bool) -> String -> String
