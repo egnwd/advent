@@ -11,6 +11,7 @@ Table of Contents
 
 * [Day 1](#day-1)
 * [Day 2](#day-2)
+* [Day 3](#day-3) *(no reflection yet)*
 
 Day 1
 ------
@@ -206,5 +207,45 @@ time                 2.760 ms   (2.734 ms .. 2.813 ms)
 mean                 2.812 ms   (2.771 ms .. 3.004 ms)
 std dev              237.1 μs   (88.73 μs .. 499.2 μs)
 variance introduced by outliers: 57% (severely inflated)
+```
+
+
+
+Day 3
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day03.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d03p]* / *[Code][d03g]*
+
+[d03p]: https://adventofcode.com/2022/day/3
+[d03g]: https://github.com/egnwd/advent/blob/2022/src/AOC/Challenge/Day03.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 3 Benchmarks
+
+```
+>> Day 03a
+benchmarking...
+time                 255.3 μs   (254.4 μs .. 256.1 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 254.9 μs   (254.5 μs .. 255.4 μs)
+std dev              1.572 μs   (1.232 μs .. 2.181 μs)
+
+* parsing and formatting times excluded
+
+>> Day 03b
+benchmarking...
+time                 292.2 μs   (291.6 μs .. 292.9 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 291.9 μs   (291.4 μs .. 292.6 μs)
+std dev              2.047 μs   (1.555 μs .. 2.879 μs)
+
+* parsing and formatting times excluded
 ```
 

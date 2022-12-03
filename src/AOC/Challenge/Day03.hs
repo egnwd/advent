@@ -42,14 +42,14 @@ findGroupBadge = preview singleItem <=< NES.intersections
 sumBy :: (Traversable t, Applicative f) => (a -> f (Finite n)) -> t a -> f Integer
 sumBy f = fmap sum . traverse (fmap getFinite . f)
 
-day03a :: [(Rucksack, Rucksack)] :~> _
+day03a :: [(Rucksack, Rucksack)] :~> Integer
 day03a = MkSol
     { sParse = traverse (splitHalf <=< traverse toPresent) . lines
     , sShow  = show
     , sSolve = sumBy findCommonItem
     }
 
-day03b :: [[Rucksack]] :~> _
+day03b :: [[Rucksack]] :~> Integer
 day03b = MkSol
     { sParse = fmap (chunksOf 3) . traverse (NES.toNonEmptySet <=< traverse toPresent) . lines
     , sShow  = show
