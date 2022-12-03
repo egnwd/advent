@@ -120,7 +120,7 @@ Normal `foldl1` will error if you don't:
 *** Exception: Prelude.foldl1: empty list
 ```
 
-where as `foldl1May` return `Nothing`:
+where as `foldl1May` returns `Nothing`:
 
 ```ghci
 λ> foldl1May (+) [] :: Maybe Int
