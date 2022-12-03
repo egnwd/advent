@@ -39,6 +39,8 @@ module AOC.Common (
                   , countTrue
                   , pickUnique
                   , lineTo
+                  , splitHalf
+                  , singleItem
                   , module AOC
                   ) where
 
@@ -67,6 +69,7 @@ import qualified Data.Map                   as M
 import qualified Data.IntMap                as IM
 import qualified Data.Set                   as S
 import qualified Data.Set.NonEmpty          as NES
+import qualified AOC.Common.Set.NonEmpty    as NES
 import qualified Text.Megaparsec            as P
 import qualified Text.Megaparsec.Char       as P
 import qualified Text.Megaparsec.Char.Lexer as PL
@@ -233,3 +236,11 @@ lineTo (V2 p0 p1) = [p0 + t *^ step | t <- [0 .. gcf]]
     gcf          = gcd dx dy
     step         = (`div` gcf) <$> d
 
+splitHalf :: Ord a => [a] -> Maybe (NES.NESet a, NES.NESet a)
+splitHalf s =
+    let sz = length s `div` 2
+     in sequenceTuple . over both NES.toNonEmptySet $ splitAt sz s
+
+-- | Convenience method for getting single item from foldable with nicer name
+singleItem :: Foldable f => IndexedFold Int (f a) a
+singleItem = folded

@@ -1,8 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
-{-# LANGUAGE OverloadedStrings #-}
-
 -- |
 -- Module      : AOC.Challenge.Day03
 -- License     : BSD3
@@ -11,64 +6,54 @@
 -- Portability : non-portable
 --
 -- Day 3.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day03 (
     day03a
   , day03b
   ) where
 
-import           AOC.Prelude
+import           AOC.Common (splitHalf, singleItem)
+import           AOC.Solver ((:~>)(..))
+import           Control.Lens (preview)
+import           Control.Monad ((<=<))
+import           Data.Char (ord, isUpper)
+import           Data.Finite
+import           Data.List (uncons)
+import           Data.List.Split (chunksOf)
+import           Data.Set.NonEmpty (NESet)
+import qualified Data.Set.NonEmpty              as NES
+import qualified AOC.Common.Set.NonEmpty        as NES
 
-import Data.Bifunctor
+type Item = Finite 53
+type Rucksack = NESet Item
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+toPresent :: Char -> Maybe Item
+toPresent = packFinite . fromIntegral . priority
 
-splitHalf s = let sz = length s in bimap S.fromList S.fromList $ splitAt (sz `div` 2) s
+priority :: Char -> Int
+priority c
+  | isUpper c = 27 + (((subtract . ord) 'A') . ord) c
+  | otherwise = 1  + (((subtract . ord) 'a') . ord) c
 
-matching s1 s2 = S.toList $ S.intersection s1 s2
+findCommonItem :: (Rucksack, Rucksack) -> Maybe Item
+findCommonItem = preview singleItem . uncurry NES.intersection
 
-score = sum . map (\c -> if isUpper c then 27 + ((subtract (ord 'A')) . ord) c else 1 + ((subtract (ord 'a')) . ord) c)
+findGroupBadge :: [Rucksack] -> Maybe Item
+findGroupBadge = preview singleItem <=< uncurry NES.intersections <=< uncons
 
-matching2 x = do
-    (f,rs) <- uncons . map S.fromList $ x
-    pure $ S.toList (foldr (S.intersection) f rs)
+sumBy :: (Traversable t, Applicative f) => (a -> f (Finite n)) -> t a -> f Integer
+sumBy f = fmap sum . traverse (fmap getFinite . f)
 
-day03a :: _ :~> _
+day03a :: [(Rucksack, Rucksack)] :~> _
 day03a = MkSol
-    { sParse = Just . map splitHalf . lines
+    { sParse = traverse (splitHalf <=< traverse toPresent) . lines
     , sShow  = show
-    , sSolve = Just . sum . map (score . uncurry matching)
+    , sSolve = sumBy findCommonItem
     }
 
-day03b :: _ :~> _
+day03b :: [[Rucksack]] :~> _
 day03b = MkSol
-    { sParse = Just . chunksOf 3 . lines
+    { sParse = fmap (chunksOf 3) . traverse (NES.toNonEmptySet <=< traverse toPresent) . lines
     , sShow  = show
-    , sSolve = fmap sum . traverse (fmap score . matching2)
+    , sSolve = sumBy findGroupBadge
     }
