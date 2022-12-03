@@ -25,6 +25,7 @@ module AOC.Common (
                   , hexDigit
                   , binDigit
                   , hexToBin
+                  , clearOut
                   , fixedPoint
                   , indexedFixedPoint
                   , loopEither
@@ -147,6 +148,9 @@ hexToBin = fmap (map (review binDigit) . concat) . traverse hexToBin' <=< traver
       15 -> pure [1,1,1,1]
       _  -> Nothing
 
+-- | Clear out characters not matching a predicate
+clearOut :: (Char -> Bool) -> String -> String
+clearOut p = map $ \c -> if p c then ' ' else c
 
 -- | Repeat a function until you get the same result twice in a row
 fixedPoint :: Eq a => (a -> a) -> a -> a

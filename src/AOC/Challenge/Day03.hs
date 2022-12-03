@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
+{-# LANGUAGE OverloadedStrings #-}
+
 -- |
 -- Module      : AOC.Challenge.Day03
 -- License     : BSD3
@@ -22,22 +24,51 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day03 (
-    -- day03a
-  -- , day03b
+    day03a
+  , day03b
   ) where
 
 import           AOC.Prelude
 
+import Data.Bifunctor
+
+import qualified Data.Graph.Inductive           as G
+import qualified Data.IntMap                    as IM
+import qualified Data.IntSet                    as IS
+import qualified Data.List.NonEmpty             as NE
+import qualified Data.List.PointedList          as PL
+import qualified Data.List.PointedList.Circular as PLC
+import qualified Data.Map                       as M
+import qualified Data.OrdPSQ                    as PSQ
+import qualified Data.Sequence                  as Seq
+import qualified Data.Set                       as S
+import qualified Data.Text                      as T
+import qualified Data.Vector                    as V
+import qualified Linear                         as L
+import qualified Text.Megaparsec                as P
+import qualified Text.Megaparsec.Char           as P
+import qualified Text.Megaparsec.Char.Lexer     as PP
+
+splitHalf s = let sz = length s in bimap S.fromList S.fromList $ splitAt (sz `div` 2) s
+
+matching s1 s2 = S.toList $ S.intersection s1 s2
+
+score = sum . map (\c -> if isUpper c then 27 + ((subtract (ord 'A')) . ord) c else 1 + ((subtract (ord 'a')) . ord) c)
+
+matching2 x = do
+    (f,rs) <- uncons . map S.fromList $ x
+    pure $ S.toList (foldr (S.intersection) f rs)
+
 day03a :: _ :~> _
 day03a = MkSol
-    { sParse = Just
+    { sParse = Just . map splitHalf . lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . map (score . uncurry matching)
     }
 
 day03b :: _ :~> _
 day03b = MkSol
-    { sParse = Just
+    { sParse = Just . chunksOf 3 . lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap sum . traverse (fmap score . matching2)
     }
