@@ -8,9 +8,7 @@ module AOC.Common.Search
 
 import           Control.Lens
 import           Data.Bifunctor
-import           Data.Tuple
 import           Control.Monad.State
-import           Data.Traversable
 import           Data.Maybe
 import           Data.Map       (Map)
 import           Data.OrdPSQ    (OrdPSQ)

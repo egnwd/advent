@@ -148,8 +148,7 @@ dirVec = \case
     South -> V2   0   1
     West  -> V2 (-1)  0
 
-getEdge :: (Ord a)
-        => V2 (V2 a)
+getEdge :: V2 (V2 a)
         -> Dir
         -> a
 getEdge (V2 (V2 w n) (V2 e s))
@@ -159,7 +158,7 @@ getEdge (V2 (V2 w n) (V2 e s))
     South -> s
     West  -> w
 
-setEdge :: (Ord a) => V2 (V2 a) -> V2 a -> Dir -> V2 a
+setEdge :: V2 (V2 a) -> V2 a -> Dir -> V2 a
 setEdge bounds (V2 i j) dir
   = let e = getEdge bounds dir
      in case dir of

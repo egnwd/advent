@@ -3,7 +3,6 @@ module AOC.Common.Set.NonEmpty
   , intersections
   ) where
 
-import           Control.Monad ((<=<))
 import           Safe (foldl1May)
 import           Data.Set (Set)
 import           Data.Set.NonEmpty (NESet)
