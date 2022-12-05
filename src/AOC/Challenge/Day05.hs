@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 {-# LANGUAGE OverloadedStrings #-}
 
 -- |
@@ -11,91 +8,71 @@
 -- Portability : non-portable
 --
 -- Day 5.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day05 (
     day05a
   , day05b
   ) where
 
-import           AOC.Prelude
-
-import qualified Data.Graph.Inductive           as G
+import           AOC.Solver ((:~>)(..))
+import           AOC.Common (CharParser, parseMaybeLenient, pDecimal, pTok)
+import           Data.Foldable (foldl')
+import           Control.Applicative ((<|>))
+import           Data.Maybe (catMaybes)
+import           Data.List (transpose)
+import           Control.Monad (void)
+import           Control.Monad.Combinators (optional, some, sepEndBy1, skipManyTill)
+import           Control.Lens (preview, _head)
 import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
 
-data Instruction = Move !Int !Int !Int deriving (Eq, Show)
+type Crate = Char
+type Ship = IM.IntMap [Crate]
+data Instruction = Move !Int !Int !Int
+type CraneArm = Ship -> Int -> Int -> [Crate]
 
-data Crate = Char
-
+parsePlanningSheet :: CharParser (Ship, [Instruction])
 parsePlanningSheet = do
-    cs <- IM.fromList . zip [1..] . map catMaybes . transpose <$> parseCrates
-    pNumbers
-    P.newline
+    s <- IM.fromList . zip [1..] . map catMaybes . transpose <$> parseCrates
+    pNumbers <* P.newline
     pl <- parsePlan
-    return (cs, pl)
+    return (s, pl)
 
-pNumbers = " " *> P.many (pTok pDecimal) <* P.newline
+pNumbers :: CharParser ()
+pNumbers = void $ skipManyTill P.anySingle P.newline
 
-parseCrates :: CharParser _
-parseCrates = (P.some (pCrate <* optional (P.char ' '))) `P.sepEndBy1` P.newline
+parseCrates :: CharParser [[Maybe Crate]]
+parseCrates = some (pCrate <* optional (P.char ' ')) `sepEndBy1` P.newline
     where
         pCrate = Just <$> ("[" *> P.upperChar <* "]") <|> Nothing <$ "   "
 
-parsePlan :: CharParser _
-parsePlan = pPlan `P.sepEndBy` P.newline
+parsePlan :: CharParser [Instruction]
+parsePlan = pPlan `sepEndBy1` P.newline
     where
-        pPlan = Move <$> ("move " *> pDecimal) <*> (" from " *> pDecimal) <*> (" to " *> pDecimal)
+        pPlan = Move <$> (labelledN "move") <*> (labelledN "from") <*> (labelledN "to")
+        labelledN l = pTok l *> pTok pDecimal
 
-moveCrates :: IM.IntMap _ -> [Instruction] -> _
-moveCrates = foldl' go
+moveCrates :: CraneArm -> Ship -> Instruction -> Ship
+moveCrates arm s (Move n f t) = IM.adjust (moving ++) t . IM.adjust (drop n) f $ s
     where
-        go cs (Move n f t) = shiftCrates cs
-            where
-                shiftCrates = IM.adjust (moving ++) t . IM.adjust (drop n) f
-                moving = reverse . take n $ cs IM.! f
+        moving = arm s f n
 
-moveCrates9001 :: IM.IntMap _ -> [Instruction] -> _
-moveCrates9001 = foldl' go
-    where
-        go cs (Move n f t) = shiftCrates cs
-            where
-                shiftCrates = IM.adjust (moving ++) t . IM.adjust (drop n) f
-                moving = take n $ cs IM.! f
+crane9000 :: CraneArm
+crane9000 s col n = reverse . take n $ s IM.! col
 
-day05a :: _ :~> _
-day05a = MkSol
-    { sParse = Just . parseOrFail parsePlanningSheet
+crane9001 :: CraneArm
+crane9001 s col n = take n $ s IM.! col
+
+day05 :: CraneArm -> (Ship, [Instruction]) :~> String
+day05 craneArm = MkSol
+    { sParse = parseMaybeLenient parsePlanningSheet
     , sShow  = id
-    , sSolve = Just . map head . IM.elems . uncurry moveCrates
+    , sSolve = traverse (preview _head) . IM.elems . uncurry (foldl' (moveCrates craneArm))
     }
 
-day05b :: _ :~> _
-day05b = MkSol
-    { sParse = Just . parseOrFail parsePlanningSheet
-    , sShow  = id
-    , sSolve = Just . map head . IM.elems . uncurry moveCrates9001
-    }
+day05a :: (Ship, [Instruction]) :~> String
+day05a = day05 crane9000
+
+day05b :: (Ship, [Instruction]) :~> String
+day05b = day05 crane9001
