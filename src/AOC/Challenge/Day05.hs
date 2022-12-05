@@ -30,7 +30,7 @@ import qualified Text.Megaparsec.Char           as P
 type Crate = Char
 type Ship = IM.IntMap [Crate]
 data Instruction = Move !Int !Int !Int
-type CraneArm = Ship -> Int -> Int -> [Crate]
+type CraneArm = [Crate] -> Int -> [Crate]
 
 parsePlanningSheet :: CharParser (Ship, [Instruction])
 parsePlanningSheet = do
@@ -56,13 +56,13 @@ parsePlan = pPlan `sepEndBy1` P.newline
 moveCrates :: CraneArm -> Ship -> Instruction -> Ship
 moveCrates arm s (Move n f t) = IM.adjust (moving ++) t . IM.adjust (drop n) f $ s
     where
-        moving = arm s f n
+        moving = arm (s IM.! f) n
 
 crane9000 :: CraneArm
-crane9000 s col n = reverse . take n $ s IM.! col
+crane9000 s n = reverse . take n $ s
 
 crane9001 :: CraneArm
-crane9001 s col n = take n $ s IM.! col
+crane9001 s n = take n s
 
 day05 :: CraneArm -> (Ship, [Instruction]) :~> String
 day05 craneArm = MkSol
