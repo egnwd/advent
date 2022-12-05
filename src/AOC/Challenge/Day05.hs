@@ -78,6 +78,14 @@ moveCrates = foldl' go
                 shiftCrates = IM.adjust (moving ++) t . IM.adjust (drop n) f
                 moving = reverse . take n $ cs IM.! f
 
+moveCrates9001 :: IM.IntMap _ -> [Instruction] -> _
+moveCrates9001 = foldl' go
+    where
+        go cs (Move n f t) = shiftCrates cs
+            where
+                shiftCrates = IM.adjust (moving ++) t . IM.adjust (drop n) f
+                moving = take n $ cs IM.! f
+
 day05a :: _ :~> _
 day05a = MkSol
     { sParse = Just . parseOrFail parsePlanningSheet
@@ -87,7 +95,7 @@ day05a = MkSol
 
 day05b :: _ :~> _
 day05b = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
+    { sParse = Just . parseOrFail parsePlanningSheet
+    , sShow  = id
+    , sSolve = Just . map head . IM.elems . uncurry moveCrates9001
     }
