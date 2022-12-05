@@ -34,7 +34,7 @@ type CraneArm = [Crate] -> Int -> [Crate]
 
 parsePlanningSheet :: CharParser (Ship, [Instruction])
 parsePlanningSheet = do
-    s <- IM.fromList . zip [1..] . map catMaybes . transpose <$> parseCrates
+    s <- parseCrates
     pNumbers <* P.newline
     pl <- parsePlan
     return (s, pl)
@@ -42,9 +42,10 @@ parsePlanningSheet = do
 pNumbers :: CharParser ()
 pNumbers = void $ skipManyTill P.anySingle P.newline
 
-parseCrates :: CharParser [[Maybe Crate]]
-parseCrates = some (pCrate <* optional (P.char ' ')) `sepEndBy1` P.newline
+parseCrates :: CharParser Ship
+parseCrates = IM.fromList . zip [1..] . map catMaybes . transpose <$> pRows
     where
+        pRows = some (pCrate <* optional (P.char ' ')) `sepEndBy1` P.newline
         pCrate = Just <$> ("[" *> P.upperChar <* "]") <|> Nothing <$ "   "
 
 parsePlan :: CharParser [Instruction]
