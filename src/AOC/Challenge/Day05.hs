@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
+{-# LANGUAGE OverloadedStrings #-}
+
 -- |
 -- Module      : AOC.Challenge.Day05
 -- License     : BSD3
@@ -22,8 +24,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day05 (
-    -- day05a
-  -- , day05b
+    day05a
+  , day05b
   ) where
 
 import           AOC.Prelude
@@ -45,11 +47,42 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+data Instruction = Move !Int !Int !Int deriving (Eq, Show)
+
+data Crate = Char
+
+parsePlanningSheet = do
+    cs <- IM.fromList . zip [1..] . map catMaybes . transpose <$> parseCrates
+    pNumbers
+    P.newline
+    pl <- parsePlan
+    return (cs, pl)
+
+pNumbers = " " *> P.many (pTok pDecimal) <* P.newline
+
+parseCrates :: CharParser _
+parseCrates = (P.some (pCrate <* optional (P.char ' '))) `P.sepEndBy1` P.newline
+    where
+        pCrate = Just <$> ("[" *> P.upperChar <* "]") <|> Nothing <$ "   "
+
+parsePlan :: CharParser _
+parsePlan = pPlan `P.sepEndBy` P.newline
+    where
+        pPlan = Move <$> ("move " *> pDecimal) <*> (" from " *> pDecimal) <*> (" to " *> pDecimal)
+
+moveCrates :: IM.IntMap _ -> [Instruction] -> _
+moveCrates = foldl' go
+    where
+        go cs (Move n f t) = shiftCrates cs
+            where
+                shiftCrates = IM.adjust (moving ++) t . IM.adjust (drop n) f
+                moving = reverse . take n $ cs IM.! f
+
 day05a :: _ :~> _
 day05a = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
+    { sParse = Just . parseOrFail parsePlanningSheet
+    , sShow  = id
+    , sSolve = Just . map head . IM.elems . uncurry moveCrates
     }
 
 day05b :: _ :~> _
