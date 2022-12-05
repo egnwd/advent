@@ -13,6 +13,7 @@ Table of Contents
 * [Day 2](#day-2)
 * [Day 3](#day-3)
 * [Day 4](#day-4)
+* [Day 5](#day-5) *(no reflection yet)*
 
 Day 1
 ------
@@ -434,5 +435,42 @@ mean                 22.29 μs   (22.25 μs .. 22.33 μs)
 std dev              124.7 ns   (92.67 ns .. 166.1 ns)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 5
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day05.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d05p]* / *[Code][d05g]*
+
+[d05p]: https://adventofcode.com/2022/day/5
+[d05g]: https://github.com/egnwd/advent/blob/2022/src/AOC/Challenge/Day05.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 5 Benchmarks
+
+```
+>> Day 05a
+benchmarking...
+time                 7.637 ms   (7.534 ms .. 7.733 ms)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 7.589 ms   (7.495 ms .. 7.673 ms)
+std dev              254.3 μs   (190.7 μs .. 355.3 μs)
+variance introduced by outliers: 14% (moderately inflated)
+
+>> Day 05b
+benchmarking...
+time                 4.078 ms   (4.055 ms .. 4.106 ms)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 4.080 ms   (4.061 ms .. 4.098 ms)
+std dev              52.88 μs   (45.22 μs .. 67.02 μs)
 ```
 
