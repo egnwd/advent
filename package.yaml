@@ -78,6 +78,7 @@ library:
   - astar
   - barbies
   - bytestring
+  - conduino
   - containers
   - comonad
   - criterion

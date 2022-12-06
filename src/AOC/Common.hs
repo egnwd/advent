@@ -43,6 +43,8 @@ module AOC.Common (
                   , lineTo
                   , splitHalf
                   , singleItem
+                  , indexed
+                  , indexed'
                   , module AOC
                   ) where
 
@@ -63,10 +65,13 @@ import           Control.Monad.State
 import           Control.Applicative
 import           Linear
 import           GHC.TypeNats
-import           Control.Lens
+import           Control.Lens hiding (indexed)
 import           Data.Finite
+import           Data.Conduino (Pipe, (.|), runPipe, await, awaitForever, yield)
 import           AOC.Common.Point           as AOC
 import           AOC.Common.Search          as AOC
+import qualified Data.Conduino.Combinators  as C
+import qualified Data.Conduino.Lift         as C
 import qualified Data.Map                   as M
 import qualified Data.IntMap                as IM
 import qualified Data.Set                   as S
@@ -256,3 +261,9 @@ splitHalf s =
 -- | Convenience method for getting single item from foldable with nicer name
 singleItem :: Foldable f => IndexedFold Int (f a) a
 singleItem = folded
+
+indexed :: (Monad m, Num s) => Pipe i o u (StateT s m) a -> Pipe i o u m (a,s)
+indexed p = C.runStateP 0 (awaitForever (\x -> id += 1 >> yield x) .| p)
+
+indexed' :: (Monad m, Num s) => Pipe i o u (StateT s m) a -> Pipe i o u m s
+indexed' = fmap snd . indexed
