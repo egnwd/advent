@@ -1,8 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
-{-# LANGUAGE OverloadedStrings #-}
-
 -- |
 -- Module      : AOC.Challenge.Day06
 -- License     : BSD3
@@ -11,60 +6,41 @@
 -- Portability : non-portable
 --
 -- Day 6.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day06 (
     day06a
   , day06b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver     ((:~>)(..))
+import           Data.Bifunctor (second)
+import           Data.List      (tails)
+import           Control.Lens   (preview, _head, _1, _last)
+import qualified Data.Set       as S
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+findStartingPoint :: Ord a => Int -> [a] -> Maybe Int
+findStartingPoint n =
+    preview
+        ( _head                     -- Get first window satisfying the predicate
+        . _1                        -- Get the indicies of the elements
+        . _last)                    -- Get the last index (the answer!)
+    . filter ((==n) . S.size . snd) -- Filter to those windows of the correct size after deduplicating
+    . map
+        ( second S.fromList         -- Make a set out of the elements
+        . unzip                     -- Make a tuple of the indicies and the elements
+        . take n)                   -- Force the windows to size `n`
+    . tails                         -- Make list of sliding windows
+    . zip [1..]                     -- Add index
 
-solve n =
-    last
-    . fst
-    . head
-    . filter ((==n) . S.size . snd)
-    . map (second S.fromList . unzip . take n)
-    . tails
-
-day06a :: _ :~> _
-day06a = MkSol
-    { sParse = Just . zip [1..]
+day06 :: Int -> String :~> Int
+day06 n = MkSol
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . solve 4
+    , sSolve = findStartingPoint n
     }
 
-day06b :: _ :~> _
-day06b = MkSol
-    { sParse = Just . zip [1..]
-    , sShow  = show
-    , sSolve = Just . solve 14
-    }
+day06a :: String :~> Int
+day06a = day06 4
+
+day06b :: String :~> Int
+day06b = day06 14
