@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
+{-# LANGUAGE OverloadedStrings #-}
+
 -- |
 -- Module      : AOC.Challenge.Day06
 -- License     : BSD3
@@ -22,8 +24,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day06 (
-    -- day06a
-  -- , day06b
+    day06a
+  , day06b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +47,24 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+solve n =
+    last
+    . fst
+    . head
+    . filter ((==n) . S.size . snd)
+    . map (second S.fromList . unzip . take n)
+    . tails
+
 day06a :: _ :~> _
 day06a = MkSol
-    { sParse = Just
+    { sParse = Just . zip [1..]
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . solve 4
     }
 
 day06b :: _ :~> _
 day06b = MkSol
-    { sParse = Just
+    { sParse = Just . zip [1..]
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . solve 14
     }
