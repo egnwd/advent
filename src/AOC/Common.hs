@@ -67,10 +67,9 @@ import           Linear
 import           GHC.TypeNats
 import           Control.Lens hiding (indexed)
 import           Data.Finite
-import           Data.Conduino (Pipe, (.|), runPipe, await, awaitForever, yield)
+import           Data.Conduino (Pipe, (.|), awaitForever, yield)
 import           AOC.Common.Point           as AOC
 import           AOC.Common.Search          as AOC
-import qualified Data.Conduino.Combinators  as C
 import qualified Data.Conduino.Lift         as C
 import qualified Data.Map                   as M
 import qualified Data.IntMap                as IM
