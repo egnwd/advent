@@ -30,7 +30,7 @@ findStartingPoint n =
         . unzip                     -- Make a tuple of the indicies and the elements
         . take n)                   -- Force the windows to size `n`
     . tails                         -- Make list of sliding windows
-    . zip [1..]                     -- Add index
+    . zip [1..]                     -- Add indicies
 
 day06 :: Int -> String :~> Int
 day06 n = MkSol
