@@ -30,8 +30,8 @@ buildSizes (DirF sz) = let (totals, concat->subs) = unzip sz
                            total = sum totals
                         in (total, total : subs)
 
-totalSize :: Entry -> Int
-totalSize = sum . filter (<= 100000) . snd . F.cata buildSizes
+sizeOfEachDirectory :: Entry -> [Int]
+sizeOfEachDirectory = snd . F.cata buildSizes
 
 totalSpace, spaceNeeded :: Int
 totalSpace = 70000000
@@ -42,7 +42,7 @@ deleteSmallest e = let (total, sizes) = F.cata buildSizes e
                        needToFree = spaceNeeded - (totalSpace - total)
                     in minimum . filter (>= needToFree) $ sizes
 
-parseStructure :: CharParser (Entry)
+parseStructure :: CharParser Entry
 parseStructure = do
     P.try (P.notFollowedBy ("$ cd .." <* P.newline))
     pTok "$ cd" *> pWord <* P.newline
@@ -60,7 +60,7 @@ day07a :: Entry :~> Int
 day07a = MkSol
     { sParse = parseMaybeLenient parseStructure
     , sShow  = show
-    , sSolve = Just . totalSize
+    , sSolve = Just . sum . filter (<= 100000) . sizeOfEachDirectory
     }
 
 day07b :: Entry :~> Int
