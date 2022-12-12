@@ -24,6 +24,7 @@ module AOC.Common (
                   , parseLinesOrError
                   , hexDigit
                   , binDigit
+                  , decDigit
                   , hexToBin
                   , Letter
                   , charFinite
@@ -124,6 +125,9 @@ hexDigit = baseDigit
 
 binDigit :: Prism' Char (Finite 2)
 binDigit = baseDigit
+
+decDigit :: Prism' Char (Finite 10)
+decDigit = baseDigit
 
 baseDigit :: (KnownNat n) => Prism' Char (Finite (n :: Nat))
 baseDigit = prism' _to _from

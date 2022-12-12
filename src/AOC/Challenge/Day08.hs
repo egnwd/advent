@@ -22,11 +22,14 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day08 (
-    -- day08a
-  -- , day08b
+    day08a
+  , day08b
   ) where
 
 import           AOC.Prelude
+
+import Control.Lens (preview)
+import Linear.V2
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
@@ -45,16 +48,31 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+seen trees (V2 x y) h = or $ all (< h) <$> [above, below, left, right]
+    where
+        above = M.elems . M.filterWithKey (\(V2 x' y') _ -> x == x' && y < y') $ trees
+        below = M.elems . M.filterWithKey (\(V2 x' y') _ -> x == x' && y > y') $ trees
+        left  = M.elems . M.filterWithKey (\(V2 x' y') _ -> x < x' && y == y') $ trees
+        right = M.elems . M.filterWithKey (\(V2 x' y') _ -> x > x' && y == y') $ trees
+
+scenicScore trees start h = product . map vantage $ [North, East, South, West]
+    where
+        vantage dir = manhattan start $ loopEither (view dir) (start + dirVec dir)
+        view :: Dir -> Point -> Either Point Point
+        view dir x = case M.lookup x trees of
+                       Nothing -> Left (x - dirVec dir)
+                       Just h' -> if h' < h then Right (x + dirVec dir) else Left x
+
 day08a :: _ :~> _
 day08a = MkSol
-    { sParse = Just
+    { sParse = Just . parseAsciiMap (preview decDigit)
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \trees -> Just . countTrue (uncurry (seen trees)) . M.toList $ trees
     }
 
 day08b :: _ :~> _
 day08b = MkSol
-    { sParse = Just
+    { sParse = Just . parseAsciiMap (preview decDigit)
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \trees -> Just . maximum .  map (uncurry (scenicScore trees)) . M.toList $ trees
     }
