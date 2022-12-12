@@ -46,6 +46,7 @@ module AOC.Common (
                   , singleItem
                   , indexed
                   , indexed'
+                  , dupe
                   , module AOC
                   ) where
 
@@ -270,3 +271,6 @@ indexed p = C.runStateP 0 (awaitForever (\x -> id += 1 >> yield x) .| p)
 
 indexed' :: (Monad m, Num s) => Pipe i o u (StateT s m) a -> Pipe i o u m s
 indexed' = fmap snd . indexed
+
+dupe :: a -> (a,a)
+dupe x = (x,x)
