@@ -4,16 +4,21 @@ module AOC.Common.Search
   ( aStar
   , aStar'
   , floydWarshall
+  , bfs
   ) where
 
-import           Control.Lens
+import           Control.Lens hiding (Empty)
 import           Data.Bifunctor
 import           Control.Monad.State
 import           Data.Maybe
 import           Data.Map       (Map)
+import           Data.Set       (Set)
+import           Data.Sequence  (Seq(..))
 import           Data.OrdPSQ    (OrdPSQ)
 import qualified Data.Map       as M
 import qualified Data.OrdPSQ    as Q
+import qualified Data.Sequence  as Seq
+import qualified Data.Set       as S
 
 data AStarState a c = AS
   { _asCameFrom :: Map a (Maybe a)
@@ -130,3 +135,35 @@ floydWarshall neighbours = reconstruct . execState fw . initialFWState $ neighbo
                  fwCosts %= M.adjust (M.insert j (cik+ckj)) i
                  nik <- uses fwNext (M.lookup k <=< M.lookup i)
                  fwNext %= M.adjust (M.alter (const nik) j) i
+
+data BFSState n = BS { _bsClosed  :: !(Map n (Maybe n))  -- ^ map of item to "parent"
+                     , _bsOpen    :: !(Seq n          )  -- ^ queue
+                     }
+
+-- | Breadth-first search, with loop detection
+bfs :: forall n. Ord n
+    => (n -> Set n)   -- ^ neighborhood
+    -> n              -- ^ start
+    -> (n -> Bool)    -- ^ target
+    -> Maybe [n]      -- ^ the shortest path, if it exists
+bfs ex x0 dest = reconstruct <$> go (addBack x0 Nothing (BS M.empty Seq.empty))
+  where
+    reconstruct :: (n, Map n (Maybe n)) -> [n]
+    reconstruct (goal, mp) = drop 1 . reverse $ goreco goal
+      where
+        goreco n = n : maybe [] goreco (mp M.! n)
+    go :: BFSState n -> Maybe (n, Map n (Maybe n))
+    go BS{..} = case _bsOpen of
+      Empty    -> Nothing
+      n :<| ns
+        | dest n    -> Just (n, _bsClosed)
+        | otherwise -> go . S.foldl' (processNeighbor n) (BS _bsClosed ns) $ ex n
+    addBack :: n -> Maybe n -> BFSState n -> BFSState n
+    addBack x up BS{..} = BS
+      { _bsClosed = M.insert x up _bsClosed
+      , _bsOpen   = _bsOpen :|> x
+      }
+    processNeighbor :: n -> BFSState n -> n -> BFSState n
+    processNeighbor curr bs0@BS{..} neighb
+      | neighb `M.member` _bsClosed = bs0
+      | otherwise                   = addBack neighb (Just curr) bs0

@@ -22,11 +22,13 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day12 (
-    -- day12a
-  -- , day12b
+    day12a
+  , day12b
   ) where
 
 import           AOC.Prelude
+
+import Data.Finite (finite)
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
@@ -45,16 +47,46 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+data Land = Start | Middle Letter | End deriving (Show, Eq, Ord)
+
+toLand 'S' = Just Start
+toLand 'E' = Just End
+toLand  c  = Middle . snd <$> charFinite c
+
+shortestPath mp = bfs ns start end
+    where
+        start = head . M.keys . M.filter (== Start) $ mp
+        end n = mp M.! n == End
+        ns n = let h = mp M.! n
+                   neighbours = S.fromList (((+n) . dirVec) <$> [North ..])
+                   options = M.filterWithKey (\k v -> k `S.member` neighbours && littleEnergy h v) mp
+                in M.keysSet options
+
+bestHikingTrail mp = bfs ns start end
+    where
+        start = head . M.keys . M.filter (== End) $ mp
+        end n = mp M.! n == Start || mp M.! n == Middle (finite 0)
+        ns n = let h = mp M.! n
+                   neighbours = S.fromList (((+n) . dirVec) <$> [North ..])
+                   options = M.filterWithKey (\k v -> k `S.member` neighbours && littleEnergy v h) mp
+                in M.keysSet options
+
+littleEnergy a b = (height b - height a) <= 1
+    where
+        height Start = 0
+        height End = 25
+        height (Middle h) = fromIntegral h
+
 day12a :: _ :~> _
 day12a = MkSol
-    { sParse = Just
+    { sParse = Just . parseAsciiMap toLand
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap length . shortestPath
     }
 
 day12b :: _ :~> _
 day12b = MkSol
-    { sParse = Just
+    { sParse = Just . parseAsciiMap toLand
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap length . bestHikingTrail
     }
