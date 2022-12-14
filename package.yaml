@@ -103,7 +103,7 @@ library:
   - lens
   - linear
   - matrix
-  - megaparsec
+  - megaparsec >= 9.0.0
   - microlens-th
   - mtl
   - nonempty-containers
