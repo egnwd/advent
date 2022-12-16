@@ -46,6 +46,13 @@ packages:
       sha256: 95214721c7b4837f0df6638700923245208170b998a9965ca475e7dab878455d
   original:
     hackage: list-transformer-1.0.7@sha256:413a224742aa83ec3b4dbc744cad8b93e349cb21a9a354dc7dc73302744935d1,1455
+- completed:
+    hackage: data-interval-2.1.1@sha256:bf5c98541c8fce7ec782f7443adcd3c949ee8b60c91c7439d9cf9deb222c265b,2772
+    pantry-tree:
+      size: 1336
+      sha256: ef0707c4618c7f40113aa82e64172f42a448baa8c7257cac4655b09f6d56efaf
+  original:
+    hackage: data-interval-2.1.1@sha256:bf5c98541c8fce7ec782f7443adcd3c949ee8b60c91c7439d9cf9deb222c265b,2772
 snapshots:
 - completed:
     size: 532832

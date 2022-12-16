@@ -99,11 +99,11 @@ library:
   - hashable
   - heredoc
   - hpack
-  - data-interval
+  - data-interval >= 2.1.1
   - lens
   - linear
   - matrix
-  - megaparsec >= 9.0.0
+  - megaparsec
   - microlens-th
   - mtl
   - nonempty-containers
