@@ -20,6 +20,8 @@ import qualified Data.OrdPSQ    as Q
 import qualified Data.Sequence  as Seq
 import qualified Data.Set       as S
 
+import Debug.Trace
+
 data AStarState a c = AS
   { _asCameFrom :: Map a (Maybe a)
   , _asOpenSet :: OrdPSQ a c (c, Maybe a)
@@ -58,7 +60,7 @@ aStar neighbours heur term start = (,[]) <$> aStar'' (initialASState start (heur
       in as & asOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
 
 aStar'
-  :: forall a c. (Ord a, Ord c, Num c)
+  :: forall a c. (Ord a, Ord c, Num c, Show c)
   => (a -> Map a c) -- ^ neighbourhood
   -> (a -> c)       -- ^ heuristic
   -> (a -> Bool)    -- ^ termination condition
@@ -80,7 +82,7 @@ aStar' neighbours heur term start = second reconstruct <$> aStar'' (initialASSta
                             !ns = neighbours n `M.difference` _asCameFrom
                          in aStar'' $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
 
-    updateNeighbour :: c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
+    updateNeighbour :: Show c => c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
     updateNeighbour g p as n w =
       let gScore' = g + w
       in as & asOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
