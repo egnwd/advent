@@ -205,7 +205,6 @@ loopEither f = go
       Left  r  -> r
       Right !y -> go y
 
-
 foldMapKeysWith :: (Ord k2) => (a -> a -> a) -> (k -> [k2]) -> M.Map k a -> M.Map k2 a
 foldMapKeysWith fWith f = M.fromListWith fWith . foldMap (\(k,a) -> map (,a) . f $ k) . M.toList
 

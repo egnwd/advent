@@ -164,20 +164,6 @@ challengeData sess yr spec = do
         e = case sess of
           Just _  -> "Part not yet released"
           Nothing -> "Part not yet released, or may require session key"
-      -- where
-      --   go (inp:meta:xs) =
-
-        -- go [] = []
-    -- parseTests xs = case break (">>>" `isPrefixOf`) xs of
-    --   (inp,[])
-    --     | null (strip (unlines inp))  -> []
-    --     | otherwise -> [(unlines inp, Nothing)]
-    --   (inp,(strip.drop 4->ans):rest)
-    --     | null (strip (unlines inp))  -> parseTests rest
-    --     | otherwise ->
-    --         let ans' = ans <$ guard (not (null ans))
-    --         in  (unlines inp, ans') : parseTests rest
-
 
 showAoCError :: AoCError -> [String]
 showAoCError = \case
@@ -245,17 +231,7 @@ htmlToMarkdown pretty html = first ((:[]) . show) . P.runPure $ do
          . P.disableExtension P.Ext_smart
          $ P.pandocExtensions
 
-
-
-
-
-
 type Parser = MP.Parsec Void String
-
-
-
-
-
 
 data TestMeta = TM { _tmAnswer :: Maybe String
                    , _tmData   :: Map String Dynamic
@@ -271,26 +247,26 @@ parseTests :: Parser [(String, TestMeta)]
 parseTests = MP.many parseTest <* MP.eof
   where
     parseTest = do
-      inp <- MP.manyTill MP.anySingle $ MP.lookAhead (MP.string ">>>")
+      inp <- MP.manyTill MP.anySingle $ MP.lookAhead (MP.try (MP.string "\n>>>" >> (void MP.letterChar <|> MP.space1)))
+      pure (traceShowIdMsg "input: " inp)
       met <- optional (MP.try parseMeta) MP.<?> "Metadata Block"
       pure (inp, fromMaybe (TM Nothing M.empty) met)
 
 parseMeta :: Parser TestMeta
 parseMeta = do
     dats <- MP.many (MP.try parseData) MP.<?> "Data Block"
-    ans  <- optional (MP.try parseAnswer) MP.<?> "Expected Answer"
+    ans  <- Just <$> (MP.try parseAnswer) MP.<?> "Expected Answer"
     pure $ TM ans (M.fromList dats)
   where
-    parseAnswer = MP.string ">>>"
+    parseAnswer = MP.string "\n>>>"
                *> MP.space1
                *> MP.many (MP.noneOf ['\n'])
                <* "\n"
     parseData = do
-      MP.string ">>>"
+      MP.string "\n>>>"
       sym <- MP.manyTill (MP.try MP.letterChar)   (MP.try (MP.char ':'))
       val <- MP.manyTill (MP.try MP.alphaNumChar) (MP.try (MP.char ':'))
       typ <- MP.many     (MP.try MP.letterChar)
-      MP.space
       case toLower <$> typ of
         "int"    -> maybe (fail "Could not parse metadata value") (pure . (sym,) . toDyn)
                   . readMaybe @Int
