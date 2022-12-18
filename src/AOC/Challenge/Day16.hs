@@ -65,21 +65,27 @@ parseValve = do
         where
             pName = P.takeWhileP (Just "name") isUpper
 
-maxOutPressure vs = bimap negate (map (\(a,_,t) -> (a,t))) <$> aStar' nf heur (\(_, _, t) -> t <= 0) start
+maxOutPressure :: _ -> _
+maxOutPressure vs = fst . bimap negate (map (\(a,_,t) -> (a,t))) <$> aStar' nf heur (\(_, _, t) -> t <= 0) start
     where
-        flows t = M.mapWithKey (\n d -> flow n * (max 0 (t-d-1)))
-        fw = M.map (M.map (fst . fromJust)) $ floydWarshall neighbours
-        flowRates = M.fromList . map (\(Valve n fr _) -> (n, negate fr)) $ vs
+        flows t = M.mapWithKey (cumFlow t)
+        cumFlow t n c = flow n * (max 0 (t-c-1))
         flow n = flowRates M.! n
+        flowRates = M.fromList . map (\(Valve n fr _) -> (n, negate fr)) $ vs
+        fw = M.map (M.map (fst . fromJust)) $ floydWarshall neighbours
         nf (n, o, t)
-          = M.fromList
-          . map (\(n', c) -> ((n', S.insert n' o, max 0 (t-c-1)), (if n' `S.member` o then 0 else 1) * flow n' * (max 0 (t-c-1))))
-          . M.toList
-          . M.delete n
-          $ fw M.! n
+          = let fs = M.fromList
+                      . map (\(n', c) -> ((n', S.insert n' o, max 0 (t-c-1)), (if n' `S.member` o then 0 else 1) * cumFlow t n' c))
+                      . M.toList
+                      . M.delete n
+                      $ fw M.! n
+             in if all (==0) fs then M.singleton (n,o,0) 0 else fs
         neighbours = M.fromList . map (\(Valve n _ ns) -> (n, M.fromList . map (,1) $ ns)) $ vs
         start = ("AA", S.empty, 30)
-        heur (n, o, t) = minimum . map (M.! n) . M.elems . M.map (flows t) $ fw
+        heur (n, o, t) = h
+            where
+                stillClosed = sort . M.elems . M.delete n $ M.filterWithKey (\k _ -> k `S.notMember` o) flowRates
+                h = cumFlow t n 0 + sum (zipWith (*) [t, t-2 .. 0] stillClosed)
 
 day16a :: _ :~> _
 day16a = MkSol

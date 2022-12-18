@@ -51,7 +51,7 @@ aStar neighbours heur term start = (,[]) <$> aStar'' (initialASState start (heur
         doAStar (n, c, (g, p), open)
           | term n = Just c
           | otherwise = let as' = as & asOpenSet .~ open & asCameFrom %~ M.insert n p
-                            ns = neighbours M.! n `M.difference` _asCameFrom
+                            !ns = neighbours M.! n `M.difference` _asCameFrom
                          in aStar'' $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
 
     updateNeighbour :: c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
@@ -84,11 +84,12 @@ aStar' neighbours heur term start = second reconstruct <$> aStar'' (initialASSta
 
     updateNeighbour :: Show c => c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
     updateNeighbour g p as n w =
-      let gScore' = g + w
+      let gScore' = g+w
       in as & asOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
 
 insertIfBetter :: (Ord k, Ord p) => k -> p -> v -> OrdPSQ k p v -> OrdPSQ k p v
-insertIfBetter k p x q = case Q.lookup k q of
+insertIfBetter k p x q =
+  case Q.lookup k q of
     Nothing       -> Q.insert k p x q
     Just (p', _)
       | p < p'    -> Q.insert k p x q
