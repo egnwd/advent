@@ -10,6 +10,8 @@ module AOC.Common.Point
   , displayAsciiSet
   , neighbours
   , allNeighbours
+  , neighboursSet
+  , allNeighboursSet
   , manhattan
   -- * D24
   , D24(..)
@@ -52,6 +54,7 @@ import           Linear
 import           Linear.Affine           (distanceA)
 import qualified Data.Map                as M
 import qualified Data.Map.NonEmpty       as NEM
+import qualified Data.Set                as S
 import qualified Data.Set.NonEmpty       as NES
 
 -- Some fns from: https://github.com/mstksg/advent-of-code-2020/blob/165461e51f991ac44bc9f8acc5c4e17caf83c13b/src/AOC/Common/Point.hs
@@ -124,11 +127,17 @@ displayAsciiSet
     -> String
 displayAsciiSet x y = displayAsciiMap x . M.fromSet (const y)
 
-neighbours :: Point -> [Point]
-neighbours k = (k +) <$> [V2 0 (-1), V2 1 0, V2 0 1, V2 (-1) 0]
-
-allNeighbours :: Point -> [Point]
+allNeighbours :: (Traversable t, Applicative t, Eq (t a), Num a, Num (t a)) => t a -> [t a]
 allNeighbours k = [k + k' | k' <- sequence (pure [-1, 0, 1]), k' /= pure 0]
+
+neighbours :: (Traversable t, Applicative t, Eq a, Eq (t a), Num a, Num (t a)) => t a -> [t a]
+neighbours k = [k + k' | k' <- sequence (pure [-1, 0, 1]), sum (abs k') == 1, k' /= pure 0]
+
+allNeighboursSet :: (Traversable t, Applicative t, Eq (t a), Ord (t a), Num a, Num (t a)) => t a -> Set (t a)
+allNeighboursSet k = S.fromList [k + k' | k' <- sequence (pure [-1, 0, 1]), k' /= pure 0]
+
+neighboursSet :: (Traversable t, Applicative t, Eq a, Ord (t a), Eq (t a), Num a, Num (t a)) => t a -> Set (t a)
+neighboursSet k = S.fromList [k + k' | k' <- sequence (pure [-1, 0, 1]), sum (abs k') == 1, k' /= pure 0]
 
 manhattan :: (Foldable t, Num c, Num (t c)) => t c -> t c -> c
 manhattan x y = sum . abs $ x - y
