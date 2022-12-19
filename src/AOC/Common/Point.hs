@@ -13,6 +13,7 @@ module AOC.Common.Point
   , neighboursSet
   , allNeighboursSet
   , manhattan
+  , contiguousRegions
   -- * D24
   , D24(..)
   , orientPoint
@@ -34,7 +35,7 @@ module AOC.Common.Point
 
 import           Control.DeepSeq
 import           Control.Lens
-import           Data.Foldable           (toList)
+import           Data.Foldable           (toList, foldMap')
 import           Data.Function
 import           Data.Group
 import           Data.Hashable
@@ -141,6 +142,26 @@ neighboursSet k = S.fromList [k + k' | k' <- sequence (pure [-1, 0, 1]), sum (ab
 
 manhattan :: (Foldable t, Num c, Num (t c)) => t c -> t c -> c
 manhattan x y = sum . abs $ x - y
+
+contiguousRegions
+    :: (Traversable t, Applicative t, Ord (t a), Num (t a), Num a, Eq a)
+    => Set (t a)
+    -> Set (NESet (t a))
+contiguousRegions = startNewPool S.empty
+  where
+    startNewPool seenPools remaining = case S.minView remaining of
+      Nothing      -> seenPools
+      Just (x, xs) ->
+        let (newPool, remaining') = fillUp (NES.singleton x) S.empty xs
+        in  startNewPool (S.insert newPool seenPools) remaining'
+    fillUp boundary internal remaining = case NES.nonEmptySet newBoundary of
+        Nothing -> (newInternal, remaining)
+        Just nb -> fillUp nb (NES.toSet newInternal) newRemaining
+      where
+        edgeCandidates = foldMap' neighboursSet boundary `S.difference` internal
+        newBoundary = edgeCandidates `S.intersection` remaining
+        newInternal = NES.withNonEmpty id NES.union internal boundary
+        newRemaining = remaining `S.difference` edgeCandidates
 
 -- ^ 24 3D Orientations
 

@@ -52,8 +52,8 @@ import qualified Text.Megaparsec.Char.Lexer     as PP
 
 type Side = V2 Point3D
 
-offsets :: [Side]
-offsets =
+offsets :: Set Side
+offsets = S.fromList
     [ V2 (V3 0 0 0) (V3 1 1 0) -- front
     , V2 (V3 0 0 1) (V3 1 1 1) -- back
     , V2 (V3 1 0 0) (V3 1 1 1) -- right
@@ -63,7 +63,7 @@ offsets =
     ]
 
 sides :: Point3D -> Set Side
-sides p = S.fromList $ (fmap (+p)) <$> offsets
+sides p = S.map (fmap (+p)) offsets
 
 findSides :: (Foldable t) => t Point3D -> Maybe (NES.NESet Side)
 findSides = NES.nonEmptySet . foldl' (\ss s -> (ss `S.union` s) S.\\ (ss `S.intersection` s)) S.empty . map sides . toList
@@ -71,24 +71,16 @@ findSides = NES.nonEmptySet . foldl' (\ss s -> (ss `S.union` s) S.\\ (ss `S.inte
 connected :: Point3D -> Set Point3D -> Bool
 connected x = not . S.null . S.intersection (neighboursSet x)
 
-findConnected :: Set Point3D -> V2 Point3D -> Set Point3D -> Set Point3D -> Set Point3D
-findConnected cubes bb r0 xs0 = fixedPoint (findConnected' xs0) r0
-    where
-        findConnected' :: Set Point3D -> Set Point3D -> Set Point3D
-        findConnected' xs r = S.foldl' go r $ xs S.\\ r
-        go a x
-          | inBoundingBox bb x && x `S.notMember` cubes && x `connected` a = S.insert x a
-          | otherwise = a
-
-findExteriorSides :: [Point3D] -> _
+findExteriorSides :: Foldable t => t Point3D -> Maybe (NES.NESet Side)
 findExteriorSides ps = do
-    let cubes = S.fromList ps
+    let cubes = S.fromList . toList $ ps
     ss <- findSides ps
     let relax = (_x %~ (subtract 1)) . (_y %~ (+1))
     bb@(V2 mn mx) <- (relax . boundingBox . NES.fromList) <$> (NE.nonEmpty . toListOf (folded . each) $ ss)
-    let (z:rs) = range (mn, mx)
-    let reachableCubes = findConnected cubes bb (S.singleton z) (S.fromList rs)
-    reachableSides <- findSides reachableCubes
+    let area = S.fromList . range $ (mn, mx)
+    minCorner <- S.lookupMin area
+    reachableCubes <- findOf folded (NES.member minCorner) $ contiguousRegions (area S.\\ cubes)
+    reachableSides <- findSides $ reachableCubes
     NES.nonEmptySet $ reachableSides `NES.intersection` ss
 
 day18a :: _ :~> _
