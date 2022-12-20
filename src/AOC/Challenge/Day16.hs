@@ -33,6 +33,7 @@ import           AOC.Prelude
 import Control.Lens
 import Control.Lens.TH
 import Debug.Trace
+import Linear
 
 import Control.Monad.State
 
@@ -73,6 +74,11 @@ maxOutPressure vs = fst . bimap negate (map (\(a,_,t) -> (a,t))) <$> aStar' nf h
         flow n = flowRates M.! n
         flowRates = M.fromList . map (\(Valve n fr _) -> (n, negate fr)) $ vs
         fw = M.map (M.map (fst . fromJust)) $ floydWarshall neighbours
+        neighbours = M.fromList . map (\(Valve n _ ns) -> (n, M.fromList . map (,1) $ ns)) $ vs
+        start = ("AA", S.empty, 30)
+        heur (n, o, t) = cumFlow t n 0 + sum (zipWith (*) [t, t-2 .. 0] stillClosed)
+            where
+                stillClosed = sort . M.elems . M.delete n $ M.withoutKeys flowRates o
         nf (n, o, t)
           = let fs = M.fromList
                       . map (\(n', c) -> ((n', S.insert n' o, max 0 (t-c-1)), (if n' `S.member` o then 0 else 1) * cumFlow t n' c))
@@ -80,12 +86,31 @@ maxOutPressure vs = fst . bimap negate (map (\(a,_,t) -> (a,t))) <$> aStar' nf h
                       . M.delete n
                       $ fw M.! n
              in if all (==0) fs then M.singleton (n,o,0) 0 else fs
+
+maxOutPressure2 :: _ -> _
+maxOutPressure2 vs = fst . bimap negate (map (\(a,_,t) -> (a,t))) <$> aStar' nf heur (\(_, _, t) -> t <= 0) start
+    where
+        flows t = M.mapWithKey (cumFlow t)
+        cumFlow t n c = flow n * (max 0 (t-c-1))
+        flow n = flowRates M.! n
+        flowRates = M.fromList . map (\(Valve n fr _) -> (n, negate fr)) $ vs
+        fw = M.map (M.map (fst . fromJust)) $ floydWarshall neighbours
         neighbours = M.fromList . map (\(Valve n _ ns) -> (n, M.fromList . map (,1) $ ns)) $ vs
-        start = ("AA", S.empty, 30)
-        heur (n, o, t) = h
+        start = (V2 "AA" "AA", S.empty, 26)
+        heur (V2 n1 n2, o, t) = cumFlow t n2 0 + cumFlow t n1 0 + sum (zipWith (*) [t, t-2 .. 0] stillClosed)
             where
-                stillClosed = sort . M.elems . M.delete n $ M.filterWithKey (\k _ -> k `S.notMember` o) flowRates
-                h = cumFlow t n 0 + sum (zipWith (*) [t, t-2 .. 0] stillClosed)
+                stillClosed = sort . M.elems . M.delete n2 . M.delete n1 $ M.withoutKeys flowRates o
+        nf :: (V2 Name, Set Name, Int) -> Map (V2 Name, Set Name, Int) Int
+        nf (n0, o, t)
+          = let fs = [ ((V2 n1 n2, S.insert n2 . S.insert n1 $ o, max 0 (t-1)), f1 + f2)
+                     | (V2 (n1, f1) (n2, f2)) <- traverse netx n0
+                     , f1 + f2 /= 0
+                     ]
+                netx n = map (\(n', c) -> (n', (if n' `S.member` o then 0 else 1) * cumFlow t n' c))
+                       . M.toList
+                       . M.delete n
+                       $ fw M.! n
+             in if null fs then M.singleton (n0,o,0) 0 else M.fromList fs
 
 day16a :: _ :~> _
 day16a = MkSol
@@ -96,7 +121,7 @@ day16a = MkSol
 
 day16b :: _ :~> _
 day16b = MkSol
-    { sParse = Just
+    { sParse = parseLines parseValve
     , sShow  = show
-    , sSolve = Just
+    , sSolve = maxOutPressure2
     }

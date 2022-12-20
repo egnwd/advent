@@ -23,8 +23,8 @@ import qualified Data.Set       as S
 import Debug.Trace
 
 data AStarState a c = AS
-  { _asCameFrom :: Map a (Maybe a)
-  , _asOpenSet :: OrdPSQ a c (c, Maybe a)
+  { _asCameFrom :: !(Map a (Maybe a))
+  , _asOpenSet :: !(OrdPSQ a c (c, Maybe a))
   }
 
 $(makeLenses ''AStarState)
@@ -66,21 +66,21 @@ aStar'
   -> (a -> Bool)    -- ^ termination condition
   -> a              -- ^ start
   -> Maybe (c, [a]) -- ^ perhaps the cost with the path
-aStar' neighbours heur term start = second reconstruct <$> aStar'' (initialASState start (heur start))
+aStar' neighbours heur term start = second reconstruct <$> go (initialASState start (heur start))
   where
     reconstruct :: (a, Map a (Maybe a)) -> [a]
     reconstruct (goal, mp) = reverse $ goreco goal
       where
         goreco n = n : maybe [] goreco (mp M.! n)
 
-    aStar'' :: AStarState a c -> Maybe (c, (a, Map a (Maybe a)))
-    aStar'' as@AS{..} = Q.minView _asOpenSet >>= doAStar
+    go :: AStarState a c -> Maybe (c, (a, Map a (Maybe a)))
+    go as@AS{..} = Q.minView _asOpenSet >>= doAStar
       where
         doAStar (n, c, (g, p), open)
           | term n = Just (c, (n, M.insert n p _asCameFrom))
           | otherwise = let as' = as & asOpenSet .~ open & asCameFrom %~ M.insert n p
                             !ns = neighbours n `M.difference` _asCameFrom
-                         in aStar'' $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
+                         in go $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
 
     updateNeighbour :: Show c => c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
     updateNeighbour g p as n w =
