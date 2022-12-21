@@ -1,5 +1,8 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day21
@@ -22,11 +25,14 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day21 (
-    -- day21a
-  -- , day21b
+    day21a
+  , day21b
   ) where
 
 import           AOC.Prelude
+import Control.Lens
+import Data.Data
+import Data.Data.Lens (uniplate)
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
@@ -45,16 +51,101 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+data Op = Add | Sub | Mul | Div | Eql deriving (Eq, Ord, Data)
+
+instance Show Op where
+    show Add = "+"
+    show Sub = "-"
+    show Mul = "*"
+    show Div = "/"
+    show Eql = "="
+
+data MonkeyBusinessInput = YellI Int | MI Name Op Name | IX deriving (Eq, Show)
+
+data MonkeyBusiness = Negate MonkeyBusiness | Yell Int | MM MonkeyBusiness Op MonkeyBusiness | MX deriving (Eq, Ord, Data)
+
+instance Plated MonkeyBusiness where
+  plate = uniplate
+
+instance Show MonkeyBusiness where
+    show (Yell n) = show n
+    show (MM l op r) = "(" ++ show l ++ " " ++ show op ++ " " ++ show r ++ ")"
+    show MX = "X"
+    show (Negate m) = show (MM (Yell (-1)) Mul m)
+
+type Name = String
+
+eval Add = (+)
+eval Sub = (-)
+eval Mul = (*)
+eval Div = (div)
+
+parseMonkey :: CharParser (Name, MonkeyBusinessInput)
+parseMonkey = do
+    name <- pName <* pTok ":"
+    mb <- (YellI <$> pDecimal) <|> (MI <$> pName <*> pOp <*> pName)
+    return (name, mb)
+        where
+            pName = pTok $ P.takeWhileP (Just "name") isLetter
+            pOp = (Add <$ pTok "+") <|> (Sub <$ pTok "-") <|> (Mul <$ pTok "*") <|> (Div <$ pTok "/")
+
+getNumbers :: Map Name (MonkeyBusinessInput) -> Map Name Int
+getNumbers ms = ms'
+    where
+        ms' = ms <&> go
+        go (YellI n) = n
+        go (MI l (eval->op) r) = (ms' M.! l) `op` (ms' M.! r)
+        go IX = error "Not part of this challenge"
+
+getEquations :: Map Name (MonkeyBusinessInput) -> Map Name MonkeyBusiness
+getEquations ms = ms'
+    where
+        ms' = ms <&> go
+        go :: MonkeyBusinessInput -> MonkeyBusiness
+        go (YellI n) = Yell n
+        go (MI l op r) = MM (ms' M.! l) op (ms' M.! r)
+        go IX = MX
+
+checkRoot :: Map Name MonkeyBusinessInput -> Map Name MonkeyBusiness -> Maybe MonkeyBusiness
+checkRoot ms ns = do
+    (MI l _ r) <- M.lookup "root" ms
+    nl <- M.lookup l ns
+    nr <- M.lookup r ns
+    pure $ MM nl Eql nr
+
+solve :: MonkeyBusiness -> Maybe Int
+solve eq = case findX eq of
+             (MM MX Eql (Yell n)) -> Just n
+             (MM (Yell n) Eql MX) -> Just n
+             _ -> Nothing
+    where
+        findX = rewrite (\x -> calc x <|> balance x)
+        balance (MM (MM l Add (Yell r)) Eql o) = Just $ MM l Eql (MM o Sub (Yell r))
+        balance (MM (MM l Sub (Yell r)) Eql o) = Just $ MM l Eql (MM o Add (Yell r))
+        balance (MM (MM l Mul (Yell r)) Eql o) = Just $ MM l Eql (MM o Div (Yell r))
+        balance (MM (MM l Div (Yell r)) Eql o) = Just $ MM l Eql (MM o Mul (Yell r))
+        balance (MM (MM (Yell l) Add r) Eql o) = Just $ MM r Eql (MM o Sub (Yell l))
+        balance (MM (MM (Yell l) Sub r) Eql o) = Just $ MM (Negate r) Eql (MM o Sub (Yell l))
+        balance (MM (MM (Yell l) Mul r) Eql o) = Just $ MM r Eql (MM o Div (Yell l))
+        balance (MM (Negate m) Eql (Yell o)) = Just $ MM m Eql (Yell (-o))
+        balance _ = Nothing
+        calc (MM (Yell l) op (Yell r)) = Just $ Yell ((eval op) l r)
+        calc (Negate (Yell n)) = Just $ Yell (-n)
+        calc _ = Nothing
+
+mutate :: Map Name MonkeyBusinessInput -> Map Name MonkeyBusinessInput
+mutate ms = ms & ix "humn" .~ IX
+
 day21a :: _ :~> _
 day21a = MkSol
-    { sParse = Just
+    { sParse = fmap M.fromList . parseLines parseMonkey
     , sShow  = show
-    , sSolve = Just
+    , sSolve = (M.lookup "root") . getNumbers
     }
 
-day21b :: _ :~> _
+day21b :: Map Name (MonkeyBusinessInput) :~> _
 day21b = MkSol
-    { sParse = Just
+    { sParse = fmap M.fromList . parseLines parseMonkey
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \ms -> solve <=< checkRoot ms . getEquations . mutate $ ms
     }

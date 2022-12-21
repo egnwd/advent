@@ -123,7 +123,6 @@ isRepeated xs = fromMaybe False isRepeated'
             let (M.elems->below, M.elems->above) = M.split mid rows
             return $ (length below == length above) && (not . null . lcp $ [below, above])
 
-
 heightOfTower' :: Int -> _ -> _
 heightOfTower' n p = head . filter isRepeated . toListOf (traverse . _1) $ iterate dropRock (theFloor, jets, rocks)
     where
