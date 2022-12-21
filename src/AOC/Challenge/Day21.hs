@@ -33,6 +33,7 @@ import           AOC.Prelude
 import Control.Lens
 import Data.Data
 import Data.Data.Lens (uniplate)
+import Data.Functor.Const
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
@@ -53,32 +54,30 @@ import qualified Text.Megaparsec.Char.Lexer     as PP
 
 data Op = Add | Sub | Mul | Div | Eql deriving (Eq, Ord, Data)
 
-instance Show Op where
-    show Add = "+"
-    show Sub = "-"
-    show Mul = "*"
-    show Div = "/"
-    show Eql = "="
+data MonkeyBusinessInput = YellI Double | MI Name Op Name | IX deriving (Eq, Ord)
 
-data MonkeyBusinessInput = YellI Int | MI Name Op Name | IX deriving (Eq, Show)
+data MonkeyBusiness = Yell Double | MM MonkeyBusiness Op MonkeyBusiness | MX deriving (Eq, Ord, Data)
 
-data MonkeyBusiness = Negate MonkeyBusiness | Yell Int | MM MonkeyBusiness Op MonkeyBusiness | MX deriving (Eq, Ord, Data)
+data MonkeyBusinessF f
+    = YellM Double
+    | MAdd (f (MonkeyBusinessF f)) (f (MonkeyBusinessF f))
+    | MSub (f (MonkeyBusinessF f)) (f (MonkeyBusinessF f))
+    | MMul (f (MonkeyBusinessF f)) (f (MonkeyBusinessF f))
+    | MDiv (f (MonkeyBusinessF f)) (f (MonkeyBusinessF f))
+    | MEql (f (MonkeyBusinessF f)) (f (MonkeyBusinessF f))
+    | X
+
+deriving instance Eq (MonkeyBusinessF Identity)
+deriving instance Ord (MonkeyBusinessF Identity)
+deriving instance Data (MonkeyBusinessF Identity)
+
+instance Plated (MonkeyBusinessF Identity) where
+  plate = uniplate
 
 instance Plated MonkeyBusiness where
   plate = uniplate
 
-instance Show MonkeyBusiness where
-    show (Yell n) = show n
-    show (MM l op r) = "(" ++ show l ++ " " ++ show op ++ " " ++ show r ++ ")"
-    show MX = "X"
-    show (Negate m) = show (MM (Yell (-1)) Mul m)
-
 type Name = String
-
-eval Add = (+)
-eval Sub = (-)
-eval Mul = (*)
-eval Div = (div)
 
 parseMonkey :: CharParser (Name, MonkeyBusinessInput)
 parseMonkey = do
@@ -89,15 +88,20 @@ parseMonkey = do
             pName = pTok $ P.takeWhileP (Just "name") isLetter
             pOp = (Add <$ pTok "+") <|> (Sub <$ pTok "-") <|> (Mul <$ pTok "*") <|> (Div <$ pTok "/")
 
-getNumbers :: Map Name (MonkeyBusinessInput) -> Map Name Int
-getNumbers ms = ms'
-    where
-        ms' = ms <&> go
-        go (YellI n) = n
-        go (MI l (eval->op) r) = (ms' M.! l) `op` (ms' M.! r)
-        go IX = error "Not part of this challenge"
+parseMonkeyF :: CharParser (Name, MonkeyBusinessF (Const Name))
+parseMonkeyF = do
+    name <- pName <* pTok ":"
+    mb <- (YellM <$> pDecimal) <|> pOp
+    return (name, mb)
+        where
+            pName = pTok $ P.takeWhileP (Just "name") isLetter
+            pOp = do
+                l <- pName
+                op <- (MAdd <$ pTok "+") <|> (MSub <$ pTok "-") <|> (MMul <$ pTok "*") <|> (MDiv <$ pTok "/")
+                r <- pName
+                return $ op (Const l) (Const r)
 
-getEquations :: Map Name (MonkeyBusinessInput) -> Map Name MonkeyBusiness
+getEquations :: Map Name MonkeyBusinessInput -> Map Name MonkeyBusiness
 getEquations ms = ms'
     where
         ms' = ms <&> go
@@ -106,6 +110,21 @@ getEquations ms = ms'
         go (MI l op r) = MM (ms' M.! l) op (ms' M.! r)
         go IX = MX
 
+getEquationsF :: Map Name (MonkeyBusinessF (Const Name)) -> Map Name (MonkeyBusinessF Identity)
+getEquationsF ms = ms'
+    where
+        ms' = ms <&> go
+        go :: MonkeyBusinessF (Const Name) -> MonkeyBusinessF Identity
+        go (MAdd (getConst->l) (getConst->r)) = MAdd (get l) (get r)
+        go (MSub (getConst->l) (getConst->r)) = MSub (get l) (get r)
+        go (MMul (getConst->l) (getConst->r)) = MMul (get l) (get r)
+        go (MDiv (getConst->l) (getConst->r)) = MDiv (get l) (get r)
+        go (MEql (getConst->l) (getConst->r)) = MEql (get l) (get r)
+        go X = X
+        go (YellM n) = YellM n
+        get :: Name -> Identity (MonkeyBusinessF Identity)
+        get = pure . (ms' M.!)
+
 checkRoot :: Map Name MonkeyBusinessInput -> Map Name MonkeyBusiness -> Maybe MonkeyBusiness
 checkRoot ms ns = do
     (MI l _ r) <- M.lookup "root" ms
@@ -113,39 +132,68 @@ checkRoot ms ns = do
     nr <- M.lookup r ns
     pure $ MM nl Eql nr
 
-solve :: MonkeyBusiness -> Maybe Int
+solve :: MonkeyBusiness -> Maybe Double
 solve eq = case findX eq of
              (MM MX Eql (Yell n)) -> Just n
              (MM (Yell n) Eql MX) -> Just n
              _ -> Nothing
     where
         findX = rewrite (\x -> calc x <|> balance x)
-        balance (MM (MM l Add (Yell r)) Eql o) = Just $ MM l Eql (MM o Sub (Yell r))
-        balance (MM (MM l Sub (Yell r)) Eql o) = Just $ MM l Eql (MM o Add (Yell r))
-        balance (MM (MM l Mul (Yell r)) Eql o) = Just $ MM l Eql (MM o Div (Yell r))
-        balance (MM (MM l Div (Yell r)) Eql o) = Just $ MM l Eql (MM o Mul (Yell r))
-        balance (MM (MM (Yell l) Add r) Eql o) = Just $ MM r Eql (MM o Sub (Yell l))
-        balance (MM (MM (Yell l) Sub r) Eql o) = Just $ MM (Negate r) Eql (MM o Sub (Yell l))
-        balance (MM (MM (Yell l) Mul r) Eql o) = Just $ MM r Eql (MM o Div (Yell l))
-        balance (MM (Negate m) Eql (Yell o)) = Just $ MM m Eql (Yell (-o))
-        balance _ = Nothing
-        calc (MM (Yell l) op (Yell r)) = Just $ Yell ((eval op) l r)
-        calc (Negate (Yell n)) = Just $ Yell (-n)
-        calc _ = Nothing
+        balance = \case
+            MM (MM l Add (Yell r)) Eql o -> pure $ MM l Eql (MM o Sub (Yell r))
+            MM (MM l Sub (Yell r)) Eql o -> pure $ MM l Eql (MM o Add (Yell r))
+            MM (MM l Mul (Yell r)) Eql o -> pure $ MM l Eql (MM o Div (Yell r))
+            MM (MM l Div (Yell r)) Eql o -> pure $ MM l Eql (MM o Mul (Yell r))
+            MM (MM (Yell l) Add r) Eql o -> pure $ MM r Eql (MM o Sub (Yell l))
+            MM (MM (Yell l) Sub r) Eql o -> pure $ MM r Eql (MM (Yell l) Sub o)
+            MM (MM (Yell l) Mul r) Eql o -> pure $ MM r Eql (MM o Div (Yell l))
+            _                            -> empty
+        calc = \case
+            MM (Yell l) Add (Yell r) -> pure $ Yell (l + r)
+            MM (Yell l) Sub (Yell r) -> pure $ Yell (l - r)
+            MM (Yell l) Mul (Yell r) -> pure $ Yell (l * r)
+            MM (Yell l) Div (Yell r) -> pure $ Yell (l / r)
+            _                       -> empty
 
-mutate :: Map Name MonkeyBusinessInput -> Map Name MonkeyBusinessInput
-mutate ms = ms & ix "humn" .~ IX
+solveF :: MonkeyBusinessF Identity -> Maybe Double
+solveF eq = case findX eq of
+             (MEql (Identity X) (Identity (YellM n))) -> Just $ n
+             (MEql (Identity (YellM n)) (Identity X)) -> Just $ n
+             _ -> Nothing
+    where
+        findX = rewrite (\x -> calc x <|> balance x)
+        balance = \case
+            MEql (Identity (MAdd l (Identity (YellM r)))) o -> pure $ MEql l (pure (MSub o (pure (YellM r))))
+            MEql (Identity (MSub l (Identity (YellM r)))) o -> pure $ MEql l (pure (MAdd o (pure (YellM r))))
+            MEql (Identity (MMul l (Identity (YellM r)))) o -> pure $ MEql l (pure (MDiv o (pure (YellM r))))
+            MEql (Identity (MDiv l (Identity (YellM r)))) o -> pure $ MEql l (pure (MMul o (pure (YellM r))))
+            MEql (Identity (MAdd (Identity (YellM l)) r)) o -> pure $ MEql r (pure (MSub o (pure (YellM l))))
+            MEql (Identity (MSub (Identity (YellM l)) r)) o -> pure $ MEql r (pure (MSub (pure (YellM l)) o))
+            MEql (Identity (MMul (Identity (YellM l)) r)) o -> pure $ MEql r (pure (MDiv o (pure (YellM l))))
+            _                            -> empty
+        calc = \case
+            MAdd (Identity (YellM l)) (Identity (YellM r)) -> pure $ YellM (l + r)
+            MSub (Identity (YellM l)) (Identity (YellM r)) -> pure $ YellM (l - r)
+            MMul (Identity (YellM l)) (Identity (YellM r)) -> pure $ YellM (l * r)
+            MDiv (Identity (YellM l)) (Identity (YellM r)) -> pure $ YellM (l / r)
+            _                       -> empty
 
-day21a :: _ :~> _
+retranslate :: Map Name MonkeyBusinessInput -> Map Name MonkeyBusinessInput
+retranslate ms = ms & (ix "humn" .~ IX) & (ix "root" %~ \(MI l _ r) -> MI l Eql r)
+
+retranslateF :: Map Name (MonkeyBusinessF f) -> Map Name (MonkeyBusinessF f)
+retranslateF ms = ms & (ix "humn" .~ X) & (ix "root" %~ \(MAdd l r) -> MEql l r)
+
+day21a :: _ :~> Int
 day21a = MkSol
-    { sParse = fmap M.fromList . parseLines parseMonkey
+    { sParse = fmap M.fromList . parseLines parseMonkeyF
     , sShow  = show
-    , sSolve = (M.lookup "root") . getNumbers
+    , sSolve = fmap round . solveF <=< fmap (MEql (pure X) . pure) . (M.lookup "root") . getEquationsF
     }
 
-day21b :: Map Name (MonkeyBusinessInput) :~> _
+day21b :: Map Name (MonkeyBusinessF (Const Name)) :~> Int
 day21b = MkSol
-    { sParse = fmap M.fromList . parseLines parseMonkey
+    { sParse = fmap M.fromList . parseLines parseMonkeyF
     , sShow  = show
-    , sSolve = \ms -> solve <=< checkRoot ms . getEquations . mutate $ ms
+    , sSolve = fmap round . solveF <=< M.lookup "root" . getEquationsF . retranslateF
     }
