@@ -16,6 +16,7 @@ Table of Contents
 * [Day 5](#day-5)
 * [Day 6](#day-6)
 * [Day 7](#day-7) *(no reflection yet)*
+* [Day 21](#day-21) *(no reflection yet)*
 
 Day 1
 ------
@@ -749,5 +750,42 @@ time                 3.251 ms   (3.179 ms .. 3.309 ms)
 mean                 3.285 ms   (3.250 ms .. 3.323 ms)
 std dev              112.8 μs   (91.46 μs .. 136.8 μs)
 variance introduced by outliers: 18% (moderately inflated)
+```
+
+
+
+Day 21
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day21.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d21p]* / *[Code][d21g]*
+
+[d21p]: https://adventofcode.com/2022/day/21
+[d21g]: https://github.com/egnwd/advent/blob/2022/src/AOC/Challenge/Day21.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 21 Benchmarks
+
+```
+>> Day 21a
+benchmarking...
+time                 19.81 ms   (19.37 ms .. 20.25 ms)
+                     0.998 R²   (0.996 R² .. 0.999 R²)
+mean                 19.79 ms   (19.35 ms .. 20.05 ms)
+std dev              843.0 μs   (478.9 μs .. 1.339 ms)
+variance introduced by outliers: 13% (moderately inflated)
+
+>> Day 21b
+benchmarking...
+time                 13.94 ms   (13.75 ms .. 14.11 ms)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 13.72 ms   (13.63 ms .. 13.79 ms)
+std dev              229.4 μs   (193.5 μs .. 282.0 μs)
 ```
 
