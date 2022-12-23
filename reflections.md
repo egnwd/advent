@@ -17,6 +17,7 @@ Table of Contents
 * [Day 6](#day-6)
 * [Day 7](#day-7) *(no reflection yet)*
 * [Day 21](#day-21) *(no reflection yet)*
+* [Day 23](#day-23) *(no reflection yet)*
 
 Day 1
 ------
@@ -787,5 +788,47 @@ time                 13.94 ms   (13.75 ms .. 14.11 ms)
                      0.999 R²   (0.998 R² .. 1.000 R²)
 mean                 13.72 ms   (13.63 ms .. 13.79 ms)
 std dev              229.4 μs   (193.5 μs .. 282.0 μs)
+```
+
+
+
+Day 23
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day23.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d23p]* / *[Code][d23g]*
+
+[d23p]: https://adventofcode.com/2022/day/23
+[d23g]: https://github.com/egnwd/advent/blob/2022/src/AOC/Challenge/Day23.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 23 Benchmarks
+
+```
+>> Day 23a
+benchmarking...
+time                 153.4 ms   (152.9 ms .. 154.4 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 152.9 ms   (152.6 ms .. 153.2 ms)
+std dev              431.5 μs   (195.5 μs .. 646.4 μs)
+variance introduced by outliers: 12% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 23b
+benchmarking...
+time                 7.350 s    (NaN s .. 7.372 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 7.374 s    (7.363 s .. 7.384 s)
+std dev              14.01 ms   (9.058 ms .. 16.48 ms)
+variance introduced by outliers: 19% (moderately inflated)
+
+* parsing and formatting times excluded
 ```
 
