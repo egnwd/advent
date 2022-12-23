@@ -94,6 +94,19 @@ findPassword (jungle, path) = do
             go (loc, h) (Rotate d) = (loc, h<>d)
             go (loc, h) (Move n) = (findEndPoint n loc h, h)
 
+findCubicPassword (jungle, path) = do
+    let startHeading = East
+    (start, _) <- M.lookupMin . M.filterWithKey (\(V2 _ y) a -> Grass == a && y == 0) $ jungle
+    let (end, endHeading) = foldl' go (start, startHeading) path
+    return $  password end endHeading
+        where
+            rows = getRows jungle
+            cols = getCols jungle
+            findEndPoint n loc h = last $ getTiles rows cols n loc h
+            go :: (Point, Dir) -> Instruction -> (Point, Dir)
+            go (loc, h) (Rotate d) = (loc, h<>d)
+            go (loc, h) (Move n) = (findEndPoint n loc h, h)
+
 day22a :: (Map Point Land, [Instruction]) :~> _
 day22a = MkSol
     { sParse = sequence . bimap (parseAsciiMap charMap) (parseMaybeLenient parsePath) <=< splitInput
@@ -103,9 +116,9 @@ day22a = MkSol
 
 day22b :: _ :~> _
 day22b = MkSol
-    { sParse = Just
+    { sParse = sequence . bimap (parseAsciiMap charMap) (parseMaybeLenient parsePath) <=< splitInput
     , sShow  = show
-    , sSolve = Just
+    , sSolve = findCubicPassword
     }
 
 splitInput :: String -> Maybe (String, String)
