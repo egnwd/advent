@@ -31,6 +31,7 @@ module AOC.Common (
                   , clearOut
                   , fixedPoint
                   , indexedFixedPoint
+                  , statefulIndexedFixedPoint
                   , loopEither
                   , foldMapKeysWith
                   , freqs
@@ -194,6 +195,15 @@ indexedFixedPoint f = go 1
         | otherwise = go (idx+1) y
       where
         y = f x
+
+statefulIndexedFixedPoint :: Eq a => ((s, a) -> (s, a)) -> (s, a) -> (Int, (s, a))
+statefulIndexedFixedPoint f = go 1
+  where
+    go idx !x
+        | snd x == snd y    = (idx, x)
+        | otherwise = go (idx+1) y
+      where
+          y = f x
 
 loopEither
     :: (a -> Either r a)
