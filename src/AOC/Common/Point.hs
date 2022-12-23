@@ -14,6 +14,10 @@ module AOC.Common.Point
   , allNeighboursSet
   , manhattan
   , contiguousRegions
+  , northEdge
+  , eastEdge
+  , southEdge
+  , westEdge
   -- * D24
   , D24(..)
   , orientPoint
@@ -170,6 +174,12 @@ type Vector3D = V3 Int
 
 data Dir = North | East | South | West
   deriving (Show, Eq, Ord, Generic, Enum)
+
+northEdge, eastEdge, southEdge, westEdge :: Set Point
+northEdge = S.fromList $ (+ dirVec North) <$> [ dirVec West, pure 0, dirVec East ]
+eastEdge = S.fromList $ (+ dirVec East) <$> [ dirVec North, pure 0, dirVec South ]
+southEdge = S.fromList $ (+ dirVec South) <$> [ dirVec East, pure 0, dirVec West ]
+westEdge = S.fromList $ (+ dirVec West) <$> [ dirVec South, pure 0, dirVec North ]
 
 dirVec :: Num a => Dir -> V2 a
 dirVec = \case
