@@ -32,24 +32,23 @@ import qualified Data.Map                       as M
 import qualified Data.Set                       as S
 import qualified Data.Set.NonEmpty              as NES
 
-step :: ([Dir], NES.NESet Point) -> ([Dir], NES.NESet Point)
+step :: ([Dir], Set Point) -> ([Dir], Set Point)
 step (ds, elves0) = (ds', elves')
     where
         ds' = take 4 . drop 1 . cycle $ ds
-        es0 = NES.toSet elves0
         elves' = move . propose $ elves0
 
-        propose :: NES.NESet Point -> Map Point Point
-        propose = M.fromSet chooseLocation . NES.toSet
+        propose :: Set Point -> Map Point Point
+        propose = M.fromSet chooseLocation
 
         chooseLocation :: Point -> Point
         chooseLocation e
-          | S.disjoint es0 (allNeighboursSet e) = e
+          | S.disjoint elves0 (allNeighboursSet e) = e
           | otherwise = fromMaybe e . getAlt . foldMap (Alt . elvesInDirection e) $ ds
 
         elvesInDirection :: Point -> Dir -> Maybe Point
         elvesInDirection e d
-          | S.disjoint es0 ((dirs d) e) = Just $ e + dirVec d
+          | S.disjoint elves0 ((dirs d) e) = Just $ e + dirVec d
           | otherwise = Nothing
 
         dirs :: Dir -> Point -> Set Point
@@ -58,31 +57,30 @@ step (ds, elves0) = (ds', elves')
         dirs South e = S.map (+e) southEdge
         dirs West e  = S.map (+e) westEdge
 
-        move :: Map Point Point -> NES.NESet Point
-        move props = toNonEmptySet . M.mapWithKey (\k a -> if lookupFreq a fs > 1 then k else a) $ props
+        move :: Map Point Point -> Set Point
+        move props = fromElems . M.mapWithKey (\k a -> if lookupFreq a fs > 1 then k else a) $ props
             where
-                toNonEmptySet = NES.unsafeFromSet . S.fromList . M.elems
+                fromElems = S.fromList . M.elems
                 fs = freqs props
 
-emptyGround :: NES.NESet Point -> Int
-emptyGround elves = totalArea - NES.size elves
-    where
-        totalArea = rangeSize (mn, mx)
-        (V2 mn mx) = boundingBox elves
+emptyGround :: Set Point -> Maybe Int
+emptyGround elves = do
+    (V2 mn mx) <- fmap boundingBox . NES.nonEmptySet $ elves
+    return $ rangeSize (mn, mx) - S.size elves
 
 startingChecks :: [Dir]
 startingChecks = [North, South, West, East]
 
-day23a :: NES.NESet Point :~> Int
+day23a :: Set Point :~> Int
 day23a = MkSol
-    { sParse = NES.nonEmptySet . parseAsciiSet (=='#')
+    { sParse = Just . parseAsciiSet (=='#')
     , sShow  = show
-    , sSolve = Just . emptyGround . snd . head . drop (dyno_ "steps" 10) . iterate step . (startingChecks,)
+    , sSolve = emptyGround . snd . head . drop (dyno_ "steps" 10) . iterate step . (startingChecks,)
     }
 
-day23b :: NES.NESet Point :~> Int
+day23b :: Set Point :~> Int
 day23b = MkSol
-    { sParse = NES.nonEmptySet . parseAsciiSet (=='#')
+    { sParse = Just . parseAsciiSet (=='#')
     , sShow  = show
     , sSolve = Just . fst . statefulIndexedFixedPoint step . (startingChecks,)
     }

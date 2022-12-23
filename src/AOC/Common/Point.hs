@@ -1,5 +1,6 @@
 module AOC.Common.Point
   ( Point
+  , Vector
   , boundingBox
   , inBoundingBox
   , pastBoundingBox
@@ -65,6 +66,7 @@ import qualified Data.Set.NonEmpty       as NES
 -- Some fns from: https://github.com/mstksg/advent-of-code-2020/blob/165461e51f991ac44bc9f8acc5c4e17caf83c13b/src/AOC/Common/Point.hs
 
 type Point = V2 Int
+type Vector = V2 Int
 
 boundingBox :: (Foldable1 f, Applicative g, Ord a) => f (g a) -> V2 (g a)
 boundingBox = (\(T2 (Ap mn) (Ap mx)) -> V2 (getMin <$> mn) (getMax <$> mx))
