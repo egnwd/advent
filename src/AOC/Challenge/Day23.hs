@@ -4,33 +4,41 @@
 --
 -- Stability   : experimental
 -- Portability : non-portable
---
--- Day 23.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day23 (
     day23a
   , day23b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver ((:~>)(..), dyno_)
+import           AOC.Common (Point, Dir(..), boundingBox, parseAsciiSet, statefulIndexedFixedPoint, freqs, lookupFreq, dirVec, allNeighboursSet)
 import           Linear
 import           Data.Ix
 import           Data.Monoid
+import           Data.Bits
+import           Data.Word
+import           Data.Maybe (fromMaybe)
+import           Control.Monad (guard)
+import           Data.Set (Set)
+import           Data.Map (Map)
 
 import qualified Data.Map                       as M
 import qualified Data.Set                       as S
 import qualified Data.Set.NonEmpty              as NES
+
+type Mask = Word8
+
+northEdge, eastEdge, southEdge, westEdge :: Mask
+northEdge = 148 -- 10010100
+eastEdge  = 7   -- 00000111
+southEdge = 41  -- 00101001
+westEdge  = 224 -- 11100000
+
+dirToEdge :: Dir -> Mask
+dirToEdge North = northEdge
+dirToEdge East = eastEdge
+dirToEdge South = southEdge
+dirToEdge West = westEdge
 
 step :: ([Dir], Set Point) -> ([Dir], Set Point)
 step (ds, elves0) = (ds', elves')
@@ -43,19 +51,20 @@ step (ds, elves0) = (ds', elves')
 
         chooseLocation :: Point -> Point
         chooseLocation e
-          | S.disjoint elves0 (allNeighboursSet e) = e
-          | otherwise = fromMaybe e . getAlt . foldMap (Alt . elvesInDirection e) $ ds
+          | ns == 0 = e
+          | otherwise = fromMaybe e . getAlt . foldMap (Alt . newElfLocation e ns) $ ds
+          where ns = neighbourMask e
 
-        elvesInDirection :: Point -> Dir -> Maybe Point
-        elvesInDirection e d
-          | S.disjoint elves0 ((dirs d) e) = Just $ e + dirVec d
-          | otherwise = Nothing
+        neighbourMask :: Point -> Mask
+        neighbourMask e = S.foldl' (\b p -> (hasElf p) (b `shiftL` 1)) 0 $ allNeighboursSet e
 
-        dirs :: Dir -> Point -> Set Point
-        dirs North e = S.map (+e) northEdge
-        dirs East e  = S.map (+e) eastEdge
-        dirs South e = S.map (+e) southEdge
-        dirs West e  = S.map (+e) westEdge
+        hasElf :: Point -> Mask -> Mask
+        hasElf p
+          | p `S.member` elves0 = flip setBit 0
+          | otherwise = flip const 0
+
+        newElfLocation :: Point -> Mask -> Dir -> Maybe Point
+        newElfLocation e ns d = (e + dirVec d) <$ guard (ns .&. (dirToEdge d) == 0)
 
         move :: Map Point Point -> Set Point
         move props = fromElems . M.mapWithKey (\k a -> if lookupFreq a fs > 1 then k else a) $ props
