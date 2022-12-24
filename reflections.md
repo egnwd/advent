@@ -19,6 +19,7 @@ Table of Contents
 * [Day 20](#day-20) *(no reflection yet)*
 * [Day 21](#day-21) *(no reflection yet)*
 * [Day 23](#day-23) *(no reflection yet)*
+* [Day 24](#day-24) *(no reflection yet)*
 
 Day 1
 ------
@@ -873,5 +874,43 @@ std dev              14.01 ms   (9.058 ms .. 16.48 ms)
 variance introduced by outliers: 19% (moderately inflated)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 24
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day24.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d24p]* / *[Code][d24g]*
+
+[d24p]: https://adventofcode.com/2022/day/24
+[d24g]: https://github.com/egnwd/advent/blob/2022/src/AOC/Challenge/Day24.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 24 Benchmarks
+
+```
+>> Day 24a
+benchmarking...
+time                 1.994 s    (1.922 s .. 2.047 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 2.013 s    (2.001 s .. 2.026 s)
+std dev              16.00 ms   (7.012 ms .. 21.38 ms)
+variance introduced by outliers: 19% (moderately inflated)
+
+>> Day 24b
+benchmarking...
+time                 6.110 s    (5.862 s .. 6.218 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 6.103 s    (6.047 s .. 6.151 s)
+std dev              66.85 ms   (19.01 ms .. 92.61 ms)
+variance introduced by outliers: 19% (moderately inflated)
 ```
 
