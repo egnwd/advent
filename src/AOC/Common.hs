@@ -33,6 +33,8 @@ module AOC.Common (
                   , indexedFixedPoint
                   , statefulIndexedFixedPoint
                   , loopEither
+                  , firstRepeated
+                  , firstRepeatedBy
                   , foldMapKeysWith
                   , freqs
                   , lookupFreq
@@ -244,6 +246,18 @@ evens (_:xs) = odds xs
 sequenceTuple :: (Maybe a, Maybe b) -> Maybe (a,b)
 sequenceTuple (Just a, Just b) = Just (a, b)
 sequenceTuple _ = Nothing
+
+firstRepeated :: Ord a => [a] -> Maybe a
+firstRepeated = firstRepeatedBy id
+
+-- | Lazily find the first repeated projection.
+firstRepeatedBy :: Ord a => (b -> a) -> [b] -> Maybe b
+firstRepeatedBy f = go S.empty
+  where
+    go seen (x:xs)
+      | f x `S.member` seen = Just x
+      | otherwise           = go (f x `S.insert` seen) xs
+    go _ []     = Nothing
 
 -- | Count the number of items in a container where the predicate is true.
 countTrue :: Foldable f => (a -> Bool) -> f a -> Int
