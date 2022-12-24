@@ -3,6 +3,7 @@
 module AOC.Common.Search
   ( aStar
   , aStar'
+  , beamAStar'
   , floydWarshall
   , bfs
   ) where
@@ -75,6 +76,35 @@ aStar' neighbours heur term start = second reconstruct <$> go (initialASState st
 
     go :: AStarState a c -> Maybe (c, (a, Map a (Maybe a)))
     go as@AS{..} = Q.minView _asOpenSet >>= doAStar
+      where
+        doAStar (n, c, (g, p), open)
+          | term n = Just (c, (n, M.insert n p _asCameFrom))
+          | otherwise = let as' = as & asOpenSet .~ open & asCameFrom %~ M.insert n p
+                            !ns = neighbours n `M.difference` _asCameFrom
+                         in go $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
+
+    updateNeighbour :: Show c => c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
+    updateNeighbour g p as n w =
+      let gScore' = g+w
+      in as & asOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
+
+beamAStar'
+  :: forall a c. (Ord a, Ord c, Num c, Show c)
+  => Int            -- ^ beam size
+  -> (a -> Map a c) -- ^ neighbourhood
+  -> (a -> c)       -- ^ heuristic
+  -> (a -> Bool)    -- ^ termination condition
+  -> a              -- ^ start
+  -> Maybe (c, [a]) -- ^ perhaps the cost with the path
+beamAStar' sz neighbours heur term start = second reconstruct <$> go (initialASState start (heur start))
+  where
+    reconstruct :: (a, Map a (Maybe a)) -> [a]
+    reconstruct (goal, mp) = reverse $ goreco goal
+      where
+        goreco n = n : maybe [] goreco (mp M.! n)
+
+    go :: AStarState a c -> Maybe (c, (a, Map a (Maybe a)))
+    go as@AS{..} = Q.minView (Q.fromList . take sz . Q.toAscList $ _asOpenSet) >>= doAStar
       where
         doAStar (n, c, (g, p), open)
           | term n = Just (c, (n, M.insert n p _asCameFrom))

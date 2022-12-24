@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, DerivingStrategies #-}
 
 -- |
 -- Module      : AOC.Challenge.Day16
@@ -69,7 +69,6 @@ parseValve = do
 maxOutPressure :: _ -> _
 maxOutPressure vs = fst . bimap negate (map (\(a,_,t) -> (a,t))) <$> aStar' nf heur (\(_, _, t) -> t <= 0) start
     where
-        flows t = M.mapWithKey (cumFlow t)
         cumFlow t n c = flow n * (max 0 (t-c-1))
         flow n = flowRates M.! n
         flowRates = M.fromList . map (\(Valve n fr _) -> (n, negate fr)) $ vs
@@ -87,30 +86,28 @@ maxOutPressure vs = fst . bimap negate (map (\(a,_,t) -> (a,t))) <$> aStar' nf h
                       $ fw M.! n
              in if all (==0) fs then M.singleton (n,o,0) 0 else fs
 
+data SearchState = SS !(V2 Name) !(Set Name) !Int deriving stock (Generic, Show, Eq, Ord)
+
+instance NFData SearchState
+
 maxOutPressure2 :: _ -> _
-maxOutPressure2 vs = fst . bimap negate (map (\(a,_,t) -> (a,t))) <$> aStar' nf heur (\(_, _, t) -> t <= 0) start
+maxOutPressure2 vs = fst . first (negate . subtract (sum flowRates * 26)) <$> beamAStar' 5000 nf heur (\(SS _ o t) -> t <= 0 || all (==0) (flowRates `M.withoutKeys` o)) start
     where
-        flows t = M.mapWithKey (cumFlow t)
-        cumFlow t n c = flow n * (max 0 (t-c-1))
         flow n = flowRates M.! n
-        flowRates = M.fromList . map (\(Valve n fr _) -> (n, negate fr)) $ vs
-        fw = M.map (M.map (fst . fromJust)) $ floydWarshall neighbours
-        neighbours = M.fromList . map (\(Valve n _ ns) -> (n, M.fromList . map (,1) $ ns)) $ vs
-        start = (V2 "AA" "AA", S.empty, 26)
-        heur (V2 n1 n2, o, t) = cumFlow t n2 0 + cumFlow t n1 0 + sum (zipWith (*) [t, t-2 .. 0] stillClosed)
-            where
-                stillClosed = sort . M.elems . M.delete n2 . M.delete n1 $ M.withoutKeys flowRates o
-        nf :: (V2 Name, Set Name, Int) -> Map (V2 Name, Set Name, Int) Int
-        nf (n0, o, t)
-          = let fs = [ ((V2 n1 n2, S.insert n2 . S.insert n1 $ o, max 0 (t-1)), f1 + f2)
-                     | (V2 (n1, f1) (n2, f2)) <- traverse netx n0
-                     , f1 + f2 /= 0
+        flowRates = M.fromList . map (\(Valve n fr _) -> (n, fr)) $ vs
+        neighbours = M.fromList . map (\(Valve n _ ns) -> (n, ns)) $ vs
+        start = SS (V2 "AA" "AA") S.empty 26
+        heur (SS _ o _) = sum $ flowRates `M.withoutKeys` o
+        nf :: SearchState -> Map SearchState Int
+        nf (SS n0 o t)
+          = let fs = [ (SS (V2 n1 n2) o' (max 0 (t-1)), sum $ flowRates `M.withoutKeys` o)
+                     | (V2 (n1, o1) (n2, o2)) <- traverse options n0
+                     , let o' = o1 `S.union` o2
                      ]
-                netx n = map (\(n', c) -> (n', (if n' `S.member` o then 0 else 1) * cumFlow t n' c))
-                       . M.toList
-                       . M.delete n
-                       $ fw M.! n
-             in if null fs then M.singleton (n0,o,0) 0 else M.fromList fs
+                options n = open n <|> next n
+                open n = (n, S.insert n o) <$ guard (n `S.notMember` o && flow n /= 0)
+                next n = (,o) <$> neighbours M.! n
+             in if null fs then M.singleton (SS n0 o (t-1)) (sum flowRates) else M.fromList fs
 
 day16a :: _ :~> _
 day16a = MkSol
