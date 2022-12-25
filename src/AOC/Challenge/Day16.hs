@@ -90,13 +90,27 @@ data SearchState = SS !(V2 Name) !(Set Name) !Int deriving stock (Generic, Show,
 
 instance NFData SearchState
 
+showUnit flow (SS (V2 me ele) o t) = unlines
+    [ "== Minute " ++ show (27-t) ++ " =="
+    , case S.size o of
+        0 -> "No valves are open."
+        1 -> "Valve " ++ intercalate "," (S.toList o) ++ " is open. Releasing " ++ show (sum (flow `M.restrictKeys` o)) ++ " pressure."
+        _ -> "Valves " ++ intercalate "," (S.toList o) ++ " are open. Releasing " ++ show (sum (flow `M.restrictKeys` o)) ++ " pressure."
+    , "You are at valve " ++ me
+    , "Elephant is at valve " ++ ele
+    ]
+
+showTrace (_, []) = ""
+showTrace (x, (u:us)) = showUnit x u ++ "\n\n" ++ showTrace (x, us)
+
 maxOutPressure2 :: _ -> _
-maxOutPressure2 vs = fst . first (negate . subtract (sum flowRates * 26)) <$> beamAStar' 5000 nf heur (\(SS _ o t) -> t <= 0 || all (==0) (flowRates `M.withoutKeys` o)) start
+maxOutPressure2 vs = fst . first (negate . subtract (sum flowRates * 26)) <$> aStar' nf heur (\(SS _ o t) -> t <= 0 || M.null (goodFlow `M.withoutKeys` o)) start
     where
         flow n = flowRates M.! n
         flowRates = M.fromList . map (\(Valve n fr _) -> (n, fr)) $ vs
+        goodFlow = M.filter (> 0) flowRates
         neighbours = M.fromList . map (\(Valve n _ ns) -> (n, ns)) $ vs
-        start = SS (V2 "AA" "AA") S.empty 26
+        start = SS (V2 "AA" "AA") S.empty 25
         heur (SS _ o _) = sum $ flowRates `M.withoutKeys` o
         nf :: SearchState -> Map SearchState Int
         nf (SS n0 o t)
@@ -107,7 +121,7 @@ maxOutPressure2 vs = fst . first (negate . subtract (sum flowRates * 26)) <$> be
                 options n = open n <|> next n
                 open n = (n, S.insert n o) <$ guard (n `S.notMember` o && flow n /= 0)
                 next n = (,o) <$> neighbours M.! n
-             in if null fs then M.singleton (SS n0 o (t-1)) (sum flowRates) else M.fromList fs
+             in M.fromList fs
 
 day16a :: _ :~> _
 day16a = MkSol
