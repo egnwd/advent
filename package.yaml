@@ -111,6 +111,7 @@ library:
   - parser-combinators
   - pointedlist
   - vector
+  - vector-sized
   - safe
   - profunctors
   - psqueues
