@@ -61,7 +61,7 @@ aStar neighbours heur term start = (,[]) <$> aStar'' (initialASState start (heur
       in as & asOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
 
 aStar'
-  :: forall a c. (Ord a, Ord c, Num c, Show c)
+  :: forall a c. (Ord a, Ord c, Num c)
   => (a -> Map a c) -- ^ neighbourhood
   -> (a -> c)       -- ^ heuristic
   -> (a -> Bool)    -- ^ termination condition
@@ -83,7 +83,7 @@ aStar' neighbours heur term start = second reconstruct <$> go (initialASState st
                             !ns = neighbours n `M.difference` _asCameFrom
                          in go $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
 
-    updateNeighbour :: Show c => c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
+    updateNeighbour :: c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
     updateNeighbour g p as n w =
       let gScore' = g+w
       in as & asOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
