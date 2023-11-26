@@ -121,6 +121,7 @@ library:
   - transformers
   - utf8-string
   - unordered-containers
+  - vector
   - yaml
 
 executables:

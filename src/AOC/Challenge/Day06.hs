@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day06
 -- License     : BSD3
@@ -8,36 +5,44 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- Day 6.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
+-- Day 6.
 
 module AOC.Challenge.Day06 (
-    -- day06a
-  -- , day06b
+    day06a
+  , day06b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver ((:~>)(..))
+import Text.Read  (readMaybe)
+import qualified Data.Vector as V
+import qualified Data.Map as M
 
-day06a :: _ :~> _
+run :: [Int] -> (Int, Int)
+run = positionOfLoop . iterate go . V.fromList
+    where
+        go ns = let imx = V.maxIndex ns
+                    mx  = ns V.! imx
+                 in V.accum (+) (ns V.// [(imx, 0)]) [(i `mod` V.length ns, 1) | i <- [imx + 1 .. imx + mx]]
+
+positionOfLoop :: [V.Vector Int] -> (Int, Int)
+positionOfLoop = go 0 M.empty
+    where
+        go :: Int -> M.Map (V.Vector Int) Int -> [V.Vector Int] -> (Int, Int)
+        go _ _ [] = undefined
+        go l m (x:xs) = case M.lookup x m of
+                          Just n -> (l,n)
+                          Nothing -> go (l+1) (M.insert x 1 (succ <$> m)) xs
+
+day06a :: [Int] :~> Int
 day06a = MkSol
-    { sParse = Just
+    { sParse = traverse readMaybe . words
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . fst . run
     }
 
-day06b :: _ :~> _
+day06b :: [Int] :~> Int
 day06b = MkSol
-    { sParse = Just
+    { sParse = traverse readMaybe . words
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . snd . run
     }

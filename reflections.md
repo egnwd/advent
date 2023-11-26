@@ -14,6 +14,7 @@ Table of Contents
 * [Day 3](#day-3) *(no reflection yet)*
 * [Day 4](#day-4) *(no reflection yet)*
 * [Day 5](#day-5) *(no reflection yet)*
+* [Day 6](#day-6) *(no reflection yet)*
 
 Day 1
 ------
@@ -36,21 +37,20 @@ that file instead!
 ```
 >> Day 01a
 benchmarking...
-time                 33.79 μs   (33.58 μs .. 34.02 μs)
-                     0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 33.64 μs   (33.31 μs .. 33.91 μs)
-std dev              989.8 ns   (687.3 ns .. 1.405 μs)
-variance introduced by outliers: 30% (moderately inflated)
+time                 33.46 μs   (33.40 μs .. 33.52 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 33.32 μs   (32.98 μs .. 33.46 μs)
+std dev              728.0 ns   (385.1 ns .. 1.105 μs)
+variance introduced by outliers: 20% (moderately inflated)
 
 * parsing and formatting times excluded
 
 >> Day 01b
 benchmarking...
-time                 43.96 μs   (43.77 μs .. 44.30 μs)
-                     0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 44.64 μs   (44.17 μs .. 45.17 μs)
-std dev              1.679 μs   (1.069 μs .. 2.178 μs)
-variance introduced by outliers: 41% (moderately inflated)
+time                 44.12 μs   (43.96 μs .. 44.30 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 44.20 μs   (44.11 μs .. 44.44 μs)
+std dev              432.0 ns   (269.3 ns .. 801.7 ns)
 
 * parsing and formatting times excluded
 ```
@@ -78,21 +78,20 @@ that file instead!
 ```
 >> Day 02a
 benchmarking...
-time                 1.455 μs   (1.451 μs .. 1.459 μs)
+time                 1.506 μs   (1.497 μs .. 1.513 μs)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 1.456 μs   (1.451 μs .. 1.467 μs)
-std dev              23.29 ns   (15.34 ns .. 38.34 ns)
-variance introduced by outliers: 16% (moderately inflated)
+mean                 1.508 μs   (1.502 μs .. 1.515 μs)
+std dev              21.65 ns   (17.26 ns .. 28.67 ns)
+variance introduced by outliers: 13% (moderately inflated)
 
 * parsing and formatting times excluded
 
 >> Day 02b
 benchmarking...
-time                 43.98 μs   (43.88 μs .. 44.10 μs)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 44.20 μs   (44.04 μs .. 44.39 μs)
-std dev              681.0 ns   (476.2 ns .. 975.6 ns)
-variance introduced by outliers: 11% (moderately inflated)
+time                 45.19 μs   (44.95 μs .. 45.67 μs)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 45.12 μs   (45.01 μs .. 45.32 μs)
+std dev              512.0 ns   (287.0 ns .. 940.1 ns)
 
 * parsing and formatting times excluded
 ```
@@ -120,19 +119,19 @@ that file instead!
 ```
 >> Day 03a
 benchmarking...
-time                 89.12 ms   (88.88 ms .. 89.39 ms)
+time                 43.34 ms   (43.22 ms .. 43.53 ms)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 89.06 ms   (88.88 ms .. 89.28 ms)
-std dev              346.1 μs   (248.5 μs .. 447.9 μs)
+mean                 43.26 ms   (43.18 ms .. 43.36 ms)
+std dev              178.4 μs   (128.4 μs .. 285.1 μs)
 
 * parsing and formatting times excluded
 
 >> Day 03b
 benchmarking...
-time                 72.49 μs   (72.26 μs .. 72.81 μs)
+time                 64.58 μs   (64.36 μs .. 64.88 μs)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 72.38 μs   (72.18 μs .. 72.58 μs)
-std dev              738.6 ns   (571.2 ns .. 902.1 ns)
+mean                 64.73 μs   (64.54 μs .. 64.97 μs)
+std dev              662.0 ns   (533.2 ns .. 829.2 ns)
 
 * parsing and formatting times excluded
 ```
@@ -160,21 +159,20 @@ that file instead!
 ```
 >> Day 04a
 benchmarking...
-time                 418.6 μs   (390.2 μs .. 440.5 μs)
-                     0.982 R²   (0.974 R² .. 0.996 R²)
-mean                 416.8 μs   (408.7 μs .. 428.4 μs)
-std dev              32.57 μs   (25.92 μs .. 41.61 μs)
-variance introduced by outliers: 66% (severely inflated)
+time                 393.0 μs   (391.2 μs .. 395.0 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 392.1 μs   (390.9 μs .. 393.5 μs)
+std dev              4.349 μs   (3.631 μs .. 5.436 μs)
 
 * parsing and formatting times excluded
 
 >> Day 04b
 benchmarking...
-time                 1.923 ms   (1.872 ms .. 1.970 ms)
-                     0.993 R²   (0.989 R² .. 0.997 R²)
-mean                 1.887 ms   (1.856 ms .. 1.913 ms)
-std dev              101.5 μs   (80.76 μs .. 126.3 μs)
-variance introduced by outliers: 38% (moderately inflated)
+time                 1.660 ms   (1.647 ms .. 1.680 ms)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 1.658 ms   (1.650 ms .. 1.676 ms)
+std dev              41.97 μs   (25.58 μs .. 66.70 μs)
+variance introduced by outliers: 12% (moderately inflated)
 
 * parsing and formatting times excluded
 ```
@@ -202,20 +200,62 @@ that file instead!
 ```
 >> Day 05a
 benchmarking...
-time                 127.5 ms   (126.6 ms .. 128.6 ms)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 126.5 ms   (125.7 ms .. 127.1 ms)
-std dev              1.106 ms   (826.8 μs .. 1.336 ms)
+time                 115.2 ms   (113.8 ms .. 116.5 ms)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 114.3 ms   (113.2 ms .. 115.0 ms)
+std dev              1.409 ms   (665.3 μs .. 2.093 ms)
 variance introduced by outliers: 11% (moderately inflated)
 
 * parsing and formatting times excluded
 
 >> Day 05b
 benchmarking...
-time                 8.232 s    (8.128 s .. 8.305 s)
+time                 8.459 s    (8.455 s .. 8.460 s)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 8.229 s    (8.218 s .. 8.246 s)
-std dev              16.70 ms   (3.449 ms .. 22.07 ms)
+mean                 8.447 s    (8.437 s .. 8.451 s)
+std dev              7.056 ms   (2.593 ms .. 9.238 ms)
+variance introduced by outliers: 19% (moderately inflated)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 6
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day06.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d06p]* / *[Code][d06g]*
+
+[d06p]: https://adventofcode.com/2017/day/6
+[d06g]: https://github.com/egnwd/advent/blob/2017/src/AOC/Challenge/Day06.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 6 Benchmarks
+
+```
+>> Day 06a
+benchmarking...
+time                 1.448 s    (1.403 s .. 1.479 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 1.509 s    (1.483 s .. 1.559 s)
+std dev              48.76 ms   (246.3 μs .. 58.34 ms)
+variance introduced by outliers: 19% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 06b
+benchmarking...
+time                 1.501 s    (1.296 s .. 1.605 s)
+                     0.998 R²   (0.994 R² .. 1.000 R²)
+mean                 1.519 s    (1.493 s .. 1.542 s)
+std dev              30.85 ms   (17.85 ms .. 37.65 ms)
 variance introduced by outliers: 19% (moderately inflated)
 
 * parsing and formatting times excluded
