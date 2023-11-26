@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 -- |
 -- Module      : AOC.Challenge.Day02
@@ -8,77 +9,52 @@
 -- Portability : non-portable
 --
 -- Day 2.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day02 (
-    day02a
-  , day02b
+    -- day02a
+  -- , day02b
   ) where
 
-import           AOC.Common                (CharParser, pSpace, parseLines)
-import           AOC.Solver                ((:~>)(..))
-import           Control.Monad.Combinators ((<|>))
-import           Data.Monoid               (Sum(..))
+import           AOC.Prelude
 
-data Outcome = Win | Draw | Lose deriving (Eq, Ord, Show)
+import qualified Data.Graph.Inductive           as G
+import qualified Data.IntMap                    as IM
+import qualified Data.IntSet                    as IS
+import qualified Data.List.NonEmpty             as NE
+import qualified Data.List.PointedList          as PL
+import qualified Data.List.PointedList.Circular as PLC
+import qualified Data.Map                       as M
+import qualified Data.OrdPSQ                    as PSQ
+import qualified Data.Sequence                  as Seq
+import qualified Data.Set                       as S
+import qualified Data.Text                      as T
+import qualified Data.Vector                    as V
+import qualified Linear                         as L
+import qualified Text.Megaparsec                as P
+import qualified Text.Megaparsec.Char           as P
+import qualified Text.Megaparsec.Char.Lexer     as PP
 
-data RPS = Rock | Paper | Scissors deriving (Eq, Show)
-
-plays :: RPS -> RPS -> Outcome
-Paper    `plays` Rock     = Win
-Rock     `plays` Scissors = Win
-Scissors `plays` Paper    = Win
-a        `plays` b
-  | a == b = Draw
-  | otherwise = Lose
-
-whatToPlay :: RPS -> Outcome -> RPS
-whatToPlay a        Draw = a
-whatToPlay Paper    Win  = Scissors
-whatToPlay Rock     Win  = Paper
-whatToPlay Scissors Win  = Rock
-whatToPlay Paper    Lose = Rock
-whatToPlay Rock     Lose = Scissors
-whatToPlay Scissors Lose = Paper
-
-score :: RPS -> Outcome -> Sum Int
-score you out = Sum $ scoreRPS you + scoreOutcome out
-    where
-        scoreRPS :: RPS -> Int
-        scoreRPS = \case
-            Rock     -> 1
-            Paper    -> 2
-            Scissors -> 3
-
-        scoreOutcome :: Outcome -> Int
-        scoreOutcome = \case
-            Win  -> 6
-            Draw -> 3
-            Lose -> 0
-
-day02a :: [(RPS, RPS)] :~> Int
+day02a :: _ :~> _
 day02a = MkSol
-    { sParse = parseLines parseGame
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . getSum . foldMap (\(opp, you) -> score you (you `plays` opp))
+    , sSolve = Just
     }
 
-day02b :: [(RPS, Outcome)] :~> Int
+day02b :: _ :~> _
 day02b = MkSol
-    { sParse = parseLines parseStrategy
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . getSum . foldMap (\(opp, out) -> score (whatToPlay opp out) out)
+    , sSolve = Just
     }
-
-parseGame :: CharParser (RPS, RPS)
-parseGame = do
-    opp <- Rock <$ "A" <|> Paper <$ "B" <|> Scissors <$ "C"
-    pSpace
-    you <- Rock <$ "X" <|> Paper <$ "Y" <|> Scissors <$ "Z"
-    return (opp, you)
-
-parseStrategy :: CharParser (RPS, Outcome)
-parseStrategy = do
-    opp <- Rock <$ "A" <|> Paper <$ "B" <|> Scissors <$ "C"
-    pSpace
-    out <- Lose <$ "X" <|> Draw <$ "Y" <|> Win <$ "Z"
-    return (opp, out)

@@ -1,8 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-{-# LANGUAGE OverloadedStrings #-}
-
 -- |
 -- Module      : AOC.Challenge.Day09
 -- License     : BSD3
@@ -24,13 +22,11 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day09 (
-    day09a
-  , day09b
+    -- day09a
+  -- , day09b
   ) where
 
 import           AOC.Prelude
-import Control.Lens
-import Linear.V2
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
@@ -49,33 +45,16 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
-data Move = Move Dir Int deriving (Eq, Show)
-
-moveToInstructions :: [Move] -> [Dir]
-moveToInstructions = concatMap (\(Move d n) -> replicate n d)
-
-parseMove = Move <$> pTok pDir <*> pDecimal
-    where
-        pDir = North <$ "D" <|> East <$ "R" <|> South <$ "U" <|> West <$ "L"
-
-step :: ([Point], _) -> Dir -> ([Point], _)
-step (rope,seen) (dirVec->d) = (rope',seen')
-    where
-        next = first Just . dupe
-        slideRope Nothing r = next $ r+d
-        slideRope (Just r') r = next $ if any (>1) (abs (r'-r)) then r + (signum <$> r' - r) else r
-        (Just last, rope') = mapAccumL slideRope Nothing rope
-        seen' = S.insert last seen
-
-day09 :: Int -> _ :~> _
-day09 knots = MkSol
-    { sParse = parseLines parseMove
+day09a :: _ :~> _
+day09a = MkSol
+    { sParse = Just
     , sShow  = show
-    , sSolve = fmap S.size . preview _2 . foldl' step (replicate knots 0, S.singleton 0) . moveToInstructions
+    , sSolve = Just
     }
 
-day09a :: _ :~> _
-day09a = day09 2
-
 day09b :: _ :~> _
-day09b = day09 10
+day09b = MkSol
+    { sParse = Just
+    , sShow  = show
+    , sSolve = Just
+    }

@@ -22,13 +22,11 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day13 (
-    day13a
-  , day13b
+    -- day13a
+  -- , day13b
   ) where
 
 import           AOC.Prelude
-
-import Control.Lens
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
@@ -47,48 +45,16 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
-data Packet = Packet [Packet] | Number Int deriving (Eq)
-
-instance Show Packet where
-    show (Number n) = show n
-    show (Packet ps) = show ps
-
-instance Ord Packet where
-    compare (Number a) (Number b) = compare a b
-    compare (Packet a) (Packet b) = compare a b
-    compare (Number a) b = compare (Packet [Number a]) b
-    compare a (Number b) = compare a (Packet [Number b])
-
--- ^ Parsing
-
-parsePacket, parseNumber, parseSignal :: CharParser Packet
-parsePacket = P.between (P.char '[') (P.char ']') $ (Packet <$> (parseSignal `P.sepBy` P.char ','))
-parseNumber = Number <$> pDecimal
-parseSignal = parseNumber <|> parsePacket
-
-parsePair :: CharParser (Packet, Packet)
-parsePair = (,) <$> (parseSignal <* P.newline) <*> (parseSignal <* (optional P.newline))
-
-correctOrder = uncurry (<)
-
-dividers :: [Packet]
-dividers =
-    [ Packet [Packet [Number 2]]
-    , Packet [Packet [Number 6]]
-    ]
-
-findDividers ps = traverse (\d -> succ <$> findIndex (==d) ps) dividers
-
 day13a :: _ :~> _
 day13a = MkSol
-    { sParse = parseMaybeLenient (parsePair `P.sepBy` P.newline)
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . sum . map fst . filter (correctOrder . snd) . zip [1..]
+    , sSolve = Just
     }
 
 day13b :: _ :~> _
 day13b = MkSol
-    { sParse = parseMaybeLenient (parsePair `P.sepBy` P.newline)
+    { sParse = Just
     , sShow  = show
-    , sSolve = fmap product . findDividers . sort . (dividers ++) . concatMap (toListOf each)
+    , sSolve = Just
     }

@@ -38,7 +38,7 @@ packages:
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
 extra-deps:
-- advent-of-code-api-0.2.7.0
+- advent-of-code-api-0.2.8.4
 - advent-of-code-ocr-0.1.2.0@sha256:86d2d6ea54072283dfb11ee0d1cc69db36da17578d85bc23d5a6cf8f57328256
 - barbies-2.0.2.0@sha256:fa6656b45c40f7d4ab1764d078c6878f37d37fab7f7135c061e9a5baa67943c0
 - astar-0.3.0.0@sha256:8bf6350542e9db9451490e8993560ee843dc48a61d46a206985430f9b62461c8

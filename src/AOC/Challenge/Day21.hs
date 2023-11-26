@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveDataTypeable, OverloadedStrings, TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 -- |
 -- Module      : AOC.Challenge.Day21
@@ -6,101 +7,54 @@
 --
 -- Stability   : experimental
 -- Portability : non-portable
+--
+-- Day 21.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day21 (
-    day21a
-  , day21b
+    -- day21a
+  -- , day21b
   ) where
 
-import           AOC.Solver                     ((:~>)(..))
-import           AOC.Common                     (CharParser, pDecimal, pTok, parseLines)
-import           Control.Lens                   (rewrite, (%~), (.~), Plated(..), ix, (&))
-import           Data.Data
-import           Data.Char                      (isLetter)
-import           Data.Map                       (Map)
-import           Control.Applicative            ((<|>), empty)
-import           Data.Data.Lens                 (uniplate)
-import           Data.Functor.Foldable          (ana)
-import           Data.Functor.Foldable.TH       (makeBaseFunctor)
+import           AOC.Prelude
 
+import qualified Data.Graph.Inductive           as G
+import qualified Data.IntMap                    as IM
+import qualified Data.IntSet                    as IS
+import qualified Data.List.NonEmpty             as NE
+import qualified Data.List.PointedList          as PL
+import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
+import qualified Data.OrdPSQ                    as PSQ
+import qualified Data.Sequence                  as Seq
+import qualified Data.Set                       as S
+import qualified Data.Text                      as T
+import qualified Data.Vector                    as V
+import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
+import qualified Text.Megaparsec.Char           as P
+import qualified Text.Megaparsec.Char.Lexer     as PP
 
-type Name = String
-
-data MonkeyBusiness
-    = Yell Double
-    | MonkeyBusiness :+: MonkeyBusiness
-    | MonkeyBusiness :-: MonkeyBusiness
-    | MonkeyBusiness :*: MonkeyBusiness
-    | MonkeyBusiness :/: MonkeyBusiness
-    | MonkeyBusiness :=: MonkeyBusiness
-    | X
-    deriving (Data)
-
-$(makeBaseFunctor ''MonkeyBusiness)
-
-instance Plated (MonkeyBusiness) where
-  plate = uniplate
-
-parseMonkey :: CharParser (Name, MonkeyBusinessF String)
-parseMonkey = do
-    name <- pName <* pTok ":"
-    mb <- (YellF <$> pDecimal) <|> pOp
-    return (name, mb)
-        where
-            pName = pTok $ P.takeWhileP (Just "name") isLetter
-            pOp = do
-                l <- pName
-                op <- ((:+:$) <$ pTok "+") <|> ((:-:$) <$ pTok "-") <|> ((:*:$) <$ pTok "*") <|> ((:/:$) <$ pTok "/")
-                r <- pName
-                return $ op l r
-
-findX :: MonkeyBusiness -> MonkeyBusiness
-findX = rewrite (\x -> calc x <|> balance x)
-
-balance, calc :: MonkeyBusiness -> Maybe MonkeyBusiness
-balance = \case
-    (l :+: (Yell r)) :=: o -> pure $ l :=: (o :-: (Yell r))
-    (l :-: (Yell r)) :=: o -> pure $ l :=: (o :+: (Yell r))
-    (l :*: (Yell r)) :=: o -> pure $ l :=: (o :/: (Yell r))
-    (l :/: (Yell r)) :=: o -> pure $ l :=: (o :*: (Yell r))
-    ((Yell l) :+: r) :=: o -> pure $ r :=: (o :-: (Yell l))
-    ((Yell l) :*: r) :=: o -> pure $ r :=: (o :/: (Yell l))
-    ((Yell l) :-: r) :=: o -> pure $ r :=: ((Yell l) :-: o)
-    _                      -> empty
-
-calc = \case
-    (Yell l) :+: (Yell r) -> pure $ Yell (l + r)
-    (Yell l) :-: (Yell r) -> pure $ Yell (l - r)
-    (Yell l) :*: (Yell r) -> pure $ Yell (l * r)
-    (Yell l) :/: (Yell r) -> pure $ Yell (l / r)
-    _                     -> empty
-
-getHumanYell :: MonkeyBusiness -> Maybe Int
-getHumanYell = \case
-     X :=: (Yell n) -> Just (round n)
-     (Yell n) :=: X -> Just (round n)
-     _              -> Nothing
-
-getYell :: MonkeyBusiness -> Maybe Int
-getYell = \case
-    (Yell n) -> Just (round n)
-    _        -> Nothing
-
-retranslate :: Map Name (MonkeyBusinessF f) -> Map Name (MonkeyBusinessF f)
-retranslate ms = ms & (ix "humn" .~ XF) & (ix "root" %~ \(l :+:$ r) -> l :=:$ r)
-
-day21a :: Map Name (MonkeyBusinessF String) :~> Int
+day21a :: _ :~> _
 day21a = MkSol
-    { sParse = fmap M.fromList . parseLines parseMonkey
+    { sParse = Just
     , sShow  = show
-    , sSolve = \ms -> getYell . rewrite calc $ ana (ms M.!) "root"
+    , sSolve = Just
     }
 
-day21b :: Map Name (MonkeyBusinessF String) :~> Int
+day21b :: _ :~> _
 day21b = MkSol
-    { sParse = fmap M.fromList . parseLines parseMonkey
+    { sParse = Just
     , sShow  = show
-    , sSolve = \ms -> getHumanYell . findX $ ana ((retranslate ms) M.!) "root"
+    , sSolve = Just
     }

@@ -1,4 +1,6 @@
-{-# LANGUAGE OverloadedStrings, TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 -- |
 -- Module      : AOC.Challenge.Day07
 -- License     : BSD3
@@ -7,65 +9,52 @@
 -- Portability : non-portable
 --
 -- Day 7.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day07 (
-    day07a
-  , day07b
+    -- day07a
+  -- , day07b
   ) where
 
-import           AOC.Solver ((:~>)(..))
-import           AOC.Common (parseMaybeLenient, pTok, pDecimal, pWord, CharParser)
+import           AOC.Prelude
+
+import qualified Data.Graph.Inductive           as G
+import qualified Data.IntMap                    as IM
+import qualified Data.IntSet                    as IS
+import qualified Data.List.NonEmpty             as NE
+import qualified Data.List.PointedList          as PL
+import qualified Data.List.PointedList.Circular as PLC
+import qualified Data.Map                       as M
+import qualified Data.OrdPSQ                    as PSQ
+import qualified Data.Sequence                  as Seq
+import qualified Data.Set                       as S
+import qualified Data.Text                      as T
+import qualified Data.Vector                    as V
+import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
-import qualified Data.Functor.Foldable          as F
-import           Data.Functor.Foldable.TH (makeBaseFunctor)
+import qualified Text.Megaparsec.Char.Lexer     as PP
 
-data Entry = File Int | Dir [Entry] deriving (Eq, Ord, Show)
-
-$(makeBaseFunctor ''Entry)
-
-buildSizes :: EntryF (Int, [Int]) -> (Int, [Int])
-buildSizes (FileF sz) = (sz, [])
-buildSizes (DirF sz) = let (totals, concat->subs) = unzip sz
-                           total = sum totals
-                        in (total, total : subs)
-
-sizeOfEachDirectory :: Entry -> [Int]
-sizeOfEachDirectory = snd . F.cata buildSizes
-
-totalSpace, spaceNeeded :: Int
-totalSpace = 70000000
-spaceNeeded = 30000000
-
-deleteSmallest :: Entry -> Int
-deleteSmallest e = let (total, sizes) = F.cata buildSizes e
-                       needToFree = spaceNeeded - (totalSpace - total)
-                    in minimum . filter (>= needToFree) $ sizes
-
-parseStructure :: CharParser Entry
-parseStructure = do
-    P.try (P.notFollowedBy ("$ cd .." <* P.newline))
-    pTok "$ cd" *> pWord <* P.newline
-    "$ ls" <* P.newline
-    files <- parseFiles
-    dirs <- P.many parseStructure
-    P.optional ("$ cd .." <* P.newline)
-    return $ Dir (files ++ dirs)
-    where
-        parseFiles = P.sepEndBy (P.try (P.skipManyTill parseDir parseFile)) P.newline <* P.skipMany parseDir
-        parseDir = pTok "dir" *> pWord <* P.newline
-        parseFile = File <$> (pTok pDecimal) <* pWord
-
-day07a :: Entry :~> Int
+day07a :: _ :~> _
 day07a = MkSol
-    { sParse = parseMaybeLenient parseStructure
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . sum . filter (<= 100000) . sizeOfEachDirectory
+    , sSolve = Just
     }
 
-day07b :: Entry :~> Int
+day07b :: _ :~> _
 day07b = MkSol
-    { sParse = parseMaybeLenient parseStructure
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . deleteSmallest
+    , sSolve = Just
     }
