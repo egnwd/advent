@@ -66,9 +66,9 @@ standaloneReflectionPath d = "reflections-out" </> printf "day%02d.md" d
 main :: IO ()
 main = shakeArgs opts $ do
     action $ do
-          rd <- S.toList <$> reflectionDays
-          need $ ["README.md", "reflections.md"]
-            ++ map standaloneReflectionPath rd
+      rd <- S.toList <$> reflectionDays
+      need $ ["README.md", "reflections.md"]
+              ++ map standaloneReflectionPath rd
 
     "reflections.md" %> \fp -> do
         days   <- getDays
