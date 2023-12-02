@@ -16,9 +16,10 @@ module AOC.Challenge.Day02 (
 
 
 import AOC.Solver ((:~>)(..))
-import AOC.Common (CharParser, pTok, pDecimal, parseLines)
+import AOC.Common (CharParser, pTok, pDecimal, parseLines, (&&&))
 import Data.Map (Map)
-import Data.Monoid (Sum(..))
+import Data.Maybe (mapMaybe)
+import Control.Monad (guard)
 import Control.Applicative ((<|>))
 import qualified Data.Map                       as M
 import qualified Text.Megaparsec                as P
@@ -26,34 +27,32 @@ import qualified Text.Megaparsec                as P
 data Colour = Red | Blue | Green deriving (Eq, Ord, Show)
 
 data Game = Game { gId :: Int
-                 , gCubeSets :: [[(Colour, Int)]]
+                 , gCubeSets :: Map Colour Int
                  } deriving (Eq, Show)
 
 gameParser :: CharParser Game
-gameParser = Game <$> ("Game " *> pDecimal <* ": ") <*> (setParser `P.sepBy` (pTok ",") `P.sepBy` (pTok ";"))
+gameParser = Game <$> idParser <*> maxSetsParser
     where
-        cubeParser = pTok $ Green <$ "green" <|> Red <$ "red" <|> Blue <$ "blue"
-        setParser = flip (,) <$> pTok pDecimal <*> cubeParser
+        idParser = "Game " *> pDecimal <* ": "
+        cubeParser = Green <$ "green" <|> Red <$ "red" <|> Blue <$ "blue"
+        setParser = (flip (,) <$> pTok pDecimal <*> cubeParser) `P.sepBy` (pTok ",")
+        maxSetsParser = M.unionsWith max <$> (M.fromList <$> setParser) `P.sepBy` (pTok ";")
 
-isPossible :: (Foldable t, Ord a, Ord k) => k -> a -> t (Map k a) -> Bool
-isPossible c n = all (\cs -> M.lookup c cs <= Just n)
+isLegal :: Map Colour Int -> Bool
+isLegal = isPossible Blue 14 &&& isPossible Green 13 &&& isPossible Red 12
+    where
+        isPossible c n cs = M.lookup c cs <= Just n
 
-day02a :: _ :~> _
+day02a :: [Game] :~> Int
 day02a = MkSol
     { sParse = parseLines gameParser
     , sShow  = show
-    , sSolve = Just
-        . getSum
-        . foldMap (Sum . fst)
-        . filter (isPossible Blue 14 . snd)
-        . filter (isPossible Green 13 . snd)
-        . filter (isPossible Red 12 . snd)
-        . map (\(Game i cs) -> (i, map (M.fromListWith (+)) cs))
+    , sSolve = Just . sum . mapMaybe (\(Game i cs) -> i <$ guard (isLegal cs))
     }
 
-day02b :: _ :~> _
+day02b :: [Game] :~> Int
 day02b = MkSol
     { sParse = parseLines gameParser
     , sShow  = show
-    , sSolve = Just . sum . map (product . M.fromListWith max . concat . gCubeSets)
+    , sSolve = Just . sum . map (product . gCubeSets)
     }

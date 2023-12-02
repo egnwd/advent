@@ -12,6 +12,8 @@
 module AOC.Common (
                     (!?)
                   , (-?)
+                  , (&&&)
+                  , (|||)
                   , CharParser
                   , Parser
                   , pSpace
@@ -95,6 +97,14 @@ import qualified Data.Text                  as T
 
 (-?) :: (Applicative f, Num c) => f c -> f c -> f c
 (-?) = liftA2 (-)
+
+(&&&) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(&&&) a b =  \x -> a x && b x
+infixr 3 &&&
+
+(|||) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(|||) a b =  \x -> a x || b x
+infixr 3 |||
 
 type CharParser = P.Parsec Void String
 type Parser = P.Parsec Void T.Text
