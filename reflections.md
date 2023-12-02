@@ -10,6 +10,7 @@ Table of Contents
 -----------------
 
 * [Day 1](#day-1) *(no reflection yet)*
+* [Day 2](#day-2) *(no reflection yet)*
 
 Day 1
 ------
@@ -49,5 +50,42 @@ std dev              110.9 μs   (93.66 μs .. 129.4 μs)
 variance introduced by outliers: 11% (moderately inflated)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 2
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day02.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d02p]* / *[Code][d02g]*
+
+[d02p]: https://adventofcode.com/2023/day/2
+[d02g]: https://github.com/egnwd/advent/blob/2023/src/AOC/Challenge/Day02.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 2 Benchmarks
+
+```
+>> Day 02a
+benchmarking...
+time                 5.608 ms   (5.521 ms .. 5.707 ms)
+                     0.995 R²   (0.990 R² .. 0.998 R²)
+mean                 5.763 ms   (5.675 ms .. 5.858 ms)
+std dev              270.8 μs   (215.4 μs .. 386.3 μs)
+variance introduced by outliers: 24% (moderately inflated)
+
+>> Day 02b
+benchmarking...
+time                 3.647 ms   (3.609 ms .. 3.707 ms)
+                     0.999 R²   (0.997 R² .. 0.999 R²)
+mean                 3.639 ms   (3.617 ms .. 3.667 ms)
+std dev              83.79 μs   (59.65 μs .. 128.6 μs)
 ```
 
