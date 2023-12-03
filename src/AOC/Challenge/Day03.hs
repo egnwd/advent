@@ -22,11 +22,11 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day03 (
-    -- day03a
-  -- , day03b
+    day03a
+  , day03b
   ) where
 
-import           AOC.Prelude
+import           AOC.Prelude hiding (indexed)
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
@@ -44,17 +44,56 @@ import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
+import Control.Lens
+import Control.Lens.Indexed
+import Data.Map.Lens (toMapOf)
+import Linear
+import Control.Arrow ((***))
+
+symbolGetter '.' = Nothing
+symbolGetter a
+ | isNumber a = Nothing
+ | otherwise = Just a
+
+parseNumberMap :: String -> (Map Point Char, Map Int ([Point], Int))
+parseNumberMap s = (symbolMap, result)
+    where
+        result = go s
+        symbolMap = parseAsciiMap symbolGetter s
+        go =
+             (\(_, _, mp) -> mp)
+           . foldl wizz (0, S.empty, M.empty)
+           . concat
+           . map (filter (isNumber . snd))
+           . zipWith (\y -> zipWith (\x -> (,) (V2 x y)) [0..]) [0..]
+           . lines
+        wizz :: (Int, Set Point, Map Int ([Point], Int)) -> (Point, Char) -> (Int, Set Point, Map Int ([Point], Int))
+        wizz (i, seen, mp) (V2 x y, a) = if S.member (V2 (x-1) y) seen
+                                            then (i, S.insert (V2 x y) seen, M.adjust (\(points, n) -> ((V2 x y) : points, n * 10 + digitToInt a)) i mp)
+                                            else (i+1, S.singleton (V2 x y), M.insert (i+1) ([V2 x y], digitToInt a) mp)
 
 day03a :: _ :~> _
 day03a = MkSol
-    { sParse = Just
+    { sParse = Just . parseNumberMap
     , sShow  = show
-    , sSolve = Just
+    , sSolve = uncurry $ \symbolMap ->
+          Just
+        . sum
+        . map snd
+        . filter (not . M.null . nearSymbols (const True) symbolMap . fst)
+        . M.elems
     }
+
+nearSymbols :: (Char -> Bool) -> Map Point Char -> [Point] -> Map Point Char
+nearSymbols p symbols = M.restrictKeys (M.filter p symbols) . S.unions . map allNeighboursSet
 
 day03b :: _ :~> _
 day03b = MkSol
-    { sParse = Just
+    { sParse = sParse day03a
     , sShow  = show
-    , sSolve = Just
+    , sSolve = uncurry $ \symbolMap ->
+          Just
+        . M.foldr (\(_, gear) -> (+ gear)) 0
+        . M.filter ((== 2) . fst)
+        . M.foldl (\mp (k,a) -> foldl (flip $ M.alter (Just . maybe (1, a) (succ *** (* a)))) mp . M.keys . nearSymbols (== '*') symbolMap $ k) M.empty
     }
