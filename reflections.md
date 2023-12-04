@@ -12,6 +12,7 @@ Table of Contents
 * [Day 1](#day-1) *(no reflection yet)*
 * [Day 2](#day-2) *(no reflection yet)*
 * [Day 3](#day-3) *(no reflection yet)*
+* [Day 4](#day-4) *(no reflection yet)*
 
 Day 1
 ------
@@ -127,6 +128,46 @@ time                 6.537 ms   (6.433 ms .. 6.668 ms)
 mean                 6.217 ms   (6.155 ms .. 6.352 ms)
 std dev              239.4 μs   (195.2 μs .. 323.9 μs)
 variance introduced by outliers: 18% (moderately inflated)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 4
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day04.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d04p]* / *[Code][d04g]*
+
+[d04p]: https://adventofcode.com/2023/day/4
+[d04g]: https://github.com/egnwd/advent/blob/2023/src/AOC/Challenge/Day04.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 4 Benchmarks
+
+```
+>> Day 04a
+benchmarking...
+time                 11.48 μs   (11.44 μs .. 11.52 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 11.49 μs   (11.45 μs .. 11.53 μs)
+std dev              149.1 ns   (123.7 ns .. 196.0 ns)
+
+* parsing and formatting times excluded
+
+>> Day 04b
+benchmarking...
+time                 226.0 μs   (224.2 μs .. 227.7 μs)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 224.5 μs   (223.6 μs .. 225.4 μs)
+std dev              3.387 μs   (2.837 μs .. 4.522 μs)
 
 * parsing and formatting times excluded
 ```

@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day04
@@ -9,52 +8,55 @@
 -- Portability : non-portable
 --
 -- Day 4.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day04 (
-    -- day04a
-  -- , day04b
+    day04a
+  , day04b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver ((:~>)(..))
+import           AOC.Common (parseLines, pTok, pDecimal, CharParser)
+import           Data.IntMap (IntMap)
+import           Data.IntSet (IntSet)
 
-import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
 import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
 
-day04a :: _ :~> _
+type Card = IntSet
+type Scratchcard = IntSet
+
+parseCard :: CharParser (Int, (Card, Scratchcard))
+parseCard = (,) <$> cId <*> ((,) <$> cNums <*> mine)
+    where
+        cId = pTok "Card" *> pDecimal <* pTok ":"
+        cNums = IS.fromList <$> P.many (pTok pDecimal)
+        mine = IS.fromList <$> (pTok "|" *> P.many (pTok pDecimal))
+
+getPoints :: Int -> Int
+getPoints 0 = 0
+getPoints n = round $ 2 ^^ (n-1)
+
+getMatches :: (Card, Scratchcard) -> Int
+getMatches = IS.size . uncurry IS.intersection
+
+run :: IntMap (Card, Scratchcard) -> IntMap Int
+run cs0 = IM.foldlWithKey go startingCopies cs0
+    where
+        startingCopies = IM.map (const 1) cs0
+        go cs cId cnm = let p = getMatches cnm
+                         in foldr (IM.adjust (+ (cs IM.! cId))) cs [cId+1..cId+p]
+
+day04a :: [(Int, (Card, Scratchcard))] :~> _
 day04a = MkSol
-    { sParse = Just
+    { sParse = parseLines parseCard
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . map (getPoints . getMatches . snd)
     }
 
-day04b :: _ :~> _
+day04b :: IntMap (Card, Scratchcard) :~> _
 day04b = MkSol
-    { sParse = Just
+    { sParse = fmap IM.fromList . parseLines parseCard
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . run
     }
