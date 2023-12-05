@@ -35,7 +35,7 @@ parseCard = (,) <$> cId <*> ((,) <$> cNums <*> mine)
 
 getPoints :: Int -> Int
 getPoints 0 = 0
-getPoints n = round $ 2 ^^ (n-1)
+getPoints n = 2 ^ (n-1)
 
 getMatches :: (Card, Scratchcard) -> Int
 getMatches = IS.size . uncurry IS.intersection

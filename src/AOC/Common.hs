@@ -52,6 +52,8 @@ module AOC.Common (
                   , indexed
                   , indexed'
                   , dupe
+                  , listTup
+                  , listTup3
                   , module AOC
                   ) where
 
@@ -307,3 +309,11 @@ indexed' = fmap snd . indexed
 
 dupe :: a -> (a,a)
 dupe x = (x,x)
+
+listTup :: [a] -> Maybe (a,a)
+listTup [x,y] = pure (x,y)
+listTup _ = Nothing
+
+listTup3 :: [a] -> Maybe (a,a,a)
+listTup3 [x,y,z] = pure (x,y,z)
+listTup3 _ = Nothing
