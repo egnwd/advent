@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day06 (
-    -- day06a
-  -- , day06b
+    day06a
+  , day06b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +45,24 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+binarySearch :: Int -> Int -> (Int -> Bool) -> Int
+binarySearch lo hi p
+    | lo == hi = lo
+    | p mid = binarySearch lo mid p
+    | otherwise = binarySearch (mid+1) hi p
+  where
+      mid = (lo + hi) `div` 2
+
 day06a :: _ :~> _
 day06a = MkSol
-    { sParse = Just
+    { sParse = fmap (uncurry zip) . listTup <=< traverse (traverse (readMaybe @ Int) . drop 1 . words) .  lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . product . map (\(n, lo) -> n - (lo*2)) .  map (\(t,mx) -> (t+1, binarySearch 0 t (\p -> p*(t-p) > mx)))
     }
 
 day06b :: _ :~> _
 day06b = MkSol
-    { sParse = Just
+    { sParse = listTup <=< traverse (readMaybe @ Int . filter (' ' /=) . unwords . drop 1 . words) .  lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \(t,mx) -> Just $ (t+1) - (2 * binarySearch 0 t (\p -> p*(t-p) > mx))
     }
