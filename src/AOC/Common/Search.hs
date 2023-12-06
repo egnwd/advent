@@ -6,6 +6,7 @@ module AOC.Common.Search
   , beamAStar'
   , floydWarshall
   , bfs
+  , binarySearch
   ) where
 
 import           Control.Lens hiding (Empty)
@@ -200,3 +201,12 @@ bfs ex x0 dest = reconstruct <$> go (addBack x0 Nothing (BS M.empty Seq.empty))
     processNeighbor curr bs0@BS{..} neighb
       | neighb `M.member` _bsClosed = bs0
       | otherwise                   = addBack neighb (Just curr) bs0
+
+binarySearch :: Integral a => a -> a -> (a -> Bool) -> a
+binarySearch lo hi p
+    | lo == hi = lo
+    | p mid = binarySearch lo mid p
+    | otherwise = binarySearch (mid+1) hi p
+  where
+      mid = (lo + hi) `div` 2
+
