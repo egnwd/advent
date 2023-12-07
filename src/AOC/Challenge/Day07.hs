@@ -47,10 +47,13 @@ import qualified Text.Megaparsec.Char.Lexer     as PP
 
 data Hands = FiveOf | FourOf | FullHouse | ThreeOf | TwoPair | Pair | HighCard deriving (Eq, Ord, Show)
 
-data Label = A | K | Q | T | N9 | N8 | N7 | N6 | N5 | N4 | N3 | N2 | J deriving (Ord, Eq)
+data Card = A | K | Q | J | T | N9 | N8 | N7 | N6 | N5 | N4 | N3 | N2 | Joker deriving (Ord, Eq, Show)
 
-readLabel :: Char -> Label
-readLabel = \case
+instance Read Card where
+    readsPrec _ = map ((, "") . readCard)
+
+readCard :: Char -> Card
+readCard = \case
     'A' -> A
     'K' -> K
     'Q' -> Q
@@ -65,70 +68,46 @@ readLabel = \case
     '3' -> N3
     '2' -> N2
 
-compares :: [a -> a -> Ordering] -> a -> a -> Ordering
 compares cs x y = mconcat $ map (\c -> c x y) cs
 
-lookupInFreq = IM.lookup
-
-hand :: [Char] -> Hands
+hand :: [Card] -> Hands
 hand (revFreq->cs)
-  | isJust . lookupInFreq 5 $ cs = FiveOf
-  | isJust . lookupInFreq 4 $ cs = FourOf
-  | (isJust . lookupInFreq 2 $ cs) && (isJust . lookupInFreq 3 $ cs) = FullHouse
-  | (isJust . lookupInFreq 3 $ cs) = ThreeOf
-  | maybe False ((== 2) . S.size) . lookupInFreq 2 $ cs = TwoPair
-  | isJust . lookupInFreq 2 $ cs = Pair
+  | isJust . IM.lookup 5 $ cs = FiveOf
+  | isJust . IM.lookup 4 $ cs = FourOf
+  | (isJust . IM.lookup 2 $ cs) && (isJust . IM.lookup 3 $ cs) = FullHouse
+  | (isJust . IM.lookup 3 $ cs) = ThreeOf
+  | maybe False ((== 2) . S.size) . IM.lookup 2 $ cs = TwoPair
+  | isJust . IM.lookup 2 $ cs = Pair
   | otherwise = HighCard
 
-jokerHand :: [Char] -> Hands
-jokerHand cs = flip upgrade (freqs cs) . jokerHand' $ revFreq (filter (/='J') cs)
+jokerHand :: [Card] -> Hands
+jokerHand cs = jokerHand' total
     where
+        cards = filter (/= Joker) cs
+        nJokers = countTrue (==Joker) cs
+        total = case IM.maxViewWithKey (revFreq cards) of
+             Just ((i, mx), rest) -> let (mxc, restc) = S.deleteFindMin mx
+                                      in IM.insert (i+nJokers) (S.singleton mxc)
+                                         . maybe rest (\s -> IM.insert i s rest)
+                                         . S.nonEmptySet
+                                         $ restc
+             Nothing -> IM.singleton nJokers (S.singleton Joker)
+
         jokerHand' cs
-          | isJust . lookupInFreq 5 $ cs = FiveOf
-          | isJust . lookupInFreq 4 $ cs = FourOf
-          | (isJust . lookupInFreq 2 $ cs) && (isJust . lookupInFreq 3 $ cs) = FullHouse
-          | (isJust . lookupInFreq 3 $ cs) = ThreeOf
-          | maybe False ((== 2) . S.size) . lookupInFreq 2 $ cs = TwoPair
-          | isJust . lookupInFreq 2 $ cs = Pair
+          | isJust . IM.lookup 5 $ cs = FiveOf
+          | isJust . IM.lookup 4 $ cs = FourOf
+          | (isJust . IM.lookup 2 $ cs) && (isJust . IM.lookup 3 $ cs) = FullHouse
+          | (isJust . IM.lookup 3 $ cs) = ThreeOf
+          | maybe False ((== 2) . S.size) . IM.lookup 2 $ cs = TwoPair
+          | isJust . IM.lookup 2 $ cs = Pair
           | otherwise = HighCard
 
-        upgrade FiveOf rs = FiveOf
-        upgrade FourOf rs
-          | lookupFreq 'J' rs == 1 = FiveOf
-          | otherwise = FourOf
-        upgrade FullHouse rs = FullHouse
-        upgrade ThreeOf rs
-          | lookupFreq 'J' rs == 1 = FourOf
-          | lookupFreq 'J' rs == 2 = FiveOf
-          | otherwise = ThreeOf
-        upgrade TwoPair rs
-          | lookupFreq 'J' rs == 1 = FullHouse
-          | otherwise = TwoPair
-        upgrade Pair rs
-          | lookupFreq 'J' rs == 1 = ThreeOf
-          | lookupFreq 'J' rs == 2 = FourOf
-          | lookupFreq 'J' rs == 3 = FiveOf
-          | otherwise = Pair
-        upgrade HighCard rs
-          | lookupFreq 'J' rs == 1 = Pair
-          | lookupFreq 'J' rs == 2 = ThreeOf
-          | lookupFreq 'J' rs == 3 = FourOf
-          | lookupFreq 'J' rs >= 4 = FiveOf
-          | otherwise = HighCard
+-- rank :: [([Char], Int)] -> [([Char], Int)]
+rank = sortBy $ flip $ compares [comparing (jokerHand . fst), comparing fst]
 
-
-highCard :: [Char] -> [Label]
-highCard = map readLabel
-
-rank :: [([Char], Int)] -> [([Char], Int)]
-rank xs = sortBy (flip $ compares [comparing (hand . fst), comparing (highCard . fst)]) xs
-
-jokerRank :: [([Char], Int)] -> [([Char], Int)]
-jokerRank xs = sortBy (flip $ compares [comparing (jokerHand . fst), comparing (highCard . fst)]) xs
-
-day07a :: _ :~> _
+day07a :: [([Card], Int)] :~> _
 day07a = MkSol
-    { sParse = traverse ((sequence . second (readMaybe @ Int)) <=< listTup . words) . lines
+    { sParse = traverse (sequence . (bimap (map readCard) (readMaybe @ Int)) <=< listTup . words) . lines
     , sShow  = show
     , sSolve = Just . sum . zipWith (\i (_, b) -> i * b) [1..] . rank
     }
@@ -137,5 +116,9 @@ day07b :: _ :~> _
 day07b = MkSol
     { sParse = sParse day07a
     , sShow  = show
-    , sSolve = Just . sum . zipWith (\i (_, b) -> i * b) [1..] . jokerRank
+    , sSolve = Just -- . rank . map (first (map toJoker))
+                 . sum . zipWith (\i (_, b) -> i * b) [1..] . rank . map (first (map toJoker))
     }
+
+toJoker J = Joker
+toJoker a = a
