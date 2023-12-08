@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
+{-# LANGUAGE OverloadedStrings #-}
+
 -- |
 -- Module      : AOC.Challenge.Day08
 -- License     : BSD3
@@ -22,8 +24,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day08 (
-    -- day08a
-  -- , day08b
+    day08a
+  , day08b
   ) where
 
 import           AOC.Prelude
@@ -44,17 +46,41 @@ import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
+import Control.Lens
+
+mapParser :: CharParser (String, (String, String))
+mapParser = do
+    label <- (P.many P.alphaNumChar) <* " = "
+    opts <- (,) <$> ("(" *> (P.many P.alphaNumChar) <* ", ") <*> ((P.many P.alphaNumChar) <* ")")
+    return (label, opts)
+
+run is0 mp = loopEither go ("AAA", 1, cycle is0)
+    where
+        go (l, n, (i:is)) = let side = if i == 'L' then _1 else _2
+                             in case (mp M.! l) ^. side of
+                                  "ZZZ" -> Left n
+                                  l' -> Right (l', n+1, is)
+
+run2 is0 mp = foldr' lcm 1 . map (\a -> loopEither go (a, 1, cycle is0)) $ as
+    where
+        as = M.keys . M.filterWithKey (\k _ -> "A" `isSuffixOf` k) $ mp
+        zs = M.keysSet . M.filterWithKey (\k _ -> "Z" `isSuffixOf` k) $ mp
+        go (l, n, (i:is)) = let side = if i == 'L' then _1 else _2
+                                l' = (mp M.! l) ^. side
+                             in if l' `S.member` zs
+                                  then Left n
+                                  else Right (l', n+1, is)
 
 day08a :: _ :~> _
 day08a = MkSol
-    { sParse = Just
+    { sParse = sequence . second (fmap M.fromList . parseLines mapParser) <=< listTup . splitOn "\n\n"
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . uncurry run
     }
 
 day08b :: _ :~> _
 day08b = MkSol
-    { sParse = Just
+    { sParse = sParse day08a
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . uncurry run2
     }
