@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day09
 -- License     : BSD3
@@ -9,52 +6,35 @@
 -- Portability : non-portable
 --
 -- Day 9.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day09 (
-    -- day09a
-  -- , day09b
+    day09a
+  , day09b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver ((:~>)(..))
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
+import           Text.Read (readMaybe)
+import           Data.Vector.Unboxed (Vector)
+import           Data.List.NonEmpty (NonEmpty)
 import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+import qualified Data.Vector.Unboxed            as V
 
-day09a :: _ :~> _
-day09a = MkSol
-    { sParse = Just
+extrapolate :: (b -> b -> b) -> (Vector Int -> b) -> Vector Int -> Maybe b
+extrapolate combine choose = fmap (foldr1 combine . fmap choose) . findDifferences
+    where
+        findDifferences :: Vector Int -> Maybe (NonEmpty (Vector Int))
+        findDifferences = NE.nonEmpty . takeWhile (not . V.all (==0)) . iterate (V.zipWith subtract <$> id <*> V.tail)
+
+day09 :: (Int -> Int -> Int) -> (Vector Int -> Int) -> [Vector Int] :~> Int
+day09 combine choose = MkSol
+    { sParse = fmap (map V.fromList) . traverse (traverse readMaybe . words) . lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap sum . traverse (extrapolate combine choose)
     }
 
-day09b :: _ :~> _
-day09b = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
-    }
+day09a :: [Vector Int] :~> Int
+day09a = day09 (+) V.last
+
+day09b :: [Vector Int] :~> Int
+day09b = day09 (-) V.head
