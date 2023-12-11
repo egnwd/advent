@@ -118,7 +118,7 @@ doubleSize mp pipe = fillGaps . M.mapKeysMonotonic (*2) . M.restrictKeys mp $ pi
                 go (k, SE) = M.insert (k+V2 0 (-1)) V . M.insert (k+V2 (-1) 0) H
                 go (k, NE) = M.insert (k+V2 0 1) V . M.insert (k+V2 (-1) 0) H
                 go (k, NW) = M.insert (k+V2 0 1) V . M.insert (k+V2 1 0) H
-                go (k, Animal) = id
+                go (_, Animal) = id
 
 day10a :: _ :~> _
 day10a = MkSol
@@ -132,5 +132,4 @@ day10b = MkSol
     { sParse = sParse day10a
     , sShow  = show
     , sSolve = \mp -> Just . (\mp' -> sum . map (S.size . NES.filter (all even)) . filter (not . containsEdge mp') . toList . contiguousRegions . snd . run2 $ mp') . doubleSize mp . snd . run $ mp
-    -- map (NES.size) . filter (not . containsEdge mp) . toList . contiguousRegions . snd . run2 mp . snd . run $ mp
     }
