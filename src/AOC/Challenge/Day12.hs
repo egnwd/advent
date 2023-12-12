@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day12 (
-    -- day12a
-  -- , day12b
+    day12a
+  , day12b
   ) where
 
 import           AOC.Prelude
@@ -44,17 +44,39 @@ import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
+import qualified Control.Monad.Memo as MM
+import Control.Lens ((%=), use, uses, ix, at)
+
+solve xs0 ns0 = MM.startEvalMemoT $ go (xs0, ns0)
+    where
+        go :: (String, [Int]) -> MM.MemoT (String,[Int]) Int Sum Int
+        go (xs, []) = if (all (`S.member` S.fromList "?.") xs) then return 1 else lift mempty
+        go ([], a) = lift mempty
+        go (xs, (n:ns)) = do
+            case take n xs of
+              '.':_ -> do
+                  MM.memo go ((tail xs), (n:ns))
+              '#':xs' -> do
+                  if (length xs' == (n-1) && all (`S.member` S.fromList "?#") xs' && all (`S.member` S.fromList "?.") (take 1 . drop n $ xs))
+                     then MM.memo go ((drop (n+1) xs), ns)
+                     else lift mempty
+              '?':_ -> sum <$> traverse (\p -> go (p:tail xs, n:ns)) ".#"
+
+inflate xs ns = (xs', ns')
+    where
+        xs' = intercalate "?" (replicate 5 xs)
+        ns' = concat $ replicate 5 ns
 
 day12a :: _ :~> _
 day12a = MkSol
-    { sParse = Just
+    { sParse = traverse (sequence . (second (traverse (readMaybe @ Int) . splitOn ",")) <=< listTup . words) . lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . map (uncurry solve)
     }
 
 day12b :: _ :~> _
 day12b = MkSol
-    { sParse = Just
+    { sParse = sParse day12a
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . getSum . sum . map (uncurry solve) . map (uncurry inflate)
     }

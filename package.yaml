@@ -103,6 +103,7 @@ library:
   - lens
   - linear
   - matrix
+  - monad-memo
   - megaparsec
   - microlens-th
   - mtl
