@@ -79,7 +79,7 @@ library:
   - barbies
   - bytestring
   - conduino
-  - containers
+  - containers >= 0.7
   - comonad
   - criterion
   - cryptohash-md5
