@@ -31,6 +31,7 @@ module AOC.Common.Point
   , Dir(..)
   , dirVec
   , setEdge
+  , getEdge
   , allDir
   , allDirSet
   -- * 3D Points
