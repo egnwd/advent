@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day15 (
-    -- day15a
-  -- , day15b
+    day15a
+  , day15b
   ) where
 
 import           AOC.Prelude
@@ -43,18 +43,49 @@ import qualified Data.Vector                    as V
 import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+import qualified Data.ByteString as B
+import Data.String (fromString)
 
-day15a :: _ :~> _
+type Label = String
+type Focus = Int
+data Instr = Remove Label | Insert Label Focus deriving (Eq, Ord, Show)
+
+parseInstrs :: CharParser [Instr]
+parseInstrs = parseInstr `P.sepBy` (P.char ',')
+    where
+        parseInstr :: CharParser Instr
+        parseInstr = do
+            l <- P.takeWhileP Nothing isLower
+            op <- (Remove <$ P.char '-') <|> (flip Insert <$> ((P.char '=') *> pDecimal))
+            return $ op l
+
+initialize = foldl' go M.empty
+    where
+        go bxs (Remove l) = let h = reindeerHash (fromString l)
+                             in M.alter (fmap $ filter ((/= l) .fst)) h bxs
+        go bxs (Insert l f) = let h = reindeerHash (fromString l)
+                               in M.insertWith placeLens h [(l, f)] bxs
+
+        placeLens [(l,f)] lns = let (placed, lns') = mapAccumL (\p (l',f') -> if l == l' then (True, (l, f)) else (p, (l',f'))) False lns
+                                 in if placed then lns' else lns ++ [(l,f)]
+        placeLens _ lns = lns
+
+focalPower (fromIntegral->bx) = fold . zipWith (\n (_,f) -> Sum (n*f*(bx+1))) [1..]
+
+reindeerHash = B.foldl' go 0
+    where
+        go h c = (h + c) * 17
+
+day15a :: [B.ByteString] :~> Int
 day15a = MkSol
-    { sParse = Just
+    { sParse = Just . map fromString . splitOn ","
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . map (fromIntegral . reindeerHash)
     }
 
-day15b :: _ :~> _
+day15b :: [Instr] :~> _
 day15b = MkSol
-    { sParse = Just
+    { sParse = parseMaybeLenient parseInstrs
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . getSum . M.foldMapWithKey focalPower . initialize
     }
