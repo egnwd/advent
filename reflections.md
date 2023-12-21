@@ -18,6 +18,9 @@ Table of Contents
 * [Day 8](#day-8) *(no reflection yet)*
 * [Day 9](#day-9) *(no reflection yet)*
 * [Day 11](#day-11) *(no reflection yet)*
+* [Day 13](#day-13) *(no reflection yet)*
+* [Day 14](#day-14) *(no reflection yet)*
+* [Day 15](#day-15) *(no reflection yet)*
 * [Day 16](#day-16) *(no reflection yet)*
 
 Day 1
@@ -382,6 +385,123 @@ mean                 1.462 ms   (1.458 ms .. 1.467 ms)
 std dev              15.26 μs   (12.99 μs .. 20.60 μs)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 13
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day13.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d13p]* / *[Code][d13g]*
+
+[d13p]: https://adventofcode.com/2023/day/13
+[d13g]: https://github.com/egnwd/advent/blob/2023/src/AOC/Challenge/Day13.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 13 Benchmarks
+
+```
+>> Day 13a
+benchmarking...
+time                 7.260 ms   (7.205 ms .. 7.322 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 7.231 ms   (7.216 ms .. 7.262 ms)
+std dev              63.11 μs   (45.24 μs .. 97.67 μs)
+
+* parsing and formatting times excluded
+
+>> Day 13b
+benchmarking...
+time                 8.396 ms   (7.839 ms .. 8.902 ms)
+                     0.981 R²   (0.968 R² .. 0.997 R²)
+mean                 7.851 ms   (7.733 ms .. 8.080 ms)
+std dev              484.4 μs   (277.5 μs .. 757.2 μs)
+variance introduced by outliers: 34% (moderately inflated)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 14
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day14.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d14p]* / *[Code][d14g]*
+
+[d14p]: https://adventofcode.com/2023/day/14
+[d14g]: https://github.com/egnwd/advent/blob/2023/src/AOC/Challenge/Day14.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 14 Benchmarks
+
+```
+>> Day 14a
+benchmarking...
+time                 32.97 ms   (31.89 ms .. 34.24 ms)
+                     0.996 R²   (0.994 R² .. 0.998 R²)
+mean                 29.45 ms   (28.69 ms .. 30.47 ms)
+std dev              2.058 ms   (1.753 ms .. 2.508 ms)
+variance introduced by outliers: 28% (moderately inflated)
+
+>> Day 14b
+benchmarking...
+time                 4.043 s    (4.003 s .. 4.116 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 4.036 s    (4.025 s .. 4.043 s)
+std dev              10.31 ms   (4.598 ms .. 13.39 ms)
+variance introduced by outliers: 19% (moderately inflated)
+```
+
+
+
+Day 15
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day15.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d15p]* / *[Code][d15g]*
+
+[d15p]: https://adventofcode.com/2023/day/15
+[d15g]: https://github.com/egnwd/advent/blob/2023/src/AOC/Challenge/Day15.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 15 Benchmarks
+
+```
+>> Day 15a
+benchmarking...
+time                 66.56 μs   (66.30 μs .. 66.83 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 66.60 μs   (66.35 μs .. 67.01 μs)
+std dev              1.015 μs   (716.1 ns .. 1.388 μs)
+
+* parsing and formatting times excluded
+
+>> Day 15b
+benchmarking...
+time                 10.75 ms   (10.62 ms .. 10.88 ms)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 10.71 ms   (10.63 ms .. 10.79 ms)
+std dev              231.8 μs   (169.4 μs .. 342.3 μs)
 ```
 
 
