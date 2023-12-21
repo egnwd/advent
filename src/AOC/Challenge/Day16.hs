@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
 -- |
@@ -10,45 +8,23 @@
 -- Portability : non-portable
 --
 -- Day 16.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day16 (
     day16a
   , day16b
   ) where
 
-import           AOC.Prelude hiding (Splitter)
-
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
+import           AOC.Solver                             ((:~>)(..))
+import           AOC.Common                             (Point, Dir(..), dirVec, parseAsciiMap, boundingBox)
+import           Control.Lens                           (makeLenses, maximumOf, (%~))
+import           Data.Function                          ((&))
+import           Data.Map                               (Map)
+import           Data.Set                               (Set)
+import           Linear                                 (V2(..))
 import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
 import qualified Data.Sequence                  as Seq
 import qualified Data.Set                       as S
 import qualified Data.Set.NonEmpty              as NES
-import qualified Data.Sequence  as Seq
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
-import Control.Lens hiding (Empty)
-import Control.Monad.State
 
 data Mirror = NWSE | SWNE deriving (Eq, Ord)
 data Splitter = V | H deriving (Eq, Ord)
@@ -88,12 +64,14 @@ parseObject = \case
 freshState :: Lazer -> EnergyState
 freshState l = EnergyState (S.singleton l) (Seq.fromList [l])
 
+allLazers :: Map Point Tile -> Maybe [Lazer]
 allLazers tiles = do
-    (L.V2 xmn ymn) `L.V2` (L.V2 xmx ymx) <- boundingBox <$> (NES.nonEmptySet . M.keysSet $ tiles)
-    let starts = concat $ [[(L.V2 xmn y, East), (L.V2 xmx y, West)] | y <- [ymn..ymx]] ++ [[(L.V2 x ymn, South), (L.V2 x ymx, North)] | x <- [xmn..xmx]]
+    (V2 xmn ymn) `V2` (V2 xmx ymx) <- boundingBox <$> (NES.nonEmptySet . M.keysSet $ tiles)
+    let starts = concat $ [[(V2 xmn y, East), (V2 xmx y, West)] | y <- [ymn..ymx]] ++ [[(V2 x ymn, South), (V2 x ymx, North)] | x <- [xmn..xmx]]
     return $ starts
 
-runTilDone tiles start = go $ freshState start
+findEnergized :: Map Point Tile -> Lazer -> Maybe Int
+findEnergized tiles start = fmap (S.size . S.map fst) . go $ freshState start
     where
         go :: EnergyState -> Maybe (Set Lazer)
         go EnergyState{..} =
@@ -137,16 +115,16 @@ splitter H = \case
     South -> [East, West]
 
 
-day16a :: _ :~> _
+day16a :: Map Point Tile :~> Int
 day16a = MkSol
     { sParse = Just . parseAsciiMap parseObject
     , sShow  = show
-    , sSolve = fmap (S.size . S.map fst) . flip runTilDone (L.V2 0 0, East)
+    , sSolve = flip findEnergized (V2 0 0, East)
     }
 
-day16b :: _ :~> _
+day16b :: Map Point Tile :~> Int
 day16b = MkSol
     { sParse = Just . parseAsciiMap parseObject
     , sShow  = show
-    , sSolve = \tiles -> maximumOf traverse =<< traverse (fmap (S.size . S.map fst) . runTilDone tiles) =<< allLazers tiles
+    , sSolve = \tiles -> maximumOf traverse =<< traverse (findEnergized tiles) =<< allLazers tiles
     }

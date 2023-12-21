@@ -17,6 +17,8 @@ Table of Contents
 * [Day 6](#day-6) *(no reflection yet)*
 * [Day 8](#day-8) *(no reflection yet)*
 * [Day 9](#day-9) *(no reflection yet)*
+* [Day 11](#day-11) *(no reflection yet)*
+* [Day 16](#day-16) *(no reflection yet)*
 
 Day 1
 ------
@@ -340,5 +342,82 @@ std dev              27.58 μs   (23.35 μs .. 32.21 μs)
 variance introduced by outliers: 19% (moderately inflated)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 11
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day11.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d11p]* / *[Code][d11g]*
+
+[d11p]: https://adventofcode.com/2023/day/11
+[d11g]: https://github.com/egnwd/advent/blob/2023/src/AOC/Challenge/Day11.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 11 Benchmarks
+
+```
+>> Day 11a
+benchmarking...
+time                 1.459 ms   (1.452 ms .. 1.465 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 1.459 ms   (1.454 ms .. 1.466 ms)
+std dev              20.33 μs   (16.02 μs .. 27.57 μs)
+
+* parsing and formatting times excluded
+
+>> Day 11b
+benchmarking...
+time                 1.466 ms   (1.460 ms .. 1.471 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 1.462 ms   (1.458 ms .. 1.467 ms)
+std dev              15.26 μs   (12.99 μs .. 20.60 μs)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 16
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day16.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d16p]* / *[Code][d16g]*
+
+[d16p]: https://adventofcode.com/2023/day/16
+[d16g]: https://github.com/egnwd/advent/blob/2023/src/AOC/Challenge/Day16.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 16 Benchmarks
+
+```
+>> Day 16a
+benchmarking...
+time                 83.79 ms   (82.43 ms .. 84.70 ms)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 85.91 ms   (85.07 ms .. 87.30 ms)
+std dev              1.836 ms   (1.190 ms .. 2.401 ms)
+
+>> Day 16b
+benchmarking...
+time                 6.049 s    (5.990 s .. 6.078 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 6.073 s    (6.055 s .. 6.080 s)
+std dev              12.39 ms   (859.8 μs .. 15.39 ms)
+variance introduced by outliers: 19% (moderately inflated)
 ```
 
