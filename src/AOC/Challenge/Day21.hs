@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day21 (
-    -- day21a
-  -- , day21b
+    day21a
+  , day21b
   ) where
 
 import           AOC.Prelude
@@ -44,12 +44,45 @@ import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
+import Control.Lens
+
+data Plot = Start | Plot | Rock deriving (Show, Eq, Ord)
+
+floodFill
+    :: Ord a
+    => (a -> Set a)     -- ^ Expansion (be sure to limit allowed points)
+    -> Int              -- ^ Step count
+    -> Set a            -- ^ Start points
+    -> Maybe (Set a)    -- ^ Flood filled
+floodFill f n = go n
+  where
+    go !n !outr
+        | n == 0 = Just outr
+        | S.null outr' = Nothing
+        | otherwise    = go (n - 1) outr'
+      where
+        outr' = foldMap f outr
+
+parsePlot = \case
+    'S' -> pure Start
+    '.' -> pure Plot
+    '#' -> pure Rock
+    _ -> Nothing
+
+findStart = fst . head . M.toList . M.filter (== Start)
+findPlots = M.keysSet . M.filter (/= Rock)
+
+solve :: Int -> (Point, Set Point) -> _
+solve n (s, garden) = allPaths
+    where
+        allPaths = floodFill paths n (S.singleton s)
+        paths p = garden `S.intersection` neighboursSet p
 
 day21a :: _ :~> _
 day21a = MkSol
-    { sParse = Just
+    { sParse = Just . bimap findStart findPlots . dupe . parseAsciiMap parsePlot
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap S.size . solve (dyno_ "steps" 64)
     }
 
 day21b :: _ :~> _
