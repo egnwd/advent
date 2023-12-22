@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day17 (
-    -- day17a
-  -- , day17b
+    day17a
+  , day17b
   ) where
 
 import           AOC.Prelude
@@ -38,23 +38,57 @@ import qualified Data.Map                       as M
 import qualified Data.OrdPSQ                    as PSQ
 import qualified Data.Sequence                  as Seq
 import qualified Data.Set                       as S
+import qualified Data.Set.NonEmpty              as NES
 import qualified Data.Text                      as T
 import qualified Data.Vector                    as V
 import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
+import Linear (V2(..))
+import Control.Lens
 
-day17a :: _ :~> _
+f (loc,(c,(d,n))) = ((loc,d,n),c)
+
+makeNeighbours city = M.fromList
+                    . map (\(loc,(c,(d,n))) -> ((loc,d,n),c))
+                    . M.toList
+                    . M.intersectionWith (,) city
+                    . M.fromList
+
+crucibleNeighbours city (a, d, n)
+  | n == 3 = makeNeighbours city . map step $ [East, West]
+  | otherwise = makeNeighbours city . map step $ [East, North, West]
+    where
+        step North = (a + dirVec d, (d, n+1))
+        step rot = (a + dirVec (d <> rot), (d <> rot, 1))
+
+ultraCrucibleNeighbours city (a, d, n)
+  | n == 1 = M.singleton (a + 3 * dirVec d, d, n+3) . sum . M.restrictKeys city . S.fromList . lineTo $ V2 (a + dirVec d) (a + 3 * dirVec d)
+  | n == 10 = makeNeighbours city . map step $ [East, West]
+  | otherwise = makeNeighbours city . map step $ [East, North, West]
+    where
+        step North = (a + dirVec d, (d, n+1))
+        step rot = (a + dirVec (d <> rot), (d <> rot, 1))
+
+findLoss :: _ -> Map Point Int -> _
+findLoss next city = aStar' (next city) heur term (start, East, 1)
+    where
+        Just (start `V2` end) = boundingBox <$> (NES.nonEmptySet . M.keysSet $ city)
+        heur = manhattan end . view _1
+        term :: (Point, Dir, Int) -> Bool
+        term (a, _, n) = a == end && n >= 4
+
+day17a :: Map Point Int :~> _
 day17a = MkSol
-    { sParse = Just
+    { sParse = Just . parseAsciiMap (readMaybe @ Int . (\x -> [x]))
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap fst . findLoss crucibleNeighbours
     }
 
-day17b :: _ :~> _
+day17b :: Map Point Int :~> _
 day17b = MkSol
-    { sParse = Just
+    { sParse = Just . parseAsciiMap (readMaybe @ Int . (\x -> [x]))
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap fst . findLoss ultraCrucibleNeighbours
     }
