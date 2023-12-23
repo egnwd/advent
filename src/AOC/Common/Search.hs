@@ -6,6 +6,7 @@ module AOC.Common.Search
   , beamAStar'
   , floydWarshall
   , bfs
+  , bfsAll
   , binarySearch
   ) where
 
@@ -172,6 +173,7 @@ floydWarshall neighbours = reconstruct . execState fw . initialFWState $ neighbo
 
 data BFSState n = BS { _bsClosed  :: !(Map n (Maybe n))  -- ^ map of item to "parent"
                      , _bsOpen    :: !(Seq n          )  -- ^ queue
+                     , _bsFound   :: !(Map n n        )  -- ^ found items
                      }
 
 -- | Breadth-first search, with loop detection
@@ -180,7 +182,7 @@ bfs :: forall n. Ord n
     -> n              -- ^ start
     -> (n -> Bool)    -- ^ target
     -> Maybe [n]      -- ^ the shortest path, if it exists
-bfs ex x0 dest = reconstruct <$> go (addBack x0 Nothing (BS M.empty Seq.empty))
+bfs ex x0 dest = reconstruct <$> go (addBack x0 Nothing (BS M.empty Seq.empty M.empty))
   where
     reconstruct :: (n, Map n (Maybe n)) -> [n]
     reconstruct (goal, mp) = drop 1 . reverse $ goreco goal
@@ -191,14 +193,52 @@ bfs ex x0 dest = reconstruct <$> go (addBack x0 Nothing (BS M.empty Seq.empty))
       Empty    -> Nothing
       n :<| ns
         | dest n    -> Just (n, _bsClosed)
-        | otherwise -> go . S.foldl' (processNeighbor n) (BS _bsClosed ns) $ ex n
+        | otherwise -> go . S.foldl' (processNeighbor n) (BS _bsClosed ns _bsFound) $ ex n
     addBack :: n -> Maybe n -> BFSState n -> BFSState n
     addBack x up BS{..} = BS
       { _bsClosed = M.insert x up _bsClosed
       , _bsOpen   = _bsOpen :|> x
+      , _bsFound  = _bsFound
       }
     processNeighbor :: n -> BFSState n -> n -> BFSState n
     processNeighbor curr bs0@BS{..} neighb
+      | neighb `M.member` _bsClosed = bs0
+      | otherwise                   = addBack neighb (Just curr) bs0
+
+-- | Breadth-first search, with loop detection, to find all matches.
+bfsAll :: forall n. (Ord n)
+    => (n -> Set n)             -- ^ neighborhood
+    -> n                        -- ^ start
+    -> (n -> Maybe n)           -- ^ keep me when True
+    -> (Set n -> Bool)          -- ^ stop when True
+    -> Map n [n]
+bfsAll ex x0 isGood stopper = reconstruct <$> founds
+  where
+    (founds, parentMap) = go . addBack x0 Nothing $ BS M.empty Seq.empty M.empty
+    reconstruct :: n -> [n]
+    reconstruct goal = drop 1 . reverse $ goreco goal
+      where
+        goreco n = n : maybe [] goreco (parentMap M.! n)
+    go :: BFSState n -> (Map n n, Map n (Maybe n))
+    go BS{..} = case _bsOpen of
+      Empty    -> (_bsFound, _bsClosed)
+      (!n) :<| ns ->
+        let (found', updated) = case isGood n of
+              Just x
+                | x `M.notMember` _bsFound -> (M.insert x n _bsFound, True)
+              _   -> (_bsFound, False)
+            stopHere = updated && stopper (M.keysSet found')
+        in  if stopHere
+              then (found', _bsClosed)
+              else go . S.foldl' (processNeighbor n) (BS _bsClosed ns found') $ ex n
+    addBack :: n -> Maybe n -> BFSState n -> BFSState n
+    addBack !x !up BS{..} = BS
+      { _bsClosed = M.insert x up _bsClosed
+      , _bsOpen   = _bsOpen :|> x
+      , _bsFound  = _bsFound
+      }
+    processNeighbor :: n -> BFSState n -> n -> BFSState n
+    processNeighbor !curr bs0@BS{..} neighb
       | neighb `M.member` _bsClosed = bs0
       | otherwise                   = addBack neighb (Just curr) bs0
 
