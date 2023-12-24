@@ -45,7 +45,7 @@ import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
-import Linear (V2(..))
+import Linear (V2(..), (*^))
 import Control.Lens
 
 f (loc,(c,(d,n))) = ((loc,d,n),c)
@@ -64,31 +64,32 @@ crucibleNeighbours city (a, d, n)
         step rot = (a + dirVec (d <> rot), (d <> rot, 1))
 
 ultraCrucibleNeighbours city (a, d, n)
-  | n == 1 = M.singleton (a + 3 * dirVec d, d, n+3) . sum . M.restrictKeys city . S.fromList . lineTo $ V2 (a + dirVec d) (a + 3 * dirVec d)
+  | n == 1 = let stops = traverse (`M.lookup` city) (lineTo $ V2 (a + dirVec d) (a + 3 * dirVec d))
+              in maybe mempty (M.singleton (a + 3 * dirVec d, d, n+3)) (sum <$> stops)
   | n == 10 = makeNeighbours city . map step $ [East, West]
   | otherwise = makeNeighbours city . map step $ [East, North, West]
     where
         step North = (a + dirVec d, (d, n+1))
         step rot = (a + dirVec (d <> rot), (d <> rot, 1))
 
-findLoss :: _ -> Map Point Int -> _
-findLoss next city = aStar' (next city) heur term (start, East, 1)
+findLoss :: Int -> Map Point Int -> _ -> _
+findLoss lo city next = minimumOf (traverse . _1) $ mapMaybe (aStar' next heur term . (start,,1)) [North ..]
     where
         Just (start `V2` end) = boundingBox <$> (NES.nonEmptySet . M.keysSet $ city)
         heur = manhattan end . view _1
         term :: (Point, Dir, Int) -> Bool
-        term (a, _, n) = a == end && n >= 4
+        term (a, _, n) = a == end && n >= lo
 
 day17a :: Map Point Int :~> _
 day17a = MkSol
-    { sParse = Just . parseAsciiMap (readMaybe @ Int . (\x -> [x]))
+    { sParse = Just . parseAsciiMap (readMaybe @ Int . pure)
     , sShow  = show
-    , sSolve = fmap fst . findLoss crucibleNeighbours
+    , sSolve = findLoss 1 <*> crucibleNeighbours
     }
 
 day17b :: Map Point Int :~> _
 day17b = MkSol
-    { sParse = Just . parseAsciiMap (readMaybe @ Int . (\x -> [x]))
+    { sParse = Just . parseAsciiMap (readMaybe @ Int . pure)
     , sShow  = show
-    , sSolve = fmap fst . findLoss ultraCrucibleNeighbours
+    , sSolve = findLoss 4 <*> ultraCrucibleNeighbours
     }
