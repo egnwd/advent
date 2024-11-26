@@ -210,7 +210,7 @@ mainSubmit Cfg{..} MSO{..} = do
     c         <- maybeToEither [printf "Part not found: %c" (partChar _csPart)] $
                    M.lookup _csPart dMap
     inp       <- liftEither . first ("[PROMPT ERROR]":) $ _cdInput
-    opts      <- defaultAoCOpts _cfgYear <$>
+    opts      <- defaultAoCOpts aocUserAgent _cfgYear <$>
                     maybeToEither ["ERROR: Session Key Required to Submit"]
                       _cfgSession
 

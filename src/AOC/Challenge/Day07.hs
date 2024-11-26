@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day07 (
-    day07a
-  , day07b
+    -- day07a
+  -- , day07b
   ) where
 
 import           AOC.Prelude
@@ -37,7 +37,7 @@ import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
 import qualified Data.OrdPSQ                    as PSQ
 import qualified Data.Sequence                  as Seq
-import qualified Data.Set.NonEmpty              as S
+import qualified Data.Set                       as S
 import qualified Data.Text                      as T
 import qualified Data.Vector                    as V
 import qualified Linear                         as L
@@ -45,80 +45,16 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
-data Hands = FiveOf | FourOf | FullHouse | ThreeOf | TwoPair | Pair | HighCard deriving (Eq, Ord, Show)
-
-data Card = A | K | Q | J | T | N9 | N8 | N7 | N6 | N5 | N4 | N3 | N2 | Joker deriving (Ord, Eq, Show)
-
-instance Read Card where
-    readsPrec _ = map ((, "") . readCard)
-
-readCard :: Char -> Card
-readCard = \case
-    'A' -> A
-    'K' -> K
-    'Q' -> Q
-    'J' -> J
-    'T' -> T
-    '9' -> N9
-    '8' -> N8
-    '7' -> N7
-    '6' -> N6
-    '5' -> N5
-    '4' -> N4
-    '3' -> N3
-    '2' -> N2
-
-compares cs x y = mconcat $ map (\c -> c x y) cs
-
-hand :: [Card] -> Hands
-hand (revFreq->cs)
-  | isJust . IM.lookup 5 $ cs = FiveOf
-  | isJust . IM.lookup 4 $ cs = FourOf
-  | (isJust . IM.lookup 2 $ cs) && (isJust . IM.lookup 3 $ cs) = FullHouse
-  | (isJust . IM.lookup 3 $ cs) = ThreeOf
-  | maybe False ((== 2) . S.size) . IM.lookup 2 $ cs = TwoPair
-  | isJust . IM.lookup 2 $ cs = Pair
-  | otherwise = HighCard
-
-jokerHand :: [Card] -> Hands
-jokerHand cs = jokerHand' total
-    where
-        cards = filter (/= Joker) cs
-        nJokers = countTrue (==Joker) cs
-        total = case IM.maxViewWithKey (revFreq cards) of
-             Just ((i, mx), rest) -> let (mxc, restc) = S.deleteFindMin mx
-                                      in IM.insert (i+nJokers) (S.singleton mxc)
-                                         . maybe rest (\s -> IM.insert i s rest)
-                                         . S.nonEmptySet
-                                         $ restc
-             Nothing -> IM.singleton nJokers (S.singleton Joker)
-
-        jokerHand' cs
-          | isJust . IM.lookup 5 $ cs = FiveOf
-          | isJust . IM.lookup 4 $ cs = FourOf
-          | (isJust . IM.lookup 2 $ cs) && (isJust . IM.lookup 3 $ cs) = FullHouse
-          | (isJust . IM.lookup 3 $ cs) = ThreeOf
-          | maybe False ((== 2) . S.size) . IM.lookup 2 $ cs = TwoPair
-          | isJust . IM.lookup 2 $ cs = Pair
-          | otherwise = HighCard
-
--- rank :: [([Char], Int)] -> [([Char], Int)]
-rank = sortBy $ flip $ compares [comparing (jokerHand . fst), comparing fst]
-
-day07a :: [([Card], Int)] :~> _
+day07a :: _ :~> _
 day07a = MkSol
-    { sParse = traverse (sequence . (bimap (map readCard) (readMaybe @ Int)) <=< listTup . words) . lines
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . sum . zipWith (\i (_, b) -> i * b) [1..] . rank
+    , sSolve = Just
     }
 
 day07b :: _ :~> _
 day07b = MkSol
-    { sParse = sParse day07a
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just -- . rank . map (first (map toJoker))
-                 . sum . zipWith (\i (_, b) -> i * b) [1..] . rank . map (first (map toJoker))
+    , sSolve = Just
     }
-
-toJoker J = Joker
-toJoker a = a

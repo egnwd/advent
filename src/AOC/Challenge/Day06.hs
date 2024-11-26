@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 -- |
 -- Module      : AOC.Challenge.Day06
 -- License     : BSD3
@@ -6,39 +9,52 @@
 -- Portability : non-portable
 --
 -- Day 6.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day06 (
-    day06a
-  , day06b
+    -- day06a
+  -- , day06b
   ) where
 
-import AOC.Solver        ((:~>)(..))
-import AOC.Common        (listTup)
-import AOC.Common.Search (binarySearch)
-import Text.Read         (readMaybe)
-import Control.Monad     (liftM2, (<=<))
+import           AOC.Prelude
 
-findMinTimeExcl :: Int -> Int -> Int
-findMinTimeExcl t mx = binarySearch 0 t p
-    where
-        p d = d * (t-d) > mx
+import qualified Data.Graph.Inductive           as G
+import qualified Data.IntMap                    as IM
+import qualified Data.IntSet                    as IS
+import qualified Data.List.NonEmpty             as NE
+import qualified Data.List.PointedList          as PL
+import qualified Data.List.PointedList.Circular as PLC
+import qualified Data.Map                       as M
+import qualified Data.OrdPSQ                    as PSQ
+import qualified Data.Sequence                  as Seq
+import qualified Data.Set                       as S
+import qualified Data.Text                      as T
+import qualified Data.Vector                    as V
+import qualified Linear                         as L
+import qualified Text.Megaparsec                as P
+import qualified Text.Megaparsec.Char           as P
+import qualified Text.Megaparsec.Char.Lexer     as PP
 
-findPossibilities :: Int -> Int -> Int
-findPossibilities n lo = (n+1) - (lo * 2)
-
-findSolution :: Int -> Int -> Int
-findSolution = liftM2 (.) findPossibilities findMinTimeExcl
-
-day06a :: [(Int, Int)] :~> Int
+day06a :: _ :~> _
 day06a = MkSol
-    { sParse = fmap (uncurry zip) . listTup <=< traverse (traverse (readMaybe @ Int) . drop 1 . words) .  lines
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . product . map (uncurry findSolution)
+    , sSolve = Just
     }
 
-day06b :: (Int, Int) :~> Int
+day06b :: _ :~> _
 day06b = MkSol
-    { sParse = listTup <=< traverse (readMaybe @ Int . filter (' ' /=) . unwords . drop 1 . words) .  lines
+    { sParse = Just
     , sShow  = show
-    , sSolve = Just . uncurry findSolution
+    , sSolve = Just
     }

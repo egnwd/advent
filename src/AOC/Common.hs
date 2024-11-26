@@ -115,7 +115,7 @@ type Parser = P.Parsec Void T.Text
 parseMaybeLenient :: P.Parsec Void s a -> s -> Maybe a
 parseMaybeLenient p = eitherToMaybe . P.parse p "parseMaybeLenient"
 
-parseOrFail :: (P.Stream s, P.ShowErrorComponent e) => P.Parsec e s a -> s -> a
+parseOrFail :: (P.Stream s, P.ShowErrorComponent e, P.TraversableStream s, P.VisualStream s) => P.Parsec e s a -> s -> a
 parseOrFail p = either (error . P.errorBundlePretty) id . P.parse p "parseOrFail"
 
 pSpace :: (P.Stream s, P.Token s ~ Char, Ord e) => P.Parsec e s ()

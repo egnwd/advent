@@ -5,57 +5,64 @@
 
 packages:
 - completed:
-    hackage: advent-of-code-api-0.2.8.4@sha256:7476a1db6952b7c95f335343c51098c9ee41d080bcb5c1d0924ebc867943cc29,2275
+    hackage: advent-of-code-api-0.2.9.1@sha256:ceb8adc0b04d13f121358e334a99c04acc2db5291ba23ea9ba783c9d4c2c194f,2275
     pantry-tree:
+      sha256: d3ddc0c197a1546fe7719fa6d5ffebfe9d0fe8487de0be22577f1cfa9807825c
       size: 1185
-      sha256: 44903f89ba3a05e03e2917509690cc9ac0830ad84c98acfedabfd6f9ea064c51
   original:
-    hackage: advent-of-code-api-0.2.8.4
+    hackage: advent-of-code-api-0.2.9.1
 - completed:
-    hackage: advent-of-code-ocr-0.1.2.0@sha256:86d2d6ea54072283dfb11ee0d1cc69db36da17578d85bc23d5a6cf8f57328256,2927
+    hackage: advent-of-code-ocr-0.1.2.1@sha256:07d9e29e28a6da49f23733e40980a0aaf33590832fccdb164a3feaef5053f70f,2991
     pantry-tree:
-      size: 614
-      sha256: 40abbd30800075fd8f38404b7950908f13f9425c071a96e2088ade46061a357c
+      sha256: 2b401a4043fca98f32455d61564ca7d61d172ba5ccfb666f675cf94dd8b7794a
+      size: 615
   original:
-    hackage: advent-of-code-ocr-0.1.2.0@sha256:86d2d6ea54072283dfb11ee0d1cc69db36da17578d85bc23d5a6cf8f57328256
+    hackage: advent-of-code-ocr-0.1.2.1
 - completed:
     hackage: barbies-2.0.2.0@sha256:fa6656b45c40f7d4ab1764d078c6878f37d37fab7f7135c061e9a5baa67943c0,4407
     pantry-tree:
-      size: 4426
       sha256: 5aa3ff178fe56b21250543384e8482de13f35ef57a06943178382b0f2e3eca24
+      size: 4426
   original:
     hackage: barbies-2.0.2.0@sha256:fa6656b45c40f7d4ab1764d078c6878f37d37fab7f7135c061e9a5baa67943c0
 - completed:
     hackage: astar-0.3.0.0@sha256:8bf6350542e9db9451490e8993560ee843dc48a61d46a206985430f9b62461c8,967
     pantry-tree:
-      size: 213
       sha256: c4176cc3fc9ad39f2a9fc7eb4346c87b6e60b70ba23d8e2adbdfc81fe544b808
+      size: 213
   original:
     hackage: astar-0.3.0.0@sha256:8bf6350542e9db9451490e8993560ee843dc48a61d46a206985430f9b62461c8
 - completed:
     hackage: conduino-0.2.2.0@sha256:1fe73859f8d518af7182c76248d0573bf69a6a6e12d79da85438a530f0227c9f,1621
     pantry-tree:
-      size: 527
       sha256: 45719113d47d7ce62da867f7d36f7518b925036867ab3a06db7b557a97c8fe43
+      size: 527
   original:
     hackage: conduino-0.2.2.0@sha256:1fe73859f8d518af7182c76248d0573bf69a6a6e12d79da85438a530f0227c9f,1621
 - completed:
     hackage: list-transformer-1.0.7@sha256:413a224742aa83ec3b4dbc744cad8b93e349cb21a9a354dc7dc73302744935d1,1455
     pantry-tree:
-      size: 280
       sha256: 95214721c7b4837f0df6638700923245208170b998a9965ca475e7dab878455d
+      size: 280
   original:
     hackage: list-transformer-1.0.7@sha256:413a224742aa83ec3b4dbc744cad8b93e349cb21a9a354dc7dc73302744935d1,1455
 - completed:
     hackage: data-interval-2.1.1@sha256:bf5c98541c8fce7ec782f7443adcd3c949ee8b60c91c7439d9cf9deb222c265b,2772
     pantry-tree:
-      size: 1336
       sha256: ef0707c4618c7f40113aa82e64172f42a448baa8c7257cac4655b09f6d56efaf
+      size: 1336
   original:
     hackage: data-interval-2.1.1@sha256:bf5c98541c8fce7ec782f7443adcd3c949ee8b60c91c7439d9cf9deb222c265b,2772
+- completed:
+    hackage: haskell-names-0.9.9@sha256:8cd295ff72cbc87b330e4b9955eae3095a701b3e8b9a633c04cf150977e90d70,12974
+    pantry-tree:
+      sha256: c8ca8eafe4d3e6d9f9b6209d1790edd7cf79f84b71c68657e6f7713d630646f4
+      size: 25945
+  original:
+    hackage: haskell-names-0.9.9@sha256:8cd295ff72cbc87b330e4b9955eae3095a701b3e8b9a633c04cf150977e90d70,12974
 snapshots:
 - completed:
-    size: 532832
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/23.yaml
-    sha256: fbb2a0519008533924c7753bd7164ddd1009f09504eb06674acad6049b46db09
-  original: lts-16.23
+    sha256: a81fb3877c4f9031e1325eb3935122e608d80715dc16b586eb11ddbff8671ecd
+    size: 640086
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/21/25.yaml
+  original: lts-21.25

@@ -25,6 +25,7 @@ module AOC.Run.Load (
   , htmlToMarkdown
   , mkDay, mkDay_, dayInt
   , TestMeta(..)
+  , aocUserAgent
   -- * Parsers
   , parseMeta
   , parseTests
@@ -98,71 +99,83 @@ makeChallengeDirs CP{..} =
     mapM_ (createDirectoryIfMissing True . takeDirectory)
           [_cpPrompt, _cpInput, _cpAnswer, _cpTests, _cpLog]
 
+
 -- | Load data associated with a challenge from a given specification.
 -- Will fetch answers online and cache if required (and if giten a session
 -- token).
-challengeData
-    :: Maybe String   -- ^ session key
-    -> Integer        -- ^ year
-    -> ChallengeSpec
-    -> IO ChallengeData
-challengeData sess yr spec = do
-    makeChallengeDirs ps
-    inp   <- runExceptT . asum $
+challengeData ::
+  -- | session key
+  Maybe String ->
+  -- | year
+  Integer ->
+  ChallengeSpec ->
+  IO ChallengeData
+challengeData sess yr spec@CS{..} = do
+  makeChallengeDirs ps
+  inp <-
+    runExceptT . asum $
       [ maybeToEither [printf "Input file not found at %s" _cpInput]
           =<< liftIO (readFileMaybe _cpInput)
       , fetchInput
       ]
-    prompt <- runExceptT . asum $
+  prompt <-
+    runExceptT . asum $
       [ maybeToEither [printf "Prompt file not found at %s" _cpPrompt]
           =<< liftIO (fmap T.pack <$> readFileMaybe _cpPrompt)
       , fetchPrompt
       ]
-    ans    <- readFileMaybe _cpAnswer
-    ts     <- readFileMaybe _cpTests >>= \case
-                Nothing  -> pure []
-                Just str -> case MP.parse parseTests _cpTests str of
-                  Left e  -> [] <$ putStrLn (MP.errorBundlePretty e)
-                  Right r -> pure r
-    return CD
+  ans <- readFileMaybe _cpAnswer
+  ts <-
+    readFileMaybe _cpTests >>= \case
+      Nothing -> pure []
+      Just str -> case MP.parse parseTests _cpTests str of
+        Left e -> [] <$ putStrLn (MP.errorBundlePretty e)
+        Right r -> pure r
+  return
+    CD
       { _cdPrompt = prompt
-      , _cdInput  = inp
+      , _cdInput = inp
       , _cdAnswer = ans
-      , _cdTests  = ts
+      , _cdTests = ts
       }
   where
     ps@CP{..} = challengePaths yr spec
     readFileMaybe :: FilePath -> IO (Maybe String)
     readFileMaybe =
-        (traverse (evaluate . force) . eitherToMaybe =<<)
-       . tryJust (guard . isDoesNotExistError)
-       . readFile
+      (traverse (evaluate . force) . eitherToMaybe =<<)
+        . tryJust (guard . isDoesNotExistError)
+        . readFile
     fetchInput :: ExceptT [String] IO String
     fetchInput = do
-        s <- maybeToEither ["Session key needed to fetch input"]
-              sess
-        let opts = defaultAoCOpts yr s
-        inp <- liftEither . bimap showAoCError T.unpack
-           =<< liftIO (runAoC opts a)
-        liftIO $ writeFile _cpInput inp
-        pure inp
+      s <-
+        maybeToEither
+          ["Session key needed to fetch input"]
+          sess
+      let opts = defaultAoCOpts aocUserAgent yr s
+      inp <-
+        liftEither . bimap showAoCError T.unpack
+          =<< liftIO (runAoC opts a)
+      liftIO $ writeFile _cpInput inp
+      pure inp
       where
-        a = AoCInput $ _csDay spec
+        a = AoCInput _csDay
     fetchPrompt :: ExceptT [String] IO Text
     fetchPrompt = do
-        prompts <- liftEither . first showAoCError
-               =<< liftIO (runAoC opts a)
-        promptH  <- maybeToEither [e]
-                 . M.lookup (_csPart spec)
-                 $ prompts
-        prompt   <- liftEither $ htmlToMarkdown True promptH
-        liftIO $ T.writeFile _cpPrompt prompt
-        pure prompt
+      prompts <-
+        liftEither . first showAoCError
+          =<< liftIO (runAoC opts a)
+      promptH <-
+        maybeToEither [e]
+          . M.lookup _csPart
+          $ prompts
+      prompt <- liftEither $ htmlToMarkdown True promptH
+      liftIO $ T.writeFile _cpPrompt prompt
+      pure prompt
       where
-        opts = defaultAoCOpts yr $ fold sess
-        a = AoCPrompt $ _csDay spec
+        opts = defaultAoCOpts aocUserAgent yr $ fold sess
+        a = AoCPrompt _csDay
         e = case sess of
-          Just _  -> "Part not yet released"
+          Just _ -> "Part not yet released"
           Nothing -> "Part not yet released, or may require session key"
 
 showAoCError :: AoCError -> [String]
@@ -274,3 +287,6 @@ parseMeta = do
         "string" -> pure (sym, toDyn val)
         _        -> fail $ "Unrecognized type " ++ typ
 
+
+aocUserAgent :: AoCUserAgent
+aocUserAgent = AoCUserAgent "github.com/egnwd/advent" "hello@elliotgreenwood.co.uk"

@@ -38,14 +38,17 @@ import           Control.Monad.Trans.Maybe
 import           Data.Bifunctor
 import           Data.Data
 import           Data.Map                   (Map)
+import           Data.Set                   (Set)
+import qualified Data.Set                   as S
 import           Data.Maybe
 import           Data.Traversable
 import           Data.Void
 import           GHC.Exts
 import           Language.Haskell.Exts      as E
-import           Language.Haskell.Names
 import           Language.Haskell.TH        as TH
-import           Language.Haskell.TH.Syntax (TExp(..))
+import qualified Language.Haskell.TH as TH
+import           Language.Haskell.TH.Datatype
+import qualified Language.Haskell.TH.Syntax as TH
 import           Prelude
 import           System.Directory
 import           System.FilePath
@@ -95,15 +98,16 @@ instance IsString ChallengeSpec where
 type Parser = P.Parsec Void String
 
 -- | Template Haskell splice to produce a list of all named solutions in
--- a directory. Expects solutions as function names following the format
+-- scope. Expects solutions as function names following the format
 -- @dayDDp@, where @DD@ is a two-digit zero-added day, and @p@ is
 -- a lower-case letter corresponding to the part of the challenge.
 --
 -- See 'mkChallengeMap' for a description of usage.
-solutionList :: FilePath -> Q (TExp [(Day, (Part, SomeSolution))])
-solutionList dir = fmap (TExp . ListE)
-                 . traverse (fmap unType . specExp)
-               =<< runIO (getChallengeSpecs dir)
+solutionList :: TH.Code TH.Q [(Day, (Part, SomeSolution))]
+solutionList =
+  TH.Code $
+    TH.TExp . TH.ListE . catMaybes
+      <$> traverse (fmap (fmap TH.unType) . specExp) (S.toList challengeSpecUniverse)
 
 -- | Meant to be called like:
 --
@@ -114,75 +118,61 @@ mkChallengeMap :: [(Day, (Part, SomeSolution))] -> ChallengeMap
 mkChallengeMap = M.unionsWith M.union
                . map (uncurry M.singleton . second (uncurry M.singleton))
 
+challengeSpecUniverse :: Set ChallengeSpec
+challengeSpecUniverse =
+  S.delete (CS (mkDay_ 25) Part2) . S.fromList $
+    CS <$> [minBound .. maxBound] <*> [minBound .. maxBound]
 
-specExp :: ChallengeSpec -> Q (TExp (Day, (Part, SomeSolution)))
+
+-- | Looks up the name in scope
+specExp :: ChallengeSpec -> TH.Q (Maybe (TH.TExp (Day, (Part, SomeSolution))))
 specExp s@(CS d p) = do
-    n <- lookupValueName (specName s)
-    con <- case n of
-      Nothing -> pure 'MkSomeSolWH
-      Just n' -> do
-        isNF <- solverNFData n'
-        pure $ if isNF
-                 then 'MkSomeSolNF
-                 else 'MkSomeSolWH
-    pure $ TExp $ TupE
-      [ VarE 'mkDay_ `AppE` LitE (IntegerL (dayInt d))
-      , TupE
-          [ ConE (partCon p)
-          , ConE con `AppE` VarE (mkName (specName s))
+  mn <- TH.lookupValueName (specName s)
+  for mn \n -> do
+    ss <- TH.unTypeCode $ specSomeSol n
+    pure $
+      TH.TExp $
+        TH.TupE
+          [ Just . TH.unType $ liftDay d
+          , Just $
+              TH.TupE
+                [ Just . TH.unType $ liftPart p
+                , Just ss
+                ]
           ]
-      ]
-  where
-    partCon Part1 = 'Part1
-    partCon Part2 = 'Part2
+
+-- | Looks up the name in scope
+specSomeSol :: TH.Name -> TH.Code TH.Q SomeSolution
+specSomeSol n = TH.Code do
+  isNF <- solverNFData n
+  let con
+        | isNF = 'MkSomeSolNF
+        | otherwise = 'MkSomeSolWH
+  pure $ TH.TExp $ TH.ConE con `TH.AppE` TH.VarE n
+
+liftDay :: Day -> TH.TExp Day
+liftDay d = TH.TExp $ TH.VarE 'mkDay_ `TH.AppE` TH.LitE (TH.IntegerL (dayInt d))
+
+liftPart :: Part -> TH.TExp Part
+liftPart = \case
+  Part1 -> TH.TExp $ TH.ConE 'Part1
+  Part2 -> TH.TExp $ TH.ConE 'Part2
 
 specName :: ChallengeSpec -> String
 specName (CS d p) = printf "day%02d%c" (dayInt d) (partChar p)
 
-getChallengeSpecs
-    :: FilePath                 -- ^ directory of modules
-    -> IO [ChallengeSpec]       -- ^ all challenge specs found
-getChallengeSpecs dir = do
-    exts   <- defaultExtensions
-    files  <- listDirectory dir
-    parsed <- forM files $ \f -> do
-      let mode = defaultParseMode { extensions    = exts
-                                  , fixities      = Just []
-                                  , parseFilename = f
-                                  }
-      res <- parseFileWithMode mode (dir </> f)
-      case res of
-        ParseOk x       -> pure x
-        ParseFailed l e -> fail $ printf "Failed parsing %s at %s: %s" f (show l) e
-    pure $ moduleSolutions parsed
-
-defaultExtensions :: IO [E.Extension]
-defaultExtensions = do
-    Right H.DecodeResult{..} <- H.readPackageConfig H.defaultDecodeOptions
-    Just H.Section{..} <- pure $ H.packageLibrary decodeResultPackage
-    pure $ parseExtension <$> sectionDefaultExtensions
-
-moduleSolutions :: (Data l, Eq l) => [Module l] -> [ChallengeSpec]
-moduleSolutions = (foldMap . foldMap) (maybeToList . isSolution)
-                . flip resolve M.empty
-
-
-isSolution :: Symbol -> Maybe ChallengeSpec
-isSolution s = do
-    Value _ (Ident _ n) <- pure s
-    Right c             <- pure $ P.runParser challengeName "" n
-    pure c
-
 challengeName :: Parser ChallengeSpec
 challengeName = do
-    _    <- P.string "day"
-    dInt <- PL.decimal
-    dFin <- maybe (fail $ "Day not in range: " ++ show dInt) pure $
-                mkDay dInt
-    c    <- P.lowerChar
-    p    <- maybe (fail $ printf "Part not parsed: %c" c) pure $
-                charPart c
-    pure $ CS dFin p
+  _ <- P.string "day"
+  dInt <- PL.decimal
+  dFin <-
+    maybe (fail $ "Day not in range: " ++ show dInt) pure $
+      mkDay dInt
+  c <- P.lowerChar
+  p <-
+    maybe (fail $ printf "Part not parsed: %c" c) pure $
+      charPart c
+  pure $ CS dFin p
 
 -- | Parse a 'Char' into a 'Part'
 charPart :: Char -> Maybe Part
@@ -196,7 +186,7 @@ solverNFData :: TH.Name -> Q Bool
 solverNFData n
   | checkIfNFData = reify n >>= \case
       VarI _ (ConT c `AppT` a `AppT` _) _
-        | c == ''(:~>) -> deepInstance ''NFData a 
+        | c == ''(:~>) -> deepInstance ''NFData a
       _ -> pure False
   | otherwise     = pure False
 
