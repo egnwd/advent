@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day01
 -- License     : BSD3
@@ -9,57 +6,38 @@
 -- Portability : non-portable
 --
 -- Day 1.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day01 (
     day01a
   , day01b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver                     ((:~>)(..))
+import           AOC.Common                     (freqs, lookupFreq, listTup)
+import           Data.List.Split                (splitOn)
+import           Data.List                      (sort)
+import           Text.Read                      (readMaybe)
+import           Control.Monad                  ((<=<))
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
-
-solve :: [Int] -> [Int] -> Int
-solve a (freqs->b) = sum . map go $ a
+solvea :: [Int] -> [Int] -> [Int]
+solvea (sort->a) (sort->b) = zipWith score a b
     where
-        go x =  x * lookupFreq x b
+        score x y = abs $ x - y
 
-day01a :: [(Int, Int)] :~> _
-day01a = MkSol
-    { sParse = traverse (listTup <=< traverse readMaybe . splitOn "  ") . lines
+solveb :: [Int] -> [Int] -> [Int]
+solveb a (freqs->b) = map sim a
+    where
+        sim x = x * lookupFreq x b
+
+day01 :: ([Int] -> [Int] -> [Int]) -> ([Int], [Int]) :~> Int
+day01 solve = MkSol
+    { sParse = fmap unzip . traverse (listTup <=< traverse readMaybe . splitOn "  ") . lines
     , sShow  = show
-    , sSolve = Just . sum . uncurry (zipWith (\a b -> abs $ a - b)) . bimap sort sort . unzip
+    , sSolve = Just . sum . uncurry solve
     }
 
-day01b :: _ :~> _
-day01b = MkSol
-    { sParse = sParse day01a
-    , sShow  = show
-    , sSolve = Just . uncurry solve . unzip
-    }
+day01a :: ([Int], [Int]) :~> Int
+day01a = day01 solvea
+
+day01b :: ([Int], [Int]) :~> Int
+day01b = day01 solveb
