@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day01 (
-    -- day01a
-  -- , day01b
+    day01a
+  , day01b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +45,21 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
-day01a :: _ :~> _
+solve :: [Int] -> [Int] -> Int
+solve a (freqs->b) = sum . map go $ a
+    where
+        go x =  x * lookupFreq x b
+
+day01a :: [(Int, Int)] :~> _
 day01a = MkSol
-    { sParse = Just
+    { sParse = traverse (listTup <=< traverse readMaybe . splitOn "  ") . lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . uncurry (zipWith (\a b -> abs $ a - b)) . bimap sort sort . unzip
     }
 
 day01b :: _ :~> _
 day01b = MkSol
-    { sParse = Just
+    { sParse = sParse day01a
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . uncurry solve . unzip
     }
