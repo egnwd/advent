@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day02 (
-    -- day02a
-  -- , day02b
+    day02a
+  , day02b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +45,43 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+monotonic x = min (monotonicD x) (monotonicU x)
+
+monotonicD [] = 0
+monotonicD [_] = 0
+monotonicD (x:y:xs)
+  | x > y = monotonicD (y:xs)
+  | otherwise = 1 + monotonicD (y:xs)
+
+monotonicU [] = 0
+monotonicU [_] = 0
+monotonicU (x:y:xs)
+  | x < y = monotonicU (y:xs)
+  | otherwise = 1 + monotonicU (y:xs)
+
+notTooMuch [] = 0
+notTooMuch [_] = 0
+notTooMuch (x:y:xs)
+  | (abs $ x - y) >= 1 && (abs $ x - y) <= 3 = notTooMuch (y:xs)
+  | otherwise = 1 + notTooMuch (y:xs)
+
+violations x = monotonic x + notTooMuch x
+
+withRemoval x = countTrue (\x' -> violations x' <= 0) xs
+    where
+        xs = zipWith (++) (inits x) (tail $ tails x)
+
 day02a :: _ :~> _
 day02a = MkSol
-    { sParse = Just
+    { sParse = traverse (traverse (readMaybe :: String-> Maybe Int) . words) . lines
     , sShow  = show
     , sSolve = Just
+             . countTrue (\x -> violations x <= 0)
     }
 
 day02b :: _ :~> _
 day02b = MkSol
-    { sParse = Just
+    { sParse = sParse day02a
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . countTrue (\x -> withRemoval x >= 1)
     }
