@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day02
 -- License     : BSD3
@@ -9,79 +6,41 @@
 -- Portability : non-portable
 --
 -- Day 2.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day02 (
     day02a
   , day02b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver          ((:~>)(..))
+import           AOC.Common          (countTrue, (&&&), (|||))
+import           Text.Read           (readMaybe)
+import           Data.Ix             (inRange)
+import           Data.List           (inits, tails)
+import           Control.Applicative (liftA2)
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+rule :: (a -> a -> Bool) -> [a] -> Bool
+rule p xs = all (uncurry p) $ zip xs (tail xs)
 
-monotonic x = min (monotonicD x) (monotonicU x)
-
-monotonicD [] = 0
-monotonicD [_] = 0
-monotonicD (x:y:xs)
-  | x > y = monotonicD (y:xs)
-  | otherwise = 1 + monotonicD (y:xs)
-
-monotonicU [] = 0
-monotonicU [_] = 0
-monotonicU (x:y:xs)
-  | x < y = monotonicU (y:xs)
-  | otherwise = 1 + monotonicU (y:xs)
-
-notTooMuch [] = 0
-notTooMuch [_] = 0
-notTooMuch (x:y:xs)
-  | (abs $ x - y) >= 1 && (abs $ x - y) <= 3 = notTooMuch (y:xs)
-  | otherwise = 1 + notTooMuch (y:xs)
-
-violations x = monotonic x + notTooMuch x
-
-withRemoval x = countTrue (\x' -> violations x' <= 0) xs
+rules :: [Int] -> Bool
+rules = monotonic &&& notTooMuch
     where
-        xs = zipWith (++) (inits x) (tail $ tails x)
+        monotonic = rule (>) ||| rule (<)
+        notTooMuch = rule $ \a b -> inRange (1,3) (abs $ a - b)
 
-day02a :: _ :~> _
+parse :: String -> Maybe [[Int]]
+parse = traverse (traverse readMaybe . words) . lines
+
+day02a :: [[Int]] :~> Int
 day02a = MkSol
-    { sParse = traverse (traverse (readMaybe :: String-> Maybe Int) . words) . lines
+    { sParse = parse
     , sShow  = show
-    , sSolve = Just
-             . countTrue (\x -> violations x <= 0)
+    , sSolve = Just . countTrue rules
     }
 
-day02b :: _ :~> _
+day02b :: [[Int]] :~> Int
 day02b = MkSol
-    { sParse = sParse day02a
+    { sParse = parse
     , sShow  = show
-    , sSolve = Just . countTrue (\x -> withRemoval x >= 1)
+    , sSolve = Just . countTrue (any rules . liftA2 (zipWith (++)) inits (tail . tails))
     }
