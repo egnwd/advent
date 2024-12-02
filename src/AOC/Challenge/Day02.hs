@@ -13,14 +13,14 @@ module AOC.Challenge.Day02 (
   ) where
 
 import           AOC.Solver          ((:~>)(..))
-import           AOC.Common          (countTrue, (&&&), (|||))
+import           AOC.Common          (countTrue, (&&&), (|||), pairwise)
 import           Text.Read           (readMaybe)
 import           Data.Ix             (inRange)
 import           Data.List           (inits, tails)
 import           Control.Applicative (liftA2)
 
 rule :: (a -> a -> Bool) -> [a] -> Bool
-rule p xs = and $ zipWith p xs (tail xs)
+rule p = and . pairwise p
 
 rules :: [Int] -> Bool
 rules = monotonic &&& notTooMuch

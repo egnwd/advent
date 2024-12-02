@@ -54,6 +54,7 @@ module AOC.Common (
                   , dupe
                   , listTup
                   , listTup3
+                  , pairwise
                   , module AOC
                   ) where
 
@@ -317,3 +318,6 @@ listTup _ = Nothing
 listTup3 :: [a] -> Maybe (a,a,a)
 listTup3 [x,y,z] = pure (x,y,z)
 listTup3 _ = Nothing
+
+pairwise :: (a -> a -> b) -> [a] -> [b]
+pairwise f = zipWith f <*> tail
