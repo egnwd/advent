@@ -20,7 +20,7 @@ import           Data.List           (inits, tails)
 import           Control.Applicative (liftA2)
 
 rule :: (a -> a -> Bool) -> [a] -> Bool
-rule p xs = all (uncurry p) $ zip xs (tail xs)
+rule p xs = and $ zipWith p xs (tail xs)
 
 rules :: [Int] -> Bool
 rules = monotonic &&& notTooMuch
