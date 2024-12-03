@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings, TypeFamilies  #-}
 
 -- |
 -- Module      : AOC.Challenge.Day03
@@ -26,58 +25,35 @@ module AOC.Challenge.Day03 (
   , day03b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver            ((:~>)(..))
+import           AOC.Common            (parseMaybeLenient, CharParser, pDecimal)
+import           Control.Applicative   ((<|>))
+import qualified Text.Megaparsec       as P
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import           Text.Megaparsec                ((<?>))
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+mulP :: CharParser Int
+mulP = P.try $ (*) <$> ("mul(" *> pDecimal) <*> ("," *> pDecimal <* ")")
 
-data Instr = Dont | Do | Mul (Int, Int) deriving (Show, Eq, Ord)
+takeRubbish :: CharParser a -> CharParser a
+takeRubbish = P.try . P.skipManyTill P.anySingle
 
-parseInstr =  (P.many (P.try (P.skipManyTill (P.anySingle <?> "Trash") instr))) <* P.takeRest
-
-instr :: CharParser Instr
-instr = (Mul <$> theMul) <|> (Dont <$ P.string "don't()") <|> (Do <$ P.string "do()")
-
-parse :: CharParser [(Int, Int)]
-parse =  (P.many (P.try (P.skipManyTill (P.anySingle <?> "Trash") theMul))) <* P.takeRest
-
-theMul = P.try ((,) <$> (P.string "mul(" *> pDecimal) <*> (P.string "," *> pDecimal <* P.string ")"))
-
-solve _ [] = mempty
-solve Do (Dont:xs) = solve Dont xs
-solve Do (x:xs) = f x <> solve Do xs
+parseGarbled :: CharParser Int -> CharParser a -> CharParser [Int]
+parseGarbled p gap = go
     where
-        f (Mul (a, b)) = Sum (a*b)
-        f _ = mempty
-solve Dont (Do:xs) = solve Do xs
-solve Dont (x:xs) = solve Dont xs
- 
+        go = takeRubbish (good <|> afterDo)
+        good = (:) <$> p <*> (go <|> rubbish)
+        afterDo = gap *> go
+        rubbish = [] <$ P.takeRest
 
-day03a :: _ :~> _
+day03a :: [Int] :~> Int
 day03a = MkSol
-    { sParse = Just . parseOrFail (parse <* P.eof)
+    { sParse = parseMaybeLenient $ parseGarbled mulP P.empty
     , sShow  = show
-    , sSolve = Just . sum . map (uncurry (*))
+    , sSolve = Just . sum
     }
 
-day03b :: _ :~> _
+day03b :: [Int] :~> _
 day03b = MkSol
-    { sParse = Just. parseOrFail (parseInstr <* P.eof)
+    { sParse = parseMaybeLenient $ parseGarbled mulP ("don't()" *> takeRubbish "do()")
     , sShow  = show
-    , sSolve = Just . getSum . solve Do
+    , sSolve = Just . sum
     }
