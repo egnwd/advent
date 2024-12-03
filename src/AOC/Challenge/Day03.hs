@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day03 (
-    -- day03a
-  -- , day03b
+    day03a
+  , day03b
   ) where
 
 import           AOC.Prelude
@@ -41,20 +41,43 @@ import qualified Data.Set                       as S
 import qualified Data.Text                      as T
 import qualified Data.Vector                    as V
 import qualified Linear                         as L
+import           Text.Megaparsec                ((<?>))
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+data Instr = Dont | Do | Mul (Int, Int) deriving (Show, Eq, Ord)
+
+parseInstr =  (P.many (P.try (P.skipManyTill (P.anySingle <?> "Trash") instr))) <* P.takeRest
+
+instr :: CharParser Instr
+instr = (Mul <$> theMul) <|> (Dont <$ P.string "don't()") <|> (Do <$ P.string "do()")
+
+parse :: CharParser [(Int, Int)]
+parse =  (P.many (P.try (P.skipManyTill (P.anySingle <?> "Trash") theMul))) <* P.takeRest
+
+theMul = P.try ((,) <$> (P.string "mul(" *> pDecimal) <*> (P.string "," *> pDecimal <* P.string ")"))
+
+solve _ [] = mempty
+solve Do (Dont:xs) = solve Dont xs
+solve Do (x:xs) = f x <> solve Do xs
+    where
+        f (Mul (a, b)) = Sum (a*b)
+        f _ = mempty
+solve Dont (Do:xs) = solve Do xs
+solve Dont (x:xs) = solve Dont xs
+ 
+
 day03a :: _ :~> _
 day03a = MkSol
-    { sParse = Just
+    { sParse = Just . parseOrFail (parse <* P.eof)
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . map (uncurry (*))
     }
 
 day03b :: _ :~> _
 day03b = MkSol
-    { sParse = Just
+    { sParse = Just. parseOrFail (parseInstr <* P.eof)
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . getSum . solve Do
     }
