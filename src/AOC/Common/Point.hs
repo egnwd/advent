@@ -22,6 +22,7 @@ module AOC.Common.Point
   -- * D24
   , D24(..)
   , orientPoint
+  , orientDir
   , allD24
   , allD24Set
   -- * Axis
@@ -305,3 +306,10 @@ orientPoint = \case
     D24 West  ZAxis True  -> \(V3 x y z) -> V3 (-y) (-x) (-z)
     D24 South ZAxis True  -> \(V3 x y z) -> V3   x  (-y) (-z)
 
+-- TODO: Check directions make sense
+orientDir :: (Num a) => (Dir, V2 a) -> V2 a
+orientDir = \case
+  (North, V2 x y) -> (V2 x y)
+  (East , V2 x y) -> (V2 (-x) y)
+  (South, V2 x y) -> (V2 y x)
+  (West , V2 x y) -> (V2 y (-x))
