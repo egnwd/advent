@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day05 (
-    -- day05a
-  -- , day05b
+    day05a
+  , day05b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +45,43 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+correct mp = go IS.empty
+    where
+        go _ [] = True
+        go seen (a:xs') = case M.lookup a mp of
+                            Just bf -> IS.disjoint seen bf && go (IS.insert a seen) xs'
+                            Nothing -> go (IS.insert a seen) xs'
+
+correctIt mp = sortBy comp
+    where
+        comp a b = case M.lookup a mp of
+                     Just bf -> if IS.member b bf then LT else case M.lookup b mp of
+                                                                 Just bf' -> if IS.member a bf' then GT else EQ
+                                                                 Nothing -> EQ
+                     Nothing -> case M.lookup b mp of
+                                  Just bf' -> if IS.member a bf' then GT else EQ
+                                  Nothing -> EQ
+
+fetchMiddle :: [a] -> Maybe a
+fetchMiddle xs =
+    let sz = length xs `div` 2
+     in xs !? sz
+
+parseTop :: String -> Maybe (Map Int IntSet)
+parseTop = fmap (M.fromListWith IS.union) . traverse (fmap (second IS.singleton) . listTup <=< traverse readMaybe . splitOn "|") . lines
+parseBottom :: String -> Maybe [[Int]]
+parseBottom = traverse (traverse readMaybe . splitOn ",") . lines
+
 day05a :: _ :~> _
 day05a = MkSol
-    { sParse = Just
+    { sParse = sequenceTuple . bimap parseTop parseBottom <=< listTup . splitOn "\n\n"
     , sShow  = show
-    , sSolve = Just
+    , sSolve = uncurry (\mp -> fmap sum . traverse fetchMiddle . filter (correct mp))
     }
 
 day05b :: _ :~> _
 day05b = MkSol
-    { sParse = Just
+    { sParse = sParse day05a
     , sShow  = show
-    , sSolve = Just
+    , sSolve = uncurry (\mp -> fmap sum . traverse (fetchMiddle . correctIt mp) . filter (not . correct mp))
     }
