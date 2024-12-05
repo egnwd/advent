@@ -45,22 +45,22 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
-correct mp = go IS.empty
+isCorrect :: Map Int IntSet -> [Int] -> Bool
+isCorrect mp = go IS.empty
     where
         go _ [] = True
         go seen (a:xs') = case M.lookup a mp of
                             Just bf -> IS.disjoint seen bf && go (IS.insert a seen) xs'
                             Nothing -> go (IS.insert a seen) xs'
 
-correctIt mp = sortBy comp
+correct :: Map Int IntSet -> [Int] -> [Int]
+correct mp = sortBy comp
     where
-        comp a b = case M.lookup a mp of
-                     Just bf -> if IS.member b bf then LT else case M.lookup b mp of
-                                                                 Just bf' -> if IS.member a bf' then GT else EQ
-                                                                 Nothing -> EQ
-                     Nothing -> case M.lookup b mp of
-                                  Just bf' -> if IS.member a bf' then GT else EQ
-                                  Nothing -> EQ
+        comp a b = case (before a b, before b a) of
+                     (Nothing, Nothing) -> EQ
+                     (Nothing, Just _) -> GT
+                     (Just _, _) -> LT
+        before a b = mfilter (IS.member b) (M.lookup a mp)
 
 fetchMiddle :: [a] -> Maybe a
 fetchMiddle xs =
@@ -76,12 +76,12 @@ day05a :: _ :~> _
 day05a = MkSol
     { sParse = sequenceTuple . bimap parseTop parseBottom <=< listTup . splitOn "\n\n"
     , sShow  = show
-    , sSolve = uncurry (\mp -> fmap sum . traverse fetchMiddle . filter (correct mp))
+    , sSolve = uncurry (\mp -> fmap sum . traverse fetchMiddle . filter (isCorrect mp))
     }
 
 day05b :: _ :~> _
 day05b = MkSol
     { sParse = sParse day05a
     , sShow  = show
-    , sSolve = uncurry (\mp -> fmap sum . traverse (fetchMiddle . correctIt mp) . filter (not . correct mp))
+    , sSolve = uncurry (\mp -> fmap sum . traverse (fetchMiddle . correct mp) . filter (not . isCorrect mp))
     }
