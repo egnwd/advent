@@ -55,6 +55,7 @@ module AOC.Common (
                   , listTup
                   , listTup3
                   , pairwise
+                  , rotate3
                   , module AOC
                   ) where
 
@@ -321,3 +322,6 @@ listTup3 _ = Nothing
 
 pairwise :: (a -> a -> b) -> [a] -> [b]
 pairwise f = zipWith f <*> tail
+
+rotate3 :: (a -> b -> c -> d) -> b -> c -> a -> d
+rotate3 f b c a = f a b c
