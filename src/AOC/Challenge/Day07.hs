@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day07 (
-    -- day07a
-  -- , day07b
+    day07a
+  , day07b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +45,28 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+parse = (,) <$> (pDecimal <* pTok (P.char ':')) <*> P.many (pTok pDecimal)
+
+canCreate ops test = S.member test . S.fromList . go
+    where
+        go [] = mempty
+        go [x] = return x
+        go (a : b : xs) = do
+            op <- ops
+            go (a `op` b : xs)
+
+numConcat a b = a * (10 ^ (succ . floor . logBase 10 $ b)) + b
+
 day07a :: _ :~> _
 day07a = MkSol
-    { sParse = Just
+    { sParse = parseLines parse
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . map fst . filter (uncurry $ canCreate [ (+), (*) ])
     }
 
-day07b :: _ :~> _
+day07b :: _ :~> Int
 day07b = MkSol
-    { sParse = Just
+    { sParse = sParse day07a
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . round . sum . map fst . filter (uncurry $ canCreate [ (+), (*), numConcat ])
     }
