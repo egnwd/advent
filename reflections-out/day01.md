@@ -7,10 +7,11 @@ the file `./reflections/day01.md`.  If you want to edit this, edit
 that file instead!
 -->
 
-*[all][reflections]* / *1* / *[2][day02]*
+*[all][reflections]* / *1* / *[2][day02]* / *[7][day07]*
 
 [reflections]: https://github.com/egnwd/advent/blob/main/reflections.md
 [day02]: https://github.com/egnwd/advent/blob/2024/reflections-out/day02.md
+[day07]: https://github.com/egnwd/advent/blob/2024/reflections-out/day07.md
 
 *[Prompt][d01p]* / *[Code][d01g]*
 
