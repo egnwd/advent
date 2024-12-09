@@ -63,18 +63,6 @@ instance NFData MemoryUnit
 
 type Memory = Seq MemoryUnit
 
-instance Show MemoryUnit where
-    show (Gap s e) = replicate (e-s+1) '.'
-    show (File f) = show f
-
-instance Show File where
-    show (F s e i) = replicate (e-s+1) (head . show $ i)
-
-showMem :: Memory -> String
-showMem = foldl' go ""
-    where
-        go acc a = acc <> show a
-
 shiftTo :: Int -> MemoryUnit -> MemoryUnit
 shiftTo s (Gap s' e') = Gap s (s+e'-s')
 shiftTo s (File (F s' e' i)) = File (F s (s+e'-s') i)
