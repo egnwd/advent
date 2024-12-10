@@ -23,8 +23,6 @@ import qualified Data.OrdPSQ    as Q
 import qualified Data.Sequence  as Seq
 import qualified Data.Set       as S
 
-import Debug.Trace
-
 data AStarState a c = AS
   { _asCameFrom :: !(Map a (Maybe a))
   , _asOpenSet :: !(OrdPSQ a c (c, Maybe a))
