@@ -16,6 +16,8 @@ Table of Contents
 * [Day 5](#day-5) *(no reflection yet)*
 * [Day 7](#day-7)
 * [Day 8](#day-8) *(no reflection yet)*
+* [Day 10](#day-10) *(no reflection yet)*
+* [Day 11](#day-11) *(no reflection yet)*
 
 Day 1
 ------
@@ -410,5 +412,86 @@ time                 1.522 ms   (1.515 ms .. 1.531 ms)
                      1.000 R²   (1.000 R² .. 1.000 R²)
 mean                 1.514 ms   (1.509 ms .. 1.522 ms)
 std dev              21.50 μs   (15.07 μs .. 34.04 μs)
+```
+
+
+
+Day 10
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day10.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d10p]* / *[Code][d10g]*
+
+[d10p]: https://adventofcode.com/2024/day/10
+[d10g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day10.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 10 Benchmarks
+
+```
+>> Day 10a
+benchmarking...
+time                 11.06 ms   (11.00 ms .. 11.12 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 10.93 ms   (10.89 ms .. 10.97 ms)
+std dev              112.8 μs   (88.26 μs .. 147.0 μs)
+
+* parsing and formatting times excluded
+
+>> Day 10b
+benchmarking...
+time                 11.12 ms   (11.09 ms .. 11.16 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 11.04 ms   (11.02 ms .. 11.08 ms)
+std dev              75.43 μs   (54.31 μs .. 93.84 μs)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 11
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day11.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d11p]* / *[Code][d11g]*
+
+[d11p]: https://adventofcode.com/2024/day/11
+[d11g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day11.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 11 Benchmarks
+
+```
+>> Day 11a
+benchmarking...
+time                 790.6 μs   (784.2 μs .. 796.0 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 765.4 μs   (758.9 μs .. 772.8 μs)
+std dev              22.17 μs   (20.15 μs .. 25.41 μs)
+variance introduced by outliers: 19% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 11b
+benchmarking...
+time                 55.99 ms   (52.90 ms .. 58.49 ms)
+                     0.995 R²   (0.992 R² .. 1.000 R²)
+mean                 53.69 ms   (53.15 ms .. 54.63 ms)
+std dev              1.492 ms   (837.7 μs .. 2.268 ms)
+
+* parsing and formatting times excluded
 ```
 
