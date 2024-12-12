@@ -18,6 +18,7 @@ Table of Contents
 * [Day 8](#day-8) *(no reflection yet)*
 * [Day 10](#day-10) *(no reflection yet)*
 * [Day 11](#day-11) *(no reflection yet)*
+* [Day 12](#day-12) *(no reflection yet)*
 
 Day 1
 ------
@@ -491,6 +492,46 @@ time                 55.99 ms   (52.90 ms .. 58.49 ms)
                      0.995 R²   (0.992 R² .. 1.000 R²)
 mean                 53.69 ms   (53.15 ms .. 54.63 ms)
 std dev              1.492 ms   (837.7 μs .. 2.268 ms)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 12
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day12.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d12p]* / *[Code][d12g]*
+
+[d12p]: https://adventofcode.com/2024/day/12
+[d12g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day12.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 12 Benchmarks
+
+```
+>> Day 12a
+benchmarking...
+time                 74.92 ms   (71.43 ms .. 79.65 ms)
+                     0.995 R²   (0.990 R² .. 1.000 R²)
+mean                 71.85 ms   (71.18 ms .. 74.85 ms)
+std dev              2.018 ms   (235.9 μs .. 3.508 ms)
+
+* parsing and formatting times excluded
+
+>> Day 12b
+benchmarking...
+time                 74.01 ms   (72.43 ms .. 76.09 ms)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 73.72 ms   (73.34 ms .. 74.99 ms)
+std dev              1.034 ms   (442.4 μs .. 1.418 ms)
 
 * parsing and formatting times excluded
 ```
