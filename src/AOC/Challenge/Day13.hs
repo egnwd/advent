@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day13
 -- License     : BSD3
@@ -9,52 +6,54 @@
 -- Portability : non-portable
 --
 -- Day 13.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day13 (
-    -- day13a
-  -- , day13b
+    day13a
+  , day13b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver ((:~>)(..))
+import           AOC.Common (parseMaybeLenient, Point, CharParser, pDecimal)
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
+import           Control.Lens                   ((^.))
+import           Control.Monad                  (guard)
+import           Data.Distributive              (distribute)
+import           Data.Functor                   (($>))
+import           Data.List.Split                (splitOn)
+import           Data.Maybe                     (mapMaybe)
+import           Linear                         (V2(..), (^*), V3(..), _x)
 import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
 
-day13a :: _ :~> _
+parse :: CharParser (V2 Int, V2 Int, Point)
+parse = do
+    a <- V2 <$> (P.string "Button A: X" *> pDecimal) <*> (P.string ", Y" *> pDecimal) <* P.newline
+    b <- V2 <$> (P.string "Button B: X" *> pDecimal) <*> (P.string ", Y" *> pDecimal) <* P.newline
+    p <- V2 <$> (P.string "Prize: X=" *> pDecimal) <*> (P.string ", Y=" *> pDecimal)
+    return (a, b, p)
+
+solve :: (V2 Int, V2 Int, Point) -> Maybe Int
+solve (a,b,p) = do
+    let V2 x' y' = distribute $ V3 a b p
+        one = x' ^* (y' ^. _x)
+        two = y' ^* (x' ^. _x)
+        V3 _ b' p' = one - two
+    b'' <- guard (p' `mod` b' == 0) $> p' `div` b'
+    let a'' = (p ^. _x - (b ^. _x * b'')) `div` (a ^. _x)
+    return $ a'' * 3 + b''
+
+heyBigSpender :: (V2 Int, V2 Int, Point) -> (V2 Int, V2 Int, Point)
+heyBigSpender (a, b, p) = (a, b, p + 10000000000000)
+
+day13a :: [(V2 Int, V2 Int, Point)] :~> Int
 day13a = MkSol
-    { sParse = Just
+    { sParse = traverse (parseMaybeLenient parse) . splitOn "\n\n"
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . mapMaybe solve
     }
 
-day13b :: _ :~> _
+day13b :: [(V2 Int, V2 Int, Point)] :~> Int
 day13b = MkSol
-    { sParse = Just
+    { sParse = traverse (parseMaybeLenient parse) . splitOn "\n\n"
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . sum . mapMaybe (solve . heyBigSpender)
     }
