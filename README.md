@@ -47,9 +47,9 @@ Check out the [reflections][] --- more info below!
 | Day 10    |             | [x][d10g] | [x][d10b]  |
 | Day 11    |             | [x][d11g] | [x][d11b]  |
 | Day 12    |             | [x][d12g] | [x][d12b]  |
-| Day 13    |             |           |            |
-| Day 14    |             |           |            |
-| Day 15    |             |           |            |
+| Day 13    |             | [x][d13g] | [x][d13b]  |
+| Day 14    |             | [x][d14g] | [x][d14b]  |
+| Day 15    |             | [x][d15g] | [x][d15b]  |
 | Day 16    |             |           |            |
 | Day 17    |             |           |            |
 | Day 18    |             |           |            |
@@ -307,3 +307,9 @@ All networking features are powered by *[advent-of-code-api][]*.
 [d11b]: https://github.com/egnwd/advent/blob/2024/reflections.md#day-11-benchmarks
 [d12g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day12.hs
 [d12b]: https://github.com/egnwd/advent/blob/2024/reflections.md#day-12-benchmarks
+[d13g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day13.hs
+[d13b]: https://github.com/egnwd/advent/blob/2024/reflections.md#day-13-benchmarks
+[d14g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day14.hs
+[d14b]: https://github.com/egnwd/advent/blob/2024/reflections.md#day-14-benchmarks
+[d15g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day15.hs
+[d15b]: https://github.com/egnwd/advent/blob/2024/reflections.md#day-15-benchmarks
