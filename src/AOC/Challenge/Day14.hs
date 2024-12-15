@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day14
 -- License     : BSD3
@@ -10,51 +7,55 @@
 --
 -- Day 14.  See "AOC.Solver" for the types used in this module!
 --
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day14 (
-    -- day14a
-  -- , day14b
+    day14a
+  , day14b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver ((:~>)(..),  dyno_)
+import           AOC.Common (CharParser, pDecimal, pTok, Point, freqs, parseLines)
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+import           Control.Monad (ap)
+import           Control.Lens (minimumOf)
+import           Linear (V2(..), (^*), V4(..))
+
+parse :: CharParser (Point, V2 Int)
+parse = do
+    p <- V2 <$> (P.string "p=" *> pDecimal) <*> (P.char ',' *> pTok pDecimal)
+    v <- V2 <$> (P.string "v=" *> pDecimal) <*> (P.char ',' *> pTok pDecimal)
+    return (p, v)
+
+move :: Int -> Int -> Int -> Point -> V2 Int -> Point
+move w h s p v = let V2 x y = p + v ^* s
+                  in V2 (x `mod` w) (y `mod` h)
+
+safety :: Int -> Int -> [Point] -> Int
+safety w h rs = let (top, bottom) = splitHalf (const True) (<= my) rs'
+                    (topLeft, topRight) = splitHalf (<= mx) (const True) top
+                    (bottomLeft, bottomRight) = splitHalf (<= mx) (const True) bottom
+                 in product $ sum <$> V4 topLeft topRight bottomLeft bottomRight
+                where
+                    mx = w `div` 2
+                    my = h `div` 2
+                    rs' = M.filterWithKey (\k _ -> and $ ap (V2 (/= mx) (/= my)) k) $ freqs rs
+                    splitHalf px py = M.partitionWithKey (\k _ -> and $ ap (V2 px py) k)
 
 day14a :: _ :~> _
 day14a = MkSol
-    { sParse = Just
+    { sParse = parseLines parse
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . safety (dyno_ "w" 101) (dyno_ "h" 103) . map (uncurry $ move (dyno_ "w" 101) (dyno_ "h" 103) 100)
     }
 
 day14b :: _ :~> _
 day14b = MkSol
-    { sParse = Just
+    { sParse = parseLines parse
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \rs ->
+        let go n = map (uncurry $ move (dyno_ "w" 101) (dyno_ "h" 103) n)
+            check = safety (dyno_ "w" 101) (dyno_ "h" 103)
+         in fmap snd . minimumOf traverse $ map (\n -> (,n) . check $ go n rs) [8000..9000]
     }
