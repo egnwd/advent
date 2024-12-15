@@ -78,8 +78,10 @@ simulate shift mp0 ds0 = do
     where
         go (r, mp) d = fromMaybe (r,mp) $ do
             ks <- shift d r mp
-            let (toMove, stay) = M.partitionWithKey (\k _ -> k `S.member` ks) mp
-                mp' = M.union stay (M.fromList . map (first (+dirVec d)) . M.toList $ toMove)
+            let mp' = uncurry M.union
+                    . first (M.fromList . map (first (+dirVec d)) . M.toList)
+                    . M.partitionWithKey (\k _ -> k `S.member` ks)
+                    $ mp
             return (r+dirVec d, mp')
 
 moveRobot :: Dir -> Point -> Map Point NormalWarehouse -> Maybe (Set Point)
