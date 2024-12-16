@@ -22,11 +22,11 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day16 (
-    -- day16a
-  -- , day16b
+    day16a
+  , day16b
   ) where
 
-import           AOC.Prelude
+import           AOC.Prelude hiding (Space)
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
@@ -45,16 +45,41 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+data ReindeerMap = Start | Space | End deriving (Show, Eq, Ord)
+
+parse 'S' = Just Start
+parse 'E' = Just End
+parse '.' = Just Space
+parse _ = Nothing
+
+toPoints mp = do
+    let points = M.fromListWith (<>) . map (\(k, x) -> (x, S.singleton k)) . M.toList $ mp
+    [s] <- S.toList <$> M.lookup Start points
+    [e] <- S.toList <$> M.lookup End points
+    return (s, e, fold points)
+
+solve :: (Point, Dir) -> Point -> Set Point -> Maybe (Int, [(Point, Dir)])
+solve start end mp = aStar' next cost ((== end) . fst) start
+    where
+        next (p,d) = M.fromList [((p',d'),c) | ((p',d'), c) <- [((p, d <> East), 1000), ((p, d <> West), 1000), ((p + dirVec d, d), 1)], p' `S.member` mp]
+        cost = manhattan end . fst
+
+solve' :: (Point, Dir) -> Point -> Set Point -> Maybe _
+solve' start end mp = aStarSeen next cost ((== end) . fst) start
+    where
+        next (p,d) = M.fromList [((p',d'),c) | ((p',d'), c) <- [((p, d <> East), 1000), ((p, d <> West), 1000), ((p + dirVec d, d), 1)], p' `S.member` mp]
+        cost = manhattan end . fst
+
 day16a :: _ :~> _
 day16a = MkSol
-    { sParse = Just
+    { sParse = toPoints . parseAsciiMap parse
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \(s, e, mp) -> fst <$> solve (s, East) e mp
     }
 
 day16b :: _ :~> _
 day16b = MkSol
-    { sParse = Just
+    { sParse = toPoints . parseAsciiMap parse
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \(s, e, mp) -> S.size . foldMap (S.fromList . map fst) . snd <$> solve' (s, East) e mp
     }
