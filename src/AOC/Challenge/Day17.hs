@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day17
@@ -10,51 +9,60 @@
 --
 -- Day 17.  See "AOC.Solver" for the types used in this module!
 --
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day17 (
-    -- day17a
-  -- , day17b
+    day17a
+  , day17b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver ((:~>)(..))
+import           AOC.Util   (eitherToMaybe)
+import           AOC.Common (CharParser, pDecimal, parseMaybeLenient)
+import           AOC.Common.Computer (Register(..), Memory(..), stepTilTermination, IErr(..))
 
-import qualified Data.Graph.Inductive           as G
+import           Control.Lens hiding (op)
+import           Control.Monad.Except
+import           Data.Bits ((.&.), shiftL, shiftR, xor)
+import           Data.Conduino
+import           Data.Foldable (foldr', toList)
+import           Data.List (intercalate)
+import qualified Data.Conduino.Combinators as C
 import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
 import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
 
-day17a :: _ :~> _
+runProg :: Memory -> Either IErr [Int]
+runProg mem = runPipe
+     $ stepTilTermination mem
+    .| C.sinkList
+
+parse :: CharParser Memory
+parse = do
+    a <- (RegA,) <$> ("Register A: " *> pDecimal <* P.newline)
+    b <- (RegB,) <$> ("Register B: " *> pDecimal <* P.newline)
+    c <- (RegC,) <$> ("Register C: " *> pDecimal <* P.newline)
+    prog <- (P.newline >> "Program: ") *> ((toEnum <$> pDecimal) `P.sepBy` ",")
+
+    return $ Mem 0 (M.fromList [a,b,c]) (IM.fromList $ zip [0..] prog)
+
+findCopier :: Memory -> [Int]
+findCopier = foldr' (\o -> concatMap (`go` o)) [0] . toList . _mProg
+    where
+        f a = ((((a .&. 7) `xor` 2) `xor` 7) `xor` (a `shiftR` ((a .&. 7) `xor` 2))) .&. 7
+        go a o = maybe [] S.toList . M.lookup o . M.fromListWith (<>) . ap (zip . fmap f) (fmap S.singleton) $ [a `shiftL` 3..(a `shiftL` 3)+7]
+
+day17a :: Memory :~> [Int]
 day17a = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
+    { sParse = parseMaybeLenient parse
+    , sShow  = intercalate "," . map show
+    , sSolve = eitherToMaybe . runProg
     }
 
-day17b :: _ :~> _
+day17b :: Memory :~> Int
 day17b = MkSol
-    { sParse = Just
+    { sParse = parseMaybeLenient parse
     , sShow  = show
-    , sSolve = Just
+    , sSolve = minimumOf traverse . findCopier
     }
