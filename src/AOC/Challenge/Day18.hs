@@ -1,6 +1,4 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
+{-# LANGUAGE OverloadedStrings #-}
 -- |
 -- Module      : AOC.Challenge.Day18
 -- License     : BSD3
@@ -10,51 +8,54 @@
 --
 -- Day 18.  See "AOC.Solver" for the types used in this module!
 --
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day18 (
-    -- day18a
-  -- , day18b
+    day18a
+  , day18b
   ) where
 
-import           AOC.Prelude
+import           AOC.Solver ((:~>)(..), dyno_)
+import           AOC.Common
+  ( parseLines
+  , pDecimal
+  , Point
+  , aStar'
+  , binarySearch
+  , neighboursSet
+  , inBoundingBox
+  , manhattan
+  , (!?)
+  , sequenceSepBy)
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
+import           Data.Set                       (Set)
 import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+import           Linear (V2(..))
+import           Data.Maybe                     (isNothing)
 
-day18a :: _ :~> _
+search :: Int -> Set Point -> Maybe (Int, [Point])
+search mx mp = aStar' next cost (== V2 mx mx) (V2 0 0)
+    where
+        next a = M.fromSet (const 1)
+               . S.filter (inBoundingBox (V2 (V2 0 0) (V2 mx mx)))
+               $ neighboursSet a `S.difference` mp
+        cost = manhattan (V2 mx mx)
+
+solve :: Int -> [Point] -> _
+solve mx ms = ms !? (binarySearch 0 (length ms) canComplete - 1)
+    where
+        canComplete n = isNothing $ search mx (S.fromList $ take n ms)
+
+day18a :: [Point] :~> Int
 day18a = MkSol
-    { sParse = Just
+    { sParse = parseLines (V2 pDecimal pDecimal `sequenceSepBy` ",")
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap fst . search (dyno_ "mx" 70) . S.fromList . take (dyno_ "bytes" 1024)
     }
 
-day18b :: _ :~> _
+day18b :: [Point] :~> Point
 day18b = MkSol
-    { sParse = Just
-    , sShow  = show
-    , sSolve = Just
+    { sParse = parseLines (V2 pDecimal  pDecimal `sequenceSepBy` ",")
+    , sShow  = \(V2 x y) -> show x ++ "," ++ show y
+    , sSolve = solve (dyno_ "mx" 70)
     }

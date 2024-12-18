@@ -22,6 +22,8 @@ Table of Contents
 * [Day 13](#day-13) *(no reflection yet)*
 * [Day 14](#day-14) *(no reflection yet)*
 * [Day 15](#day-15) *(no reflection yet)*
+* [Day 17](#day-17) *(no reflection yet)*
+* [Day 18](#day-18) *(no reflection yet)*
 
 Day 1
 ------
@@ -656,5 +658,88 @@ time                 1.476 s    (1.431 s .. 1.523 s)
 mean                 1.467 s    (1.459 s .. 1.474 s)
 std dev              8.863 ms   (7.777 ms .. 9.405 ms)
 variance introduced by outliers: 19% (moderately inflated)
+```
+
+
+
+Day 17
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day17.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d17p]* / *[Code][d17g]*
+
+[d17p]: https://adventofcode.com/2024/day/17
+[d17g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day17.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 17 Benchmarks
+
+```
+>> Day 17a
+benchmarking...
+time                 21.11 μs   (19.73 μs .. 22.93 μs)
+                     0.899 R²   (0.796 R² .. 0.996 R²)
+mean                 21.71 μs   (20.13 μs .. 26.96 μs)
+std dev              8.322 μs   (3.731 μs .. 16.03 μs)
+variance introduced by outliers: 99% (severely inflated)
+
+* parsing and formatting times excluded
+
+>> Day 17b
+benchmarking...
+time                 24.58 μs   (23.99 μs .. 25.63 μs)
+                     0.988 R²   (0.978 R² .. 0.996 R²)
+mean                 25.33 μs   (24.61 μs .. 26.49 μs)
+std dev              2.780 μs   (2.151 μs .. 3.840 μs)
+variance introduced by outliers: 87% (severely inflated)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 18
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day18.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d18p]* / *[Code][d18g]*
+
+[d18p]: https://adventofcode.com/2024/day/18
+[d18g]: https://github.com/egnwd/advent/blob/2024/src/AOC/Challenge/Day18.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 18 Benchmarks
+
+```
+>> Day 18a
+benchmarking...
+time                 15.22 ms   (14.72 ms .. 15.89 ms)
+                     0.993 R²   (0.988 R² .. 1.000 R²)
+mean                 15.23 ms   (15.04 ms .. 15.54 ms)
+std dev              638.4 μs   (461.6 μs .. 814.4 μs)
+variance introduced by outliers: 15% (moderately inflated)
+
+* parsing and formatting times excluded
+
+>> Day 18b
+benchmarking...
+time                 22.94 ms   (22.89 ms .. 23.04 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 23.02 ms   (22.98 ms .. 23.10 ms)
+std dev              128.9 μs   (75.97 μs .. 193.5 μs)
+
+* parsing and formatting times excluded
 ```
 
