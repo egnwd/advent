@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day19
 -- License     : BSD3
@@ -10,51 +7,65 @@
 --
 -- Day 19.  See "AOC.Solver" for the types used in this module!
 --
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day19 (
-    -- day19a
-  -- , day19b
+    day19a
+  , day19b
   ) where
 
 import           AOC.Prelude
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
 import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
 
-day19a :: _ :~> _
+type Towel = String
+type Design = String
+
+parseTowels :: String -> Set Towel
+parseTowels = S.fromList . splitOn ", "
+
+parseDesigns :: String -> [Design]
+parseDesigns = lines
+
+isPossible :: Set Towel -> [Design] -> Int
+isPossible towels designs = evalState (length <$> filterM go designs) (M.fromSet (const True) towels)
+    where
+        go :: Design -> State (Map Design Bool) Bool
+        go [] = return True
+        go a = anyM (\s -> getOrAdd (drop (length s) a) go)
+             . S.toList
+             . S.filter (`isPrefixOf` a)
+             $ towels
+
+possibleDesigns :: Set Towel -> [Design] -> Int
+possibleDesigns towels designs = evalState (sum <$> traverse go designs) M.empty
+    where
+        go :: Design -> State (Map Design Int) Int
+        go [] = return 1
+        go a = fmap sum
+             . traverse (\s -> getOrAdd (drop (length s) a) go)
+             . S.toList
+             . S.filter (`isPrefixOf` a)
+             $ towels
+
+getOrAdd :: (MonadState (Map k a) m, Ord k) => k -> (k -> m a) -> m a
+getOrAdd key go = gets (M.lookup key) >>= \case
+    Just x -> return x
+    Nothing -> do
+        x <- go key
+        modify $ M.insert key x
+        return x
+
+day19a :: (Set Towel, [Design]) :~> Int
 day19a = MkSol
-    { sParse = Just
+    { sParse = fmap (bimap parseTowels parseDesigns) . listTup . splitOn "\n\n"
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . uncurry isPossible
     }
 
-day19b :: _ :~> _
+day19b :: (Set Towel, [Design]) :~> Int
 day19b = MkSol
-    { sParse = Just
+    { sParse = fmap (bimap parseTowels parseDesigns) . listTup . splitOn "\n\n"
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just . uncurry possibleDesigns
     }

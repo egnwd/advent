@@ -19,6 +19,8 @@ module AOC.Util (
   , maybeAlt
   , traceShowIdMsg
   , traceShowMsg
+  , ifM
+  , anyM
   ) where
 
 import           Control.Applicative
@@ -65,3 +67,12 @@ traceShowIdMsg msg x = trace (msg ++ show x) x
 -- | Like 'traceShow' but with an extra message
 traceShowMsg :: Show a => String -> a -> b -> b
 traceShowMsg msg x = trace (msg ++ show x)
+
+ifM :: Monad m => m Bool -> m a -> m a -> m a
+ifM b t f = do b <- b; if b then t else f
+
+(||^) :: Monad m => m Bool -> m Bool -> m Bool
+(||^) a b = ifM a (pure True) b
+
+anyM :: (Monad m, Foldable t) => (a -> m Bool) -> t a -> m Bool
+anyM p = foldr ((||^) . p) (pure False)
