@@ -142,8 +142,8 @@ challengeData sess yr spec@CS{..} = do
     ps@CP{..} = challengePaths yr spec
     readFileMaybe :: FilePath -> IO (Maybe String)
     readFileMaybe =
-      (traverse (evaluate . force) . eitherToMaybe =<<)
-        . tryJust (guard . isDoesNotExistError)
+      (traverse (evaluate . force) . eitherToMaybe)
+        <=< tryJust (guard . isDoesNotExistError)
         . readFile
     fetchInput :: ExceptT [String] IO String
     fetchInput = do
@@ -268,7 +268,7 @@ parseTests = MP.many parseTest <* MP.eof
 parseMeta :: Parser TestMeta
 parseMeta = do
     dats <- MP.many (MP.try parseData) MP.<?> "Data Block"
-    ans  <- Just <$> (MP.try parseAnswer) MP.<?> "Expected Answer"
+    ans  <- Just <$> MP.try parseAnswer MP.<?> "Expected Answer"
     pure $ TM ans (M.fromList dats)
   where
     parseAnswer = MP.string "\n>>>"

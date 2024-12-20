@@ -22,6 +22,8 @@ module AOC.Run (
     TestSpec(..)
   -- * Runners
   -- ** Run solutions, tests, benchmarks
+  , defaultMTO
+  -- ** Run solutions, tests, benchmarks
   , MainRunOpts(..), HasMainRunOpts(..), mainRun, defaultMRO
   -- ** View prompts
   , MainViewOpts(..), HasMainViewOpts(..), mainView, defaultMVO
@@ -93,6 +95,16 @@ data MainSubmitOpts = MSO { _msoSpec  :: !ChallengeSpec
   deriving Show
 
 makeClassy ''MainSubmitOpts
+
+-- | Default options for testing'.
+defaultMTO :: TestSpec -> MainRunOpts
+defaultMTO ts = MRO { _mroSpec   = ts
+                    , _mroActual = False
+                    , _mroTest   = True
+                    , _mroBench  = False
+                    , _mroLock   = False
+                    , _mroInput  = \_ _ -> pure Nothing
+                    }
 
 -- | Default options for 'mainRun'.
 defaultMRO :: TestSpec -> MainRunOpts

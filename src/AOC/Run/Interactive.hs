@@ -16,6 +16,7 @@ module AOC.Run.Interactive (
     execSolution
   , execSolutionWith
   , testSolution
+  , testOnlySolution
   , viewPrompt
   , waitForPrompt
   , submitSolution
@@ -79,6 +80,20 @@ testSolution :: ChallengeSpec -> IO (Maybe Bool)
 testSolution cs = eitherIO $ do
     cfg <- liftIO $ configFile defConfPath
     out <- mainRun cfg $ (defaultMRO (TSDayPart cs))
+      { _mroTest  = True
+      }
+    res <- maybeToEither ["Result not found in result map (Internal Error)"] $
+      lookupSolution cs out
+    pure $ fst res
+--
+-- | Run test suite for a given challenge spec.
+--
+-- Returns 'Just' if any tests were run, with a 'Bool' specifying whether
+-- or not all tests passed.
+testOnlySolution :: ChallengeSpec -> IO (Maybe Bool)
+testOnlySolution cs = eitherIO $ do
+    cfg <- liftIO $ configFile defConfPath
+    out <- mainRun cfg $ (defaultMTO (TSDayPart cs))
       { _mroTest  = True
       }
     res <- maybeToEither ["Result not found in result map (Internal Error)"] $

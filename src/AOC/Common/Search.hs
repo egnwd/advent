@@ -3,7 +3,6 @@
 module AOC.Common.Search
   ( aStar
   , aStar'
-  , aStarSeen
   , beamAStar'
   , floydWarshall
   , bfs
@@ -29,26 +28,12 @@ data AStarState a c = AS
   , _asOpenSet :: !(OrdPSQ a c (c, Maybe a))
   }
 
-data AStarStateAll a c = ASA
-  { _asaCameFrom :: !(Map a (Maybe a))
-  , _asaOpenSet :: !(OrdPSQ a c (c, Maybe a))
-  , _asaBests :: !(Maybe (c, [(a, Map a (Maybe a))]))
-  }
-
 $(makeLenses ''AStarState)
-$(makeLenses ''AStarStateAll)
 
 initialASState :: (Num c) => a -> c -> AStarState a c
 initialASState start f = AS
   { _asCameFrom = M.singleton start Nothing
   , _asOpenSet = Q.singleton start f (0, Nothing)
-  }
-
-initialASStateAll :: (Num c) => a -> c -> AStarStateAll a c
-initialASStateAll start f = ASA
-  { _asaCameFrom = M.singleton start Nothing
-  , _asaOpenSet = Q.singleton start f (0, Nothing)
-  , _asaBests = Nothing
   }
 
 -- | Fast(er) version of [aStar from search-algorithms](https://hackage.haskell.org/package/search-algorithms-0.3.1/docs/Algorithm-Search.html#v:aStar)
@@ -103,45 +88,8 @@ aStar' neighbours heur term start = second reconstruct <$> go (initialASState st
       let gScore' = g+w
       in as & asOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
 
-aStarSeen
-  :: forall a c. (Ord a, Ord c, Num c)
-  => (a -> Map a c) -- ^ neighbourhood
-  -> (a -> c)       -- ^ heuristic
-  -> (a -> Bool)    -- ^ termination condition
-  -> a              -- ^ start
-  -> Maybe _ -- ^ perhaps the cost with the path
-aStarSeen neighbours heur term start = second (map reconstruct) <$> go (initialASStateAll start (heur start))
-  where
-    reconstruct :: (a, Map a (Maybe a)) -> [a]
-    reconstruct (goal, mp) = reverse $ goreco goal
-      where
-        goreco n = n : maybe [] goreco (mp M.! n)
-
-    go :: AStarStateAll a c -> Maybe (c, [(a, Map a (Maybe a))])
-    go as@ASA{..} = Q.minView _asaOpenSet >>= doAStar
-      where
-        doAStar (n, c, (g, p), open)
-          | term n = do
-            case _asaBests of
-              Nothing -> let as' = as & asaOpenSet .~ open & asaCameFrom %~ M.insert n p & asaBests ?~ (c, [(n, _asaCameFrom)])
-                             !ns = neighbours n `M.difference` _asaCameFrom
-                          in go $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
-              Just (c', bs)
-                | c > c' -> Just (c', bs)
-                | otherwise -> let as' = as & asaOpenSet .~ open & asaCameFrom %~ M.insert n p & asaBests . _Just . _2 %~ ((n, _asaCameFrom) :)
-                                   !ns = neighbours n `M.difference` _asaCameFrom
-                                in go $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
-          | otherwise = let as' = as & asaOpenSet .~ open & asaCameFrom %~ M.insert n p
-                            !ns = neighbours n `M.difference` _asaCameFrom
-                         in go $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
-
-    updateNeighbour :: c -> Maybe a -> AStarStateAll a c -> a -> c -> AStarStateAll a c
-    updateNeighbour g p as n w =
-      let gScore' = g+w
-      in as & asaOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
-
 beamAStar'
-  :: forall a c. (Ord a, Ord c, Num c, Show c)
+  :: forall a c. (Ord a, Ord c, Num c)
   => Int            -- ^ beam size
   -> (a -> Map a c) -- ^ neighbourhood
   -> (a -> c)       -- ^ heuristic
@@ -164,7 +112,7 @@ beamAStar' sz neighbours heur term start = second reconstruct <$> go (initialASS
                             !ns = neighbours n `M.difference` _asCameFrom
                          in go $ M.foldlWithKey' (updateNeighbour g (Just n)) as' ns
 
-    updateNeighbour :: Show c => c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
+    updateNeighbour :: c -> Maybe a -> AStarState a c -> a -> c -> AStarState a c
     updateNeighbour g p as n w =
       let gScore' = g+w
       in as & asOpenSet %~ insertIfBetter n (gScore' + heur n) (gScore', p)
