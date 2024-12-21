@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day20 (
-    -- day20a
-  -- , day20b
+    day20a
+  , day20b
   ) where
 
 import           AOC.Prelude
@@ -44,17 +44,44 @@ import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
+import           Data.Finite
+
+data RaceTrack = Start | Track | End deriving (Show, Eq, Ord)
+
+parse 'S' = Just Start
+parse 'E' = Just End
+parse '.' = Just Track
+parse _ = Nothing
+
+toPoints mp = do
+    let points = M.fromListWith (<>) . map (\(k, x) -> (x, S.singleton k)) . M.toList $ mp
+    [s] <- S.toList <$> M.lookup Start points
+    [e] <- S.toList <$> M.lookup End points
+    return (s, e, fold points)
+
+race :: Point -> Point -> Set Point -> Maybe _
+race start end mp = aStar' next cost ((== end) . fst) (start, 2)
+    where
+        cost = manhattan end . fst
+        next :: (Point, Finite 3) -> Map (Point, Finite 3) Int
+        next (p, 0) = M.fromSet (const 1) . S.map (,0) $ neighboursSet p `S.intersection` mp
+        next (p, 1) = M.fromSet (const 1) . S.map (,0) $ neighboursSet p
+        next (p, 2) = let nx = neighboursSet p
+                          cheats = S.map (,1) nx
+                          regular = S.map (,2) (nx `S.intersection` mp)
+                       in M.fromSet (const 1) $ S.union cheats regular
+        next (_, _) = undefined
 
 day20a :: _ :~> _
 day20a = MkSol
-    { sParse = Just
+    { sParse = toPoints . parseAsciiMap parse
     , sShow  = show
-    , sSolve = Just
+    , sSolve = \(s, e, m) -> race s e m
     }
 
 day20b :: _ :~> _
 day20b = MkSol
-    { sParse = Just
+    { sParse = toPoints . parseAsciiMap parse
     , sShow  = show
     , sSolve = Just
     }

@@ -8,6 +8,8 @@ module AOC.Common.Search
   , bfs
   , bfsAll
   , binarySearch
+  , Dist(..)
+  , dijkstra
   ) where
 
 import           Control.Lens hiding (Empty)
@@ -18,6 +20,8 @@ import           Data.Map       (Map)
 import           Data.Set       (Set)
 import           Data.Sequence  (Seq(..))
 import           Data.OrdPSQ    (OrdPSQ)
+import           Control.DeepSeq (NFData)
+import           GHC.Generics   (Generic)
 import qualified Data.Map       as M
 import qualified Data.OrdPSQ    as Q
 import qualified Data.Sequence  as Seq
@@ -248,3 +252,58 @@ binarySearch lo hi p
   where
       mid = (lo + hi) `div` 2
 
+
+data Dist a = Dist a | Infinity deriving (Show, Eq, Ord, Functor, Generic)
+instance NFData a => NFData (Dist a)
+
+instance Num a => Num (Dist a) where
+  (Dist a) + (Dist b) = Dist (a + b)
+  _ + _ = Infinity
+
+  (Dist a) * (Dist b) = Dist (a * b)
+  _ * _ = Infinity
+
+  abs = fmap abs
+
+  signum = fmap signum
+
+  fromInteger = Dist . fromInteger
+
+  negate = fmap negate
+
+data DijkstraState a c = DijkstraState
+  { _visitedSet :: Set a
+  , _distanceMap :: Map a (Dist c)
+  , _nodeQueue :: OrdPSQ a (Dist c) ()
+  }
+
+$(makeLenses ''DijkstraState)
+
+initialDijkstraState :: Num c => s -> DijkstraState s c
+initialDijkstraState s = DijkstraState S.empty (M.singleton s 0) (Q.singleton s 0 ())
+
+dijkstra
+  :: forall a c. (Ord a, Ord c, Num c)
+  => (a -> Map a c) -- ^ neighbourhood
+  -> (a -> Bool)    -- ^ termination condition
+  -> a              -- ^ start
+  -> Maybe (Dist c, Map a (Dist c)) -- ^ perhaps the cost with the path
+dijkstra next end start = go (initialDijkstraState start)
+  where
+    go :: DijkstraState a c -> Maybe (Dist c, Map a (Dist c))
+    go ds@(DijkstraState v0 d0 q0) =
+      case Q.minView q0 of
+        Nothing -> Nothing
+        Just (n, c, (), q)
+          | end n -> Just (c, d0)
+          | n `S.member` v0 -> go (ds & nodeQueue .~ q)
+          | otherwise -> let ds' = ds & visitedSet %~ S.insert n
+                             !ns = M.map Dist (next n) `M.withoutKeys` v0
+                          in go $ M.foldlWithKey' (updateNeighbour n) ds' ns
+
+    updateNeighbour :: a -> DijkstraState a c -> a -> Dist c -> DijkstraState a c
+    updateNeighbour p ds n w =
+      let cost' = w + (ds ^. distanceMap . at p . non Infinity)
+      in if cost' < ds ^. distanceMap . at n . non Infinity
+            then ds & distanceMap %~ M.insert n cost' & nodeQueue %~ Q.insert n cost' ()
+            else ds
