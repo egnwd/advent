@@ -31,6 +31,7 @@ module AOC.Common.Point
   -- * Dir
   , Dir(..)
   , dirVec
+  , vecDir
   , setEdge
   , getEdge
   , allDir
@@ -177,7 +178,7 @@ type Point3D = V3 Int
 type Vector3D = V3 Int
 
 data Dir = North | East | South | West
-  deriving (Show, Eq, Ord, Generic, Enum)
+  deriving (Show, Eq, Ord, Generic, Enum, Bounded)
 
 northEdge, eastEdge, southEdge, westEdge :: Set Point
 northEdge = S.fromList $ (+ dirVec North) <$> [ dirVec West, pure 0, dirVec East ]
@@ -191,6 +192,14 @@ dirVec = \case
     East  -> V2   1   0
     South -> V2   0   1
     West  -> V2 (-1)  0
+
+vecDir :: (Eq a, Num a) => V2 a -> Maybe Dir
+vecDir = \case
+    V2   0 (-1) -> Just North
+    V2   1   0  -> Just East
+    V2   0   1  -> Just South
+    V2 (-1)  0  -> Just West
+    _ -> Nothing
 
 getEdge :: V2 (V2 a)
         -> Dir

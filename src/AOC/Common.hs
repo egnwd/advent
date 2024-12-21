@@ -28,6 +28,7 @@ module AOC.Common (
                   , hexDigit
                   , binDigit
                   , decDigit
+                  , unDecDigit
                   , hexToBin
                   , Letter
                   , charFinite
@@ -155,6 +156,9 @@ binDigit = baseDigit
 
 decDigit :: Prism' Char (Finite 10)
 decDigit = baseDigit
+
+unDecDigit :: Prism' Char (Finite 11)
+unDecDigit = baseDigit
 
 baseDigit :: (KnownNat n) => Prism' Char (Finite (n :: Nat))
 baseDigit = prism' _to _from
