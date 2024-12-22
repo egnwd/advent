@@ -9,6 +9,7 @@ module AOC.Common.Search
   , bfsAll
   , binarySearch
   , Dist(..)
+  , fromDist
   , dijkstra
   ) where
 
@@ -270,6 +271,10 @@ instance Num a => Num (Dist a) where
   fromInteger = Dist . fromInteger
 
   negate = fmap negate
+
+fromDist :: Dist a -> Maybe a
+fromDist (Dist d) = pure d
+fromDist Infinity = Nothing
 
 data DijkstraState a c = DijkstraState
   { _visitedSet :: Set a
