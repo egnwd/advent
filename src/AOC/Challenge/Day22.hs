@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day22
 -- License     : BSD3
@@ -10,51 +7,48 @@
 --
 -- Day 22.  See "AOC.Solver" for the types used in this module!
 --
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day22 (
-    -- day22a
-  -- , day22b
+    day22a
+  , day22b
   ) where
 
 import           AOC.Prelude
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+import           Data.Bits
+import           Control.Lens
+import           Linear (V4(..))
 
-day22a :: _ :~> _
+prune :: Int -> Int
+prune = (`mod` 16777216)
+
+step :: Int -> Int
+step a = let a' = prune $ (a * 64) `xor` a
+             a'' = prune $ (a' `div` 32) `xor` a'
+          in prune $ (a'' * 2048) `xor` a''
+
+bananaMap :: Integral a => [a] -> Map (V4 a) a
+bananaMap xs = M.fromListWith (const id)
+               . zipWith ((swap .) . (,)) (tail . tail . tail . tail $ xs)
+               . (zipWith4 V4 <*> tail <*> (tail . tail) <*> (tail . tail . tail))
+               . pairwise subtract $ xs
+
+sell :: [Map (V4 Int) Int] -> Maybe Int
+sell xs = maximumOf traverse (M.unionsWith (+) xs)
+
+day22a :: [Int] :~> _
 day22a = MkSol
-    { sParse = Just
+    { sParse = traverse readMaybe . lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = fmap sum . traverse ((!? 2000) . iterate step)
     }
 
-day22b :: _ :~> _
+day22b :: [Int] :~> _
 day22b = MkSol
-    { sParse = Just
+    { sParse = traverse readMaybe . lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = sell . map (bananaMap . map (`mod` 10) . take (succ $ dyno_ "sales" 2000) . iterate step)
     }
+
+
