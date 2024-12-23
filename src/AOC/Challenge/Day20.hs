@@ -45,43 +45,46 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 import           Data.Finite
+import           Data.Functor.Foldable
 
-data RaceTrack = Start | Track | End deriving (Show, Eq, Ord)
+data RaceTrack = Start | Wall | End deriving (Show, Eq, Ord)
 
+parse :: Char -> Maybe RaceTrack
 parse 'S' = Just Start
 parse 'E' = Just End
-parse '.' = Just Track
+parse '#' = Just Wall
 parse _ = Nothing
 
+toPoints :: Ord b => Map b RaceTrack -> Maybe (b, b, Set b)
 toPoints mp = do
     let points = M.fromListWith (<>) . map (\(k, x) -> (x, S.singleton k)) . M.toList $ mp
     [s] <- S.toList <$> M.lookup Start points
     [e] <- S.toList <$> M.lookup End points
-    return (s, e, fold points)
+    return (s, e, M.keysSet . M.filter (== Wall) $ mp)
 
-race :: Point -> Point -> Set Point -> Maybe _
-race start end mp = aStar' next cost ((== end) . fst) (start, 2)
-    where
-        cost = manhattan end . fst
-        next :: (Point, Finite 3) -> Map (Point, Finite 3) Int
-        next (p, 0) = M.fromSet (const 1) . S.map (,0) $ neighboursSet p `S.intersection` mp
-        next (p, 1) = M.fromSet (const 1) . S.map (,0) $ neighboursSet p
-        next (p, 2) = let nx = neighboursSet p
-                          cheats = S.map (,1) nx
-                          regular = S.map (,2) (nx `S.intersection` mp)
-                       in M.fromSet (const 1) $ S.union cheats regular
-        next (_, _) = undefined
+race :: Int -> Point -> Point -> Set Point -> Maybe (Sum Int)
+race cheat start end ws = do
+    (mn, path) <- aStar' next (manhattan end) (== end) start
+    return $ foldMap (go mn $ M.fromList $ zip path [0..]) path
+        where
+            next p = M.fromSet (const 1) $ neighboursSet p `S.difference` ws
+            cheats :: Set Point
+            cheats = fixedPoint (foldMap (S.filter ((<= cheat) . manhattan 0) . (S.insert <*> neighboursSet))) (S.singleton 0)
+            go :: Int -> Map Point Int -> Point -> Sum Int
+            go mn pth p = Sum
+                        . M.size
+                        . M.filterWithKey (\k i -> mn - ((pth M.! p) + manhattan p k + (mn - i)) >= 100)
+                        $ pth `M.restrictKeys` S.mapMonotonic (+p) cheats
 
-day20a :: _ :~> _
-day20a = MkSol
+day20 :: Int -> (Point, Point, Set Point) :~> Int
+day20 n = MkSol
     { sParse = toPoints . parseAsciiMap parse
     , sShow  = show
-    , sSolve = \(s, e, m) -> race s e m
+    , sSolve = \(s, e, m) -> getSum <$> race n s e m
     }
 
-day20b :: _ :~> _
-day20b = MkSol
-    { sParse = toPoints . parseAsciiMap parse
-    , sShow  = show
-    , sSolve = Just
-    }
+day20a :: (Point, Point, Set Point) :~> Int
+day20a = day20 2
+
+day20b :: (Point, Point, Set Point) :~> Int
+day20b = day20 20
