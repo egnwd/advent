@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day20
 -- License     : BSD3
@@ -10,16 +7,6 @@
 --
 -- Day 20.  See "AOC.Solver" for the types used in this module!
 --
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day20 (
     day20a
@@ -28,24 +15,8 @@ module AOC.Challenge.Day20 (
 
 import           AOC.Prelude
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
 import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
-import           Data.Finite
-import           Data.Functor.Foldable
 
 data RaceTrack = Start | Wall | End deriving (Show, Eq, Ord)
 
@@ -64,17 +35,16 @@ toPoints mp = do
 
 race :: Int -> Point -> Point -> Set Point -> Maybe (Sum Int)
 race cheat start end ws = do
-    (mn, path) <- aStar' next (manhattan end) (== end) start
-    return $ foldMap (go mn $ M.fromList $ zip path [0..]) path
+    path <- snd <$> aStar' next (manhattan end) (== end) start
+    return $ foldMap (go $ M.fromList $ zip path [0..]) path
         where
             next p = M.fromSet (const 1) $ neighboursSet p `S.difference` ws
-            cheats :: Set Point
             cheats = fixedPoint (foldMap (S.filter ((<= cheat) . manhattan 0) . (S.insert <*> neighboursSet))) (S.singleton 0)
-            go :: Int -> Map Point Int -> Point -> Sum Int
-            go mn pth p = Sum
+            timeSaved enter enterTime exit endTime = endTime - enterTime - manhattan enter exit
+            go pth enterCheat = Sum
                         . M.size
-                        . M.filterWithKey (\k i -> mn - ((pth M.! p) + manhattan p k + (mn - i)) >= 100)
-                        $ pth `M.restrictKeys` S.mapMonotonic (+p) cheats
+                        . M.filterWithKey (((>= 100) .) . timeSaved enterCheat (pth M.! enterCheat))
+                        $ pth `M.restrictKeys` S.mapMonotonic (+enterCheat) cheats
 
 day20 :: Int -> (Point, Point, Set Point) :~> Int
 day20 n = MkSol
