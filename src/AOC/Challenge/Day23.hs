@@ -50,7 +50,6 @@ findMaximumClique  = S.toAscList . maximumBy (compare `on` S.size) . go
                  Just ((v, ns), g') -> S.foldr' (\k -> S.insert (S.insert v (k `S.intersection` ns)) . S.insert k) S.empty (go g')
 
 
-
 day23a :: Map String (Set String) :~> Int
 day23a = MkSol
     { sParse = parse

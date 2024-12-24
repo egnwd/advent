@@ -35,9 +35,10 @@ import qualified Data.List.NonEmpty             as NE
 import qualified Data.List.PointedList          as PL
 import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
+import qualified Data.OrdPSQ                    as Q
 import           Data.Sequence                  (Seq(..))
 import qualified Data.Sequence                  as Seq
+import qualified Data.Sequence.NonEmpty         as NES
 import qualified Data.Set                       as S
 import qualified Data.Text                      as T
 import qualified Data.Vector                    as V
@@ -68,12 +69,29 @@ instance Show ControlPad where
     show (Arrow West) = "<"
     show Select = "A"
 
+type Actions = [ControlPad]
+
 type NumpadDigit = Finite 11
 
 parseNumberPad :: Char -> Maybe NumpadDigit
 parseNumberPad = preview unDecDigit
 numberKeypad :: Map Point NumpadDigit
 numberKeypad = parseAsciiMap parseNumberPad "789\n456\n123\n 0A"
+
+neighboursMap :: forall a. Ord a => Map Point a -> Map a (Map a (ControlPad, Int))
+neighboursMap mp = M.mapWithKey (\k a -> M.fromSet (\b -> (pickAction k b, 1))
+                                       . S.fromList
+                                       . M.elems
+                                       . (mp `M.restrictKeys`)
+                                       . neighboursSet $ a) actionMap
+    where
+        actionMap :: Map a Point
+        actionMap = M.fromList . map swap . M.toList $ mp
+        pickAction :: a -> a -> ControlPad
+        pickAction a b = Arrow . fromJust . vecDir $ (subtract `on` (actionMap M.!)) a b
+
+numberPad :: Map NumpadDigit (Map NumpadDigit (ControlPad, Int))
+numberPad = neighboursMap numberKeypad
 
 parseArrowPad :: Char -> Maybe ControlPad
 parseArrowPad 'A' = Just Select
@@ -85,12 +103,74 @@ parseArrowPad _ = Nothing
 arrowKeypad :: Map Point ControlPad
 arrowKeypad = parseAsciiMap parseArrowPad " ^A\n<v>"
 
+arrowPad :: Map ControlPad (Map ControlPad (ControlPad, Int))
+arrowPad = neighboursMap arrowKeypad
+
 distFromSelect :: Ord a => Map Point a -> a -> a -> Maybe Int
 distFromSelect mp a x = do
     let mp' = M.fromList . map swap . M.toList $ mp
     aPos <- M.lookup a mp'
     xPos <- M.lookup x mp'
     return $ manhattan aPos xPos
+
+newtype AStarAllState a b c = AStarAllState { _nodeQueue :: Q.OrdPSQ a (Dist c) (NES.NESeq (Set a, Seq b)) }
+
+$(makeLenses ''AStarAllState)
+
+initialAStarAllState :: Num c => a -> AStarAllState a b c
+initialAStarAllState s = AStarAllState (Q.singleton s 0 (NES.singleton (S.singleton s, Seq.empty)))
+
+-- | TODO: Include Heur to improve perf
+allShortestPaths
+  :: forall a b c. (Ord a, Ord b, Ord c, Num c, Show c, Show a, Bounded b)
+  => (a -> c)              -- ^ heuristic
+  -> (a -> Map a (b, c))   -- ^ neighbourhood
+  -> (a -> Bool)           -- ^ termination condition
+  -> a                     -- ^ start
+  -> Maybe (Dist c, [Seq b]) -- ^ perhaps the cost with the path
+allShortestPaths heur next end start = second (map (Seq.|> maxBound)) <$> go (initialAStarAllState start)
+  where
+    go :: AStarAllState a b c -> Maybe _
+    go ds@(AStarAllState q0) =
+      case Q.minView q0 of
+        Nothing -> Nothing
+        Just (n, c, p NES.:<|| ps, q)
+          | end n -> Just (c, snd p : goAgain c (AStarAllState $ Q.fromList . fst . Q.atMostView c $ q'))
+          | otherwise -> let ds' = ds & nodeQueue .~ q'
+                             !ns = M.map (second Dist) (next n)
+                          in go $ M.foldlWithKey' (updateNeighbour p c) ds' ns
+          where
+              q' = case NES.nonEmptySeq ps of
+                     Nothing -> q
+                     Just xs -> Q.insert n c xs q
+
+    goAgain :: Dist c -> AStarAllState a b c -> [Seq b]
+    goAgain minDist ds =
+      case Q.minView (ds ^. nodeQueue) of
+        Nothing -> []
+        Just (n, c, p NES.:<|| ps, q)
+          | end n -> snd p : goAgain minDist (AStarAllState $ Q.fromList . fst . Q.atMostView minDist $ q')
+          | otherwise -> let ds' = ds & nodeQueue .~ q'
+                             !ns = M.map (second Dist) (next n)
+                          in goAgain minDist . (nodeQueue %~ Q.fromList . fst . Q.atMostView minDist) $ M.foldlWithKey' (updateNeighbour p c) ds' ns
+          where
+              q' = case NES.nonEmptySeq ps of
+                     Nothing -> q
+                     Just xs -> Q.insert n c xs q
+
+    updateNeighbour :: (Set a, Seq b) -> Dist c -> AStarAllState a b c -> a -> (b, Dist c) -> AStarAllState a b c
+    updateNeighbour (seen, pth) c ds n (act, w) =
+      let cost' = w + c
+          addBack = (S.insert n seen, pth Seq.|> act)
+      in if n `S.member` seen
+            then ds
+            else case Q.lookup n (ds ^. nodeQueue) of
+                   Nothing -> ds & nodeQueue %~ Q.insert n cost' (NES.singleton addBack)
+                   Just (cost, pths)
+                     | cost' == cost -> ds & nodeQueue %~ Q.insert n cost' (pths NES.|> addBack)
+                     | cost' < cost -> ds & nodeQueue %~ Q.insert n cost' (NES.singleton addBack)
+                     | otherwise -> ds
+
 
 -- :( if it's optimal at the start that doesn't propogate up :(
 paths :: (Bounded a, Ord a) => Map Point a -> Map Point (Map Point (Maybe (Int, [Point])))
@@ -128,13 +208,40 @@ press f t = do
     return $ concatMap toList r3s
 
 solve :: [NumpadDigit] -> Maybe _
-solve ns = fmap (concat) . sequence . pairwise press $ (10 : ns)
+solve ns = fmap concat . sequence . pairwise press $ (10 : ns)
+
+solve' :: [[NumpadDigit]] -> Maybe _
+solve' = traverse (fmap collapse . sequence . pairwise go . (10 :))
+    where
+        go :: NumpadDigit -> NumpadDigit -> Maybe _
+        go f t = paths numberPad f t
+               >>= traverse (sequence . pairwise ((fmap (map argmin) .) . paths arrowPad) . (Select :))
+               -- >>= (traverse . traverse . traverse) (sequence . pairwise ((fmap (map argmin) .) . paths arrowPad) . (Select :))
+
+        collapse :: [[[[Maybe (ArgMin Int Actions)]]]] -> _
+        collapse = robotArms1 . robotArms2 -- . robotArms3
+            where
+                robotArms1 :: [[[Maybe (ArgMin Int Actions)]]] -> [[Maybe (ArgMin Int Actions)]]
+                robotArms1 = (fmap) fold
+                robotArms2 :: [[ [[ Maybe (ArgMin Int Actions) ]] ]] -> _ -- [[Maybe (ArgMin Int Actions)]]
+                robotArms2 = (fmap . fmap . fmap) (fold)
+                -- robotArms3 :: [[ [[ [Maybe (ArgMin Int Actions)] ]] ]] -> _
+                -- robotArms3 = (fmap . fmap . fmap) (collapse' . fmap fold)
+        argmin :: Actions -> Maybe (ArgMin Int Actions)
+        argmin x = Just $ Min (Arg (length x) x)
+        paths :: (Ord a, Show a) => Map a (Map a (ControlPad, Int)) -> a -> a -> Maybe [Actions]
+        paths pad start end = map toList . snd <$> allShortestPaths (const 1) (fromMaybe M.empty . (`M.lookup` pad)) (== end) start
+
+collapse' :: [Maybe (ArgMin Int Actions)] -> Maybe (ArgMin Int Actions)
+collapse' = fmap (fmap (foldl' addArg (Arg 0 [])) . sequence) . sequence
+addArg :: Arg Int Actions -> Arg Int Actions -> Arg Int Actions
+addArg (Arg n xs) (Arg m ys) = Arg (n+m) (xs ++ ys)
 
 day21a :: [[NumpadDigit]] :~> _
 day21a = MkSol
     { sParse = traverse (traverse (preview unDecDigit)) . lines
     , sShow  = show
-    , sSolve = traverse solve
+    , sSolve = solve'
     }
 
 day21b :: _ :~> _
