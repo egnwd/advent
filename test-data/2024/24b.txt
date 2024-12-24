@@ -1,0 +1,22 @@
+x00: 1
+x01: 1
+x02: 1
+y00: 0
+y01: 1
+y02: 0
+
+x00 AND y00 -> bbb
+x02 XOR y02 -> ddd
+x02 AND y02 -> lll
+kkk XOR jjj -> mmm
+kkk AND jjj -> nnn
+lll XOR nnn -> jjj
+x00 XOR y00 -> ccc
+x00 XOR y00 -> kkk
+bbb XOR ddd -> eee
+x01 XOR y01 -> fff
+x01 AND y01 -> ggg
+fff XOR eee -> hhh
+fff AND eee -> iii
+ggg XOR iii -> ooo
+>>> ddd,jjj,kkk,ooo

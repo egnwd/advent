@@ -18,6 +18,7 @@ module AOC.Common (
                   , Parser
                   , pSpace
                   , pWord
+                  , pIdent
                   , pDecimal
                   , pTok
                   , parseMaybeLenient
@@ -130,6 +131,9 @@ pTok p = p <* pSpace
 
 pWord :: (P.Stream s, P.Token s ~ Char, Ord e) => P.Parsec e s String
 pWord = pTok $ P.many (P.satisfy (not . isSpace))
+
+pIdent :: (P.Stream s, P.Token s ~ Char, Ord e) => P.Parsec e s String
+pIdent = pTok $ P.many (P.alphaNumChar)
 
 pDecimal :: (P.Stream s, P.Token s ~ Char, Ord e, Num a) => P.Parsec e s a
 pDecimal = PL.signed P.space PL.decimal
