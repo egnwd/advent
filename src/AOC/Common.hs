@@ -58,6 +58,7 @@ module AOC.Common (
                   , listTup
                   , listTup3
                   , pairwise
+                  , pairwiseM
                   , rotate3
                   , module AOC
                   ) where
@@ -339,6 +340,9 @@ listTup3 _ = Nothing
 
 pairwise :: (a -> a -> b) -> [a] -> [b]
 pairwise f = zipWith f <*> tail
+
+pairwiseM :: Monad m => (a -> a -> m b) -> [a] -> m [b]
+pairwiseM f = sequence . pairwise f
 
 rotate3 :: (a -> b -> c -> d) -> b -> c -> a -> d
 rotate3 f b c a = f a b c

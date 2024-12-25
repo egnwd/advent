@@ -11,22 +11,24 @@ module AOC.Common.Search
   , Dist(..)
   , fromDist
   , dijkstra
+  , allShortestPaths
   ) where
 
 import           Control.Lens hiding (Empty)
 import           Data.Bifunctor
 import           Control.Monad.State
 import           Data.Maybe
-import           Data.Map       (Map)
-import           Data.Set       (Set)
-import           Data.Sequence  (Seq(..))
-import           Data.OrdPSQ    (OrdPSQ)
-import           Control.DeepSeq (NFData)
-import           GHC.Generics   (Generic)
-import qualified Data.Map       as M
-import qualified Data.OrdPSQ    as Q
-import qualified Data.Sequence  as Seq
-import qualified Data.Set       as S
+import           Data.Map               (Map)
+import           Data.Set               (Set)
+import           Data.Sequence          (Seq(..))
+import           Data.OrdPSQ            (OrdPSQ)
+import           Control.DeepSeq        (NFData)
+import           GHC.Generics           (Generic)
+import qualified Data.Map               as M
+import qualified Data.OrdPSQ            as Q
+import qualified Data.Sequence          as Seq
+import qualified Data.Sequence.NonEmpty as NES
+import qualified Data.Set               as S
 
 data AStarState a c = AS
   { _asCameFrom :: !(Map a (Maybe a))
@@ -312,3 +314,60 @@ dijkstra next end start = go (initialDijkstraState start)
       in if cost' < ds ^. distanceMap . at n . non Infinity
             then ds & distanceMap %~ M.insert n cost' & nodeQueue %~ Q.insert n cost' ()
             else ds
+
+newtype AllShortestPathsState a b c = AllShortestPathsState { _aspNodeQueue :: Q.OrdPSQ a (Dist c) (NES.NESeq (Set a, Seq b)) }
+
+$(makeLenses ''AllShortestPathsState)
+
+initialAStarAllState :: Num c => a -> AllShortestPathsState a b c
+initialAStarAllState s = AllShortestPathsState (Q.singleton s 0 (NES.singleton (S.singleton s, Seq.empty)))
+
+allShortestPaths
+  :: forall a b c. (Ord a, Ord b, Ord c, Num c, Bounded b)
+  => (a -> Map a (b, c))   -- ^ neighbourhood
+  -> (a -> Bool)           -- ^ termination condition
+  -> a                     -- ^ start
+  -> Maybe (Dist c, [Seq b]) -- ^ perhaps the cost with the path
+allShortestPaths next end start = go (initialAStarAllState start)
+  where
+    go :: AllShortestPathsState a b c -> Maybe (Dist c, [Seq b])
+    go ds@(AllShortestPathsState q0) =
+      case Q.minView q0 of
+        Nothing -> Nothing
+        Just (n, c, p NES.:<|| ps, q)
+          | end n -> Just (c, snd p : goAgain c (AllShortestPathsState $ Q.fromList . fst . Q.atMostView c $ q'))
+          | otherwise -> let ds' = ds & aspNodeQueue .~ q'
+                             !ns = M.map (second Dist) (next n)
+                          in go $ M.foldlWithKey' (updateNeighbour p c) ds' ns
+          where
+              q' = case NES.nonEmptySeq ps of
+                     Nothing -> q
+                     Just xs -> Q.insert n c xs q
+
+    goAgain :: Dist c -> AllShortestPathsState a b c -> [Seq b]
+    goAgain minDist ds =
+      case Q.minView (ds ^. aspNodeQueue) of
+        Nothing -> []
+        Just (n, c, p NES.:<|| ps, q)
+          | end n -> snd p : goAgain minDist (AllShortestPathsState $ Q.fromList . fst . Q.atMostView minDist $ q')
+          | otherwise -> let ds' = ds & aspNodeQueue .~ q'
+                             !ns = M.map (second Dist) (next n)
+                          in goAgain minDist . (aspNodeQueue %~ Q.fromList . fst . Q.atMostView minDist) $ M.foldlWithKey' (updateNeighbour p c) ds' ns
+          where
+              q' = case NES.nonEmptySeq ps of
+                     Nothing -> q
+                     Just xs -> Q.insert n c xs q
+
+    updateNeighbour :: (Set a, Seq b) -> Dist c -> AllShortestPathsState a b c -> a -> (b, Dist c) -> AllShortestPathsState a b c
+    updateNeighbour (seen, pth) c ds n (act, w) =
+      let cost' = w + c
+          addBack = (S.insert n seen, pth Seq.|> act)
+      in if n `S.member` seen
+            then ds
+            else case Q.lookup n (ds ^. aspNodeQueue) of
+                   Nothing -> ds & aspNodeQueue %~ Q.insert n cost' (NES.singleton addBack)
+                   Just (cost, pths)
+                     | cost' == cost -> ds & aspNodeQueue %~ Q.insert n cost' (pths NES.|> addBack)
+                     | cost' < cost -> ds & aspNodeQueue %~ Q.insert n cost' (NES.singleton addBack)
+                     | otherwise -> ds
+
