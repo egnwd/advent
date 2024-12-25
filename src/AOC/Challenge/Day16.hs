@@ -26,7 +26,7 @@ module AOC.Challenge.Day16 (
   , day16b
   ) where
 
-import           AOC.Prelude hiding (Space)
+import           AOC.Prelude hiding (Space, allShortestPaths)
 
 import qualified Data.Graph.Inductive           as G
 import qualified Data.IntMap                    as IM
