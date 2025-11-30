@@ -140,7 +140,7 @@ executables:
     - -O2
     dependencies:
     - ansi-terminal
-    - aoc2024
+    - aoc2025
     - containers
     - deepseq
     - finite-typelits

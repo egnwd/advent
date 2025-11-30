@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 -- |
 -- Module      : AOC.Challenge.Day08
 -- License     : BSD3
@@ -7,57 +10,51 @@
 --
 -- Day 8.  See "AOC.Solver" for the types used in this module!
 --
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day08 (
-    day08a
-  , day08b
+    -- day08a
+  -- , day08b
   ) where
 
-import           AOC.Solver ((:~>)(..))
-import           AOC.Common (Point, inBoundingBox, boundingBox, parseAsciiMap)
+import           AOC.Prelude
 
-import           Control.Monad                  (guard)
-import           Data.Functor                   (($>))
-import           Data.List                      (unfoldr)
-import           Data.Map                       (Map)
-import           Data.Set                       (Set)
+import qualified Data.Graph.Inductive           as G
+import qualified Data.IntMap                    as IM
+import qualified Data.IntSet                    as IS
+import qualified Data.List.NonEmpty             as NE
+import qualified Data.List.PointedList          as PL
+import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
+import qualified Data.OrdPSQ                    as PSQ
+import qualified Data.Sequence                  as Seq
 import qualified Data.Set                       as S
-import qualified Data.Set.NonEmpty              as NES
+import qualified Data.Text                      as T
+import qualified Data.Vector                    as V
+import qualified Linear                         as L
+import qualified Text.Megaparsec                as P
+import qualified Text.Megaparsec.Char           as P
+import qualified Text.Megaparsec.Char.Lexer     as PP
 
-data Airspace = Air | Antenna Char deriving Eq
-
-type AntennaRule = (Point -> Bool) -> (Point, Point) -> [Point]
-
-parse :: Char -> Maybe Airspace
-parse '.' = Just Air
-parse c = Just (Antenna c)
-
-brokenRule, correctRule :: AntennaRule
-brokenRule inMap (a, b) = let next = b + b - a
-                           in guard (inMap next) $> next
-
-correctRule inMap = unfoldr $ \(a, b) -> let next = b + b - a
-                                         in guard (inMap b) $> (b, (b, next))
-
-findAntinodes :: AntennaRule -> Map Point Airspace -> Maybe (Set Point)
-findAntinodes getAntinodes mp = do
-    keys <- NES.nonEmptySet . M.keysSet $ mp
-    let antennas = M.filter (/= Air) mp
-    let an = concatMap (\((a, _), (b, _)) -> getAntinodes (inBoundingBox $ boundingBox keys) (a, b))
-           . filter (\((p1, n1), (p2, n2)) -> p1 /= p2 && n1 == n2)
-           $ (,) <$> M.toList antennas <*> M.toList antennas
-    return $ S.fromList an
-
-day08 :: AntennaRule -> Map Point Airspace :~> Int
-day08 alg = MkSol
-    { sParse = Just . parseAsciiMap parse
+day08a :: _ :~> _
+day08a = MkSol
+    { sParse = Just . lines
     , sShow  = show
-    , sSolve = fmap S.size . findAntinodes alg
+    , sSolve = Just . id
     }
 
-day08a :: Map Point Airspace :~> Int
-day08a = day08 brokenRule
-
-day08b :: Map Point Airspace :~> Int
-day08b = day08 correctRule
+day08b :: _ :~> _
+day08b = MkSol
+    { sParse = sParse day08a
+    , sShow  = show
+    , sSolve = Just . id
+    }

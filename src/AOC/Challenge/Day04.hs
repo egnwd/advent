@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 -- |
 -- Module      : AOC.Challenge.Day04
 -- License     : BSD3
@@ -6,55 +9,52 @@
 -- Portability : non-portable
 --
 -- Day 4.  See "AOC.Solver" for the types used in this module!
+--
+-- After completing the challenge, it is recommended to:
+--
+-- *   Replace "AOC.Prelude" imports to specific modules (with explicit
+--     imports) for readability.
+-- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
+--     pragmas.
+-- *   Replace the partial type signatures underscores in the solution
+--     types @_ :~> _@ with the actual types of inputs and outputs of the
+--     solution.  You can delete the type signatures completely and GHC
+--     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day04 (
-    day04a
-  , day04b
+    -- day04a
+  -- , day04b
   ) where
 
-import           AOC.Common (allNeighboursSet, allDirSet, parseAsciiMap, Point, Dir(..), orientDir)
-import           AOC.Solver ((:~>)(..))
+import           AOC.Prelude
 
-import           Data.Map                       (Map)
+import qualified Data.Graph.Inductive           as G
+import qualified Data.IntMap                    as IM
+import qualified Data.IntSet                    as IS
+import qualified Data.List.NonEmpty             as NE
+import qualified Data.List.PointedList          as PL
+import qualified Data.List.PointedList.Circular as PLC
 import qualified Data.Map                       as M
-import           Data.Set                       (Set)
+import qualified Data.OrdPSQ                    as PSQ
+import qualified Data.Sequence                  as Seq
 import qualified Data.Set                       as S
-import qualified Data.Set.NonEmpty              as NES
-import           Linear                         (V2(..))
-import           Data.Tuple                     (swap)
-import           Control.Arrow                  (first)
+import qualified Data.Text                      as T
+import qualified Data.Vector                    as V
+import qualified Linear                         as L
+import qualified Text.Megaparsec                as P
+import qualified Text.Megaparsec.Char           as P
+import qualified Text.Megaparsec.Char.Lexer     as PP
 
-letterToPoint :: Map Point Char -> Map Char (Set Point)
-letterToPoint = M.fromListWith (<>)
-              . map (swap . first S.singleton)
-              . M.toList
-
-checkForXmas :: Char -> (Point -> a -> Map Point Char) -> Set a -> Map Point Char -> Maybe (Set (Map Point Char))
-checkForXmas seed construct dirs m = expand construct dirs m <$> M.lookup seed (letterToPoint m)
-
-expand :: (Point -> a -> Map Point Char) -> Set a -> Map Point Char -> S.Set Point -> Set (Map Point Char)
-expand construct dirs m = S.unions . S.map go
-    where
-        go x = S.filter (`M.isSubmapOf` m) . S.map (construct x) $ dirs
-
-constructXmas :: Point -> Point -> Map Point Char
-constructXmas x d = M.fromList [(x, 'X'), (d + x, 'M'), (2 * d + x, 'A'), (3 * d + x, 'S')]
-
-constructX'mas :: Point -> Dir -> Map Point Char
-constructX'mas m d = M.mapKeys (\k -> orientDir (d, k) + m) xmas
-    where
-        xmas = M.fromList [(V2 0 0, 'M'), (V2 1 1, 'A'), (V2 2 2, 'S'), (V2 0 2, 'M'), (V2 2 0, 'S')]
-
-day04a :: Map Point Char :~> Int
+day04a :: _ :~> _
 day04a = MkSol
-    { sParse = Just. parseAsciiMap Just
+    { sParse = Just . lines
     , sShow  = show
-    , sSolve = fmap length . checkForXmas 'X' constructXmas (allNeighboursSet (V2 0 0))
+    , sSolve = Just . id
     }
 
-day04b :: Map Point Char :~> Int
+day04b :: _ :~> _
 day04b = MkSol
     { sParse = sParse day04a
     , sShow  = show
-    , sSolve = fmap length . checkForXmas 'A' constructX'mas (NES.toSet allDirSet)
+    , sSolve = Just . id
     }
