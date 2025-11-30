@@ -1,4 +1,4 @@
-name:                aoc2024
+name:                aoc2025
 version:             0.1.0.0
 github:              "egnwd/advent"
 license:             BSD3
@@ -130,7 +130,7 @@ library:
   - yaml
 
 executables:
-  aoc2024:
+  aoc2025:
     main:                main.hs
     source-dirs:         app
     ghc-options:
@@ -148,7 +148,7 @@ executables:
     - optparse-applicative
 
 tests:
-  aoc2024-test:
+  aoc2025-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -156,11 +156,11 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aoc2024
+    - aoc2025
     - ansi-terminal
 
 benchmarks:
-  aoc2024-bench:
+  aoc2025-bench:
     main: Bench.hs
     source-dirs: bench
     ghc-options:
@@ -169,4 +169,4 @@ benchmarks:
     - -with-rtsopts=-N
     - -O2
     dependencies:
-    - aoc2024
+    - aoc2025

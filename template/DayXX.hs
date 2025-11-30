@@ -47,14 +47,14 @@ import qualified Text.Megaparsec.Char.Lexer     as PP
 
 day${day}a :: _ :~> _
 day${day}a = MkSol
-    { sParse = Just
+    { sParse = Just $ lines
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just $ id
     }
 
 day${day}b :: _ :~> _
 day${day}b = MkSol
-    { sParse = Just
+    { sParse = sParse day${day}a
     , sShow  = show
-    , sSolve = Just
+    , sSolve = Just $ id
     }

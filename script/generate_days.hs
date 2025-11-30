@@ -19,7 +19,7 @@ outRoot = "src/AOC/Challenge"
 main :: IO ()
 main = do
     temp <- template <$> T.readFile "template/DayXX.hs"
-    forM_ [1..25] $ \i -> do
+    forM_ [1..12] $ \i -> do
       let newFilePath = outRoot </> printf "Day%02d.hs" i
           Just newFile = renderA temp (ctx i)
       skip <- doesFileExist newFilePath
