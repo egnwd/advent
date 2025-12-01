@@ -37,19 +37,6 @@ import           AOC.Challenge.Day09 as AOC
 import           AOC.Challenge.Day10 as AOC
 import           AOC.Challenge.Day11 as AOC
 import           AOC.Challenge.Day12 as AOC
-import           AOC.Challenge.Day13 as AOC
-import           AOC.Challenge.Day14 as AOC
-import           AOC.Challenge.Day15 as AOC
-import           AOC.Challenge.Day16 as AOC
-import           AOC.Challenge.Day17 as AOC
-import           AOC.Challenge.Day18 as AOC
-import           AOC.Challenge.Day19 as AOC
-import           AOC.Challenge.Day20 as AOC
-import           AOC.Challenge.Day21 as AOC
-import           AOC.Challenge.Day22 as AOC
-import           AOC.Challenge.Day23 as AOC
-import           AOC.Challenge.Day24 as AOC
-import           AOC.Challenge.Day25 as AOC
 
 import           AOC.Discover
 import           AOC.Solver

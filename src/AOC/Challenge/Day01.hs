@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day01 (
-    -- day01a
-  -- , day01b
+    day01a
+  , day01b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +45,23 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+parser = (Left <$> (P.char 'L' *> pDecimal)) <|> (Right <$> (P.char 'R' *> pDecimal))
+
+rotate n (Left x) = (n - x) `mod` 100
+rotate n (Right x) = (n + x) `mod` 100
+
+explode = concatMap (\case Left x -> replicate x (Left 1); Right x -> replicate x (Right 1))
+
 day01a :: _ :~> _
 day01a = MkSol
-    { sParse = Just . lines
+    { sParse = parseLines parser
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = Just . countTrue (==0) . scanl rotate 50
     }
 
 day01b :: _ :~> _
 day01b = MkSol
     { sParse = sParse day01a
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = Just . countTrue (==0) . scanl rotate 50 . explode
     }
