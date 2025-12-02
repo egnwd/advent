@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day01
 -- License     : BSD3
@@ -9,59 +6,48 @@
 -- Portability : non-portable
 --
 -- Day 1.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day01 (
     day01a
   , day01b
   ) where
 
-import           AOC.Prelude
+import           AOC.Common                (countTrue, CharParser, parseLines, pDecimal)
+import           AOC.Solver                ((:~>)(..))
+import           Control.Applicative       ((<|>))
+import           Data.List                 (mapAccumL)
+import qualified Text.Megaparsec.Char as P
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
-
+parser :: CharParser (Either Int Int)
 parser = (Left <$> (P.char 'L' *> pDecimal)) <|> (Right <$> (P.char 'R' *> pDecimal))
 
+rotate :: Int -> Either Int Int -> Int
 rotate n (Left x) = (n - x) `mod` 100
 rotate n (Right x) = (n + x) `mod` 100
 
-explode = concatMap (\case Left x -> replicate x (Left 1); Right x -> replicate x (Right 1))
+next :: Int -> Either Int Int -> [Either Int Int]
+next 0 (Left l) = next 100 (Left l)
+next 100 (Right r) = next 0 (Right r)
+next initial (Left n)
+  | n > initial = Left initial : next 100 (Left $ n - initial)
+  | otherwise   = [Left n]
+next initial (Right n)
+  | n > (100-initial) = Right (100-initial) : next 0 (Right $ n - (100-initial))
+  | otherwise         = [Right n]
 
-day01a :: _ :~> _
+go :: Int -> [Either Int Int] -> (Int, [[Int]])
+go = mapAccumL (\n x -> mapAccumL (\s a -> (rotate s a, s)) n $ next n x)
+
+day01a :: [Either Int Int] :~> Int
 day01a = MkSol
     { sParse = parseLines parser
     , sShow  = show
     , sSolve = Just . countTrue (==0) . scanl rotate 50
     }
 
-day01b :: _ :~> _
+day01b :: [Either Int Int] :~> Int
 day01b = MkSol
-    { sParse = sParse day01a
+    { sParse = parseLines parser
     , sShow  = show
-    , sSolve = Just . countTrue (==0) . scanl rotate 50 . explode
+    , sSolve = Just . countTrue (==0) . concat . snd . go 50
     }
