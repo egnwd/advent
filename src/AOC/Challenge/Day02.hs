@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day02 (
-    -- day02a
-  -- , day02b
+    day02a
+  , day02b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +45,29 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
-day02a :: _ :~> _
+rangeToList :: Int -> Int -> [Int]
+rangeToList start end = [start..end]
+
+isInvalid :: Int -> Int -> Bool
+isInvalid d x = n `mod` d == 0 && sameChunks
+    where
+        sameChunks = (==1) . S.size . S.fromList $ chunksOf (n `div` d) s
+        s = show x
+        n = length s
+
+isInvalidN :: Int -> Bool
+isInvalidN x = or [ isInvalid d x | d <- [2..length (show x)]]
+
+day02a :: [(Int, Int)] :~> _
 day02a = MkSol
-    { sParse = Just . lines
+    { sParse = traverse (listTup <=< traverse readMaybe . splitOn "-") . splitOn ","
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = Just . sum . concatMap (filter (isInvalid 2) . uncurry rangeToList)
     }
 
-day02b :: _ :~> _
+day02b :: [(Int, Int)] :~> _
 day02b = MkSol
-    { sParse = sParse day02a
+    { sParse = traverse (listTup <=< traverse readMaybe . splitOn "-") . splitOn ","
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = Just . sum . concatMap (filter isInvalidN . uncurry rangeToList)
     }
