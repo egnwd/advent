@@ -22,26 +22,25 @@ import qualified Data.Set         as S
 rangeToList :: Int -> Int -> [Int]
 rangeToList start end = [start..end]
 
-isInvalid :: Int -> Int -> Bool
+isInvalid :: Int -> String -> Bool
 isInvalid d x = n `mod` d == 0 && sameChunks
     where
-        sameChunks = (==1) . S.size . S.fromList $ chunksOf (n `div` d) s
-        s = show x
-        n = length s
+        sameChunks = (==1) . S.size . S.fromList $ chunksOf (n `div` d) x
+        n = length x
 
-isInvalidN :: Int -> Bool
-isInvalidN x = or [ isInvalid d x | d <- [2..length (show x)]]
+isInvalidN :: String -> Bool
+isInvalidN x = or [ isInvalid d x | d <- [2..length x]]
 
 day02a :: [(Int, Int)] :~> Int
 day02a = MkSol
     { sParse = traverse (listTup <=< traverse readMaybe . splitOn "-") . splitOn ","
     , sShow  = show
-    , sSolve = Just . sum . concatMap (filter (isInvalid 2) . uncurry rangeToList)
+    , sSolve = Just . sum . concatMap (filter (isInvalid 2 . show) . uncurry rangeToList)
     }
 
 day02b :: [(Int, Int)] :~> Int
 day02b = MkSol
     { sParse = traverse (listTup <=< traverse readMaybe . splitOn "-") . splitOn ","
     , sShow  = show
-    , sSolve = Just . sum . concatMap (filter isInvalidN . uncurry rangeToList)
+    , sSolve = Just . sum . concatMap (filter (isInvalidN . show) . uncurry rangeToList)
     }

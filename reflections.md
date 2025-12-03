@@ -73,20 +73,20 @@ that file instead!
 ```
 >> Day 02a
 benchmarking...
-time                 191.9 ms   (191.5 ms .. 192.5 ms)
+time                 195.3 ms   (195.0 ms .. 195.5 ms)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 192.0 ms   (191.8 ms .. 192.2 ms)
-std dev              255.4 μs   (176.1 μs .. 336.8 μs)
+mean                 195.6 ms   (195.4 ms .. 195.7 ms)
+std dev              216.8 μs   (127.0 μs .. 284.3 μs)
 variance introduced by outliers: 14% (moderately inflated)
 
 * parsing and formatting times excluded
 
 >> Day 02b
 benchmarking...
-time                 1.716 s    (1.703 s .. 1.724 s)
+time                 1.499 s    (1.491 s .. 1.503 s)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 1.718 s    (1.716 s .. 1.719 s)
-std dev              1.766 ms   (874.1 μs .. 2.477 ms)
+mean                 1.498 s    (1.497 s .. 1.499 s)
+std dev              1.606 ms   (836.7 μs .. 2.246 ms)
 variance introduced by outliers: 19% (moderately inflated)
 
 * parsing and formatting times excluded
