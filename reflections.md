@@ -11,6 +11,7 @@ Table of Contents
 
 * [Day 1](#day-1) *(no reflection yet)*
 * [Day 2](#day-2) *(no reflection yet)*
+* [Day 3](#day-3) *(no reflection yet)*
 
 Day 1
 ------
@@ -73,21 +74,61 @@ that file instead!
 ```
 >> Day 02a
 benchmarking...
-time                 195.3 ms   (195.0 ms .. 195.5 ms)
+time                 195.5 ms   (195.2 ms .. 195.8 ms)
                      1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 195.6 ms   (195.4 ms .. 195.7 ms)
-std dev              216.8 μs   (127.0 μs .. 284.3 μs)
+mean                 195.7 ms   (195.4 ms .. 195.8 ms)
+std dev              254.4 μs   (164.5 μs .. 385.7 μs)
 variance introduced by outliers: 14% (moderately inflated)
 
 * parsing and formatting times excluded
 
 >> Day 02b
 benchmarking...
-time                 1.499 s    (1.491 s .. 1.503 s)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 1.498 s    (1.497 s .. 1.499 s)
-std dev              1.606 ms   (836.7 μs .. 2.246 ms)
+time                 1.560 s    (1.397 s .. 1.655 s)
+                     0.999 R²   (0.996 R² .. 1.000 R²)
+mean                 1.577 s    (1.535 s .. 1.628 s)
+std dev              51.64 ms   (23.78 ms .. 72.00 ms)
 variance introduced by outliers: 19% (moderately inflated)
+
+* parsing and formatting times excluded
+```
+
+
+
+Day 3
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day03.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d03p]* / *[Code][d03g]*
+
+[d03p]: https://adventofcode.com/2025/day/3
+[d03g]: https://github.com/egnwd/advent/blob/2025/src/AOC/Challenge/Day03.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 3 Benchmarks
+
+```
+>> Day 03a
+benchmarking...
+time                 292.3 μs   (291.4 μs .. 293.7 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 290.7 μs   (289.8 μs .. 291.4 μs)
+std dev              2.738 μs   (1.902 μs .. 3.825 μs)
+
+* parsing and formatting times excluded
+
+>> Day 03b
+benchmarking...
+time                 802.6 μs   (799.3 μs .. 806.2 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 799.0 μs   (797.8 μs .. 800.5 μs)
+std dev              4.881 μs   (3.813 μs .. 7.259 μs)
 
 * parsing and formatting times excluded
 ```
