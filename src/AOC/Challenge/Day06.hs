@@ -13,38 +13,39 @@ module AOC.Challenge.Day06 (
   ) where
 
 import AOC.Solver      ((:~>)(..))
-import Data.List       (transpose)
-import Data.List.Split (splitOn, splitWhen)
+import Data.Char       (isSpace)
+import Data.List       (transpose, uncons)
+import Data.List.Split (splitWhen)
 import Text.Read       (readMaybe)
 import Control.Arrow   (second)
-import Control.Monad   ( (>=>) )
+import Control.Monad   ((>=>), (<=<))
 
-parse :: [String] -> Maybe ([Int] -> Int, [Int])
-parse ("+":xs) = sequence (sum, traverse readMaybe xs)
-parse ("*":xs) = sequence (product, traverse readMaybe xs)
-parse _ = Nothing
+parse :: String -> [String] -> Maybe Int
+parse "+" xs = sum <$> traverse readMaybe xs
+parse "*" xs = product <$> traverse readMaybe xs
+parse _ _ = Nothing
 
 getOp :: [String] -> Maybe (Char, [String])
 getOp [] = Nothing
 getOp [x] = Just (last x, [init x])
 getOp (x:xs) = second (x :) <$> getOp xs
 
-parse2 :: [String] -> Maybe ([Int] -> Int, [Int])
+parse2 :: [String] -> Maybe Int
 parse2 = getOp >=> \case
-    ('+', ys) -> sequence (sum, traverse readMaybe ys)
-    ('*', ys) -> sequence (product, traverse readMaybe ys)
+    ('+', ys) -> sum <$> traverse readMaybe ys
+    ('*', ys) -> product <$> traverse readMaybe ys
     _ -> Nothing
 
-day06a :: [([Int] -> Int, [Int])] :~> Int
+day06a :: [Int] :~> Int
 day06a = MkSol
-    { sParse = traverse (parse . reverse) . transpose . map (filter (not . null) . splitOn " ") . lines
+    { sParse = traverse (uncurry parse <=< uncons . reverse) . transpose . map words . lines
     , sShow  = show
-    , sSolve = Just . sum . map (uncurry ($))
+    , sSolve = Just . sum
     }
 
-day06b :: [([Int] -> Int, [Int])] :~> Int
+day06b :: [Int] :~> Int
 day06b = MkSol
-    { sParse = traverse (parse2 . reverse) . splitWhen (all (==' ')) .  transpose . lines
+    { sParse = traverse (parse2 . reverse) . splitWhen (all isSpace) .  transpose . lines
     , sShow  = show
-    , sSolve = Just . sum . map (uncurry ($))
+    , sSolve = Just . sum
     }
