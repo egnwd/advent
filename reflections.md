@@ -14,6 +14,7 @@ Table of Contents
 * [Day 3](#day-3) *(no reflection yet)*
 * [Day 4](#day-4) *(no reflection yet)*
 * [Day 5](#day-5) *(no reflection yet)*
+* [Day 6](#day-6) *(no reflection yet)*
 
 Day 1
 ------
@@ -200,5 +201,46 @@ that file instead!
 (No parse)
 >> Day 05b
 (No parse)
+```
+
+
+
+Day 6
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day06.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d06p]* / *[Code][d06g]*
+
+[d06p]: https://adventofcode.com/2025/day/6
+[d06g]: https://github.com/egnwd/advent/blob/2025/src/AOC/Challenge/Day06.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 6 Benchmarks
+
+```
+>> Day 06a
+benchmarking...
+time                 11.59 μs   (11.57 μs .. 11.62 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 11.57 μs   (11.56 μs .. 11.59 μs)
+std dev              59.29 ns   (47.62 ns .. 76.55 ns)
+
+* parsing and formatting times excluded
+
+>> Day 06b
+benchmarking...
+time                 9.261 μs   (8.996 μs .. 9.517 μs)
+                     0.997 R²   (0.995 R² .. 1.000 R²)
+mean                 9.056 μs   (9.007 μs .. 9.192 μs)
+std dev              262.1 ns   (125.7 ns .. 452.5 ns)
+variance introduced by outliers: 34% (moderately inflated)
+
+* parsing and formatting times excluded
 ```
 

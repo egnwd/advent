@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports   #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 -- |
 -- Module      : AOC.Challenge.Day06
 -- License     : BSD3
@@ -9,52 +6,45 @@
 -- Portability : non-portable
 --
 -- Day 6.  See "AOC.Solver" for the types used in this module!
---
--- After completing the challenge, it is recommended to:
---
--- *   Replace "AOC.Prelude" imports to specific modules (with explicit
---     imports) for readability.
--- *   Remove the @-Wno-unused-imports@ and @-Wno-unused-top-binds@
---     pragmas.
--- *   Replace the partial type signatures underscores in the solution
---     types @_ :~> _@ with the actual types of inputs and outputs of the
---     solution.  You can delete the type signatures completely and GHC
---     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day06 (
-    -- day06a
-  -- , day06b
+    day06a
+  , day06b
   ) where
 
-import           AOC.Prelude
+import AOC.Solver      ((:~>)(..))
+import Data.List       (transpose)
+import Data.List.Split (splitOn, splitWhen)
+import Text.Read       (readMaybe)
+import Control.Arrow   (second)
+import Control.Monad   ( (>=>) )
 
-import qualified Data.Graph.Inductive           as G
-import qualified Data.IntMap                    as IM
-import qualified Data.IntSet                    as IS
-import qualified Data.List.NonEmpty             as NE
-import qualified Data.List.PointedList          as PL
-import qualified Data.List.PointedList.Circular as PLC
-import qualified Data.Map                       as M
-import qualified Data.OrdPSQ                    as PSQ
-import qualified Data.Sequence                  as Seq
-import qualified Data.Set                       as S
-import qualified Data.Text                      as T
-import qualified Data.Vector                    as V
-import qualified Linear                         as L
-import qualified Text.Megaparsec                as P
-import qualified Text.Megaparsec.Char           as P
-import qualified Text.Megaparsec.Char.Lexer     as PP
+parse :: [String] -> Maybe ([Int] -> Int, [Int])
+parse ("+":xs) = sequence (sum, traverse readMaybe xs)
+parse ("*":xs) = sequence (product, traverse readMaybe xs)
+parse _ = Nothing
 
-day06a :: _ :~> _
+getOp :: [String] -> Maybe (Char, [String])
+getOp [] = Nothing
+getOp [x] = Just (last x, [init x])
+getOp (x:xs) = second (x :) <$> getOp xs
+
+parse2 :: [String] -> Maybe ([Int] -> Int, [Int])
+parse2 = getOp >=> \case
+    ('+', ys) -> sequence (sum, traverse readMaybe ys)
+    ('*', ys) -> sequence (product, traverse readMaybe ys)
+    _ -> Nothing
+
+day06a :: [([Int] -> Int, [Int])] :~> Int
 day06a = MkSol
-    { sParse = Just . lines
+    { sParse = traverse (parse . reverse) . transpose . map (filter (not . null) . splitOn " ") . lines
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = Just . sum . map (uncurry ($))
     }
 
-day06b :: _ :~> _
+day06b :: [([Int] -> Int, [Int])] :~> Int
 day06b = MkSol
-    { sParse = sParse day06a
+    { sParse = traverse (parse2 . reverse) . splitWhen (all (==' ')) .  transpose . lines
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = Just . sum . map (uncurry ($))
     }
