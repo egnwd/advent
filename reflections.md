@@ -13,6 +13,7 @@ Table of Contents
 * [Day 2](#day-2) *(no reflection yet)*
 * [Day 3](#day-3) *(no reflection yet)*
 * [Day 4](#day-4) *(no reflection yet)*
+* [Day 5](#day-5) *(no reflection yet)*
 
 Day 1
 ------
@@ -172,5 +173,32 @@ mean                 47.31 ms   (46.99 ms .. 48.71 ms)
 std dev              1.085 ms   (186.8 μs .. 2.063 ms)
 
 * parsing and formatting times excluded
+```
+
+
+
+Day 5
+------
+
+<!--
+This section is generated and compiled by the build script at ./Build.hs from
+the file `./reflections/day05.md`.  If you want to edit this, edit
+that file instead!
+-->
+
+*[Prompt][d05p]* / *[Code][d05g]*
+
+[d05p]: https://adventofcode.com/2025/day/5
+[d05g]: https://github.com/egnwd/advent/blob/2025/src/AOC/Challenge/Day05.hs
+
+*Reflection not yet written -- please check back later!*
+
+### Day 5 Benchmarks
+
+```
+>> Day 05a
+(No parse)
+>> Day 05b
+(No parse)
 ```
 
