@@ -22,8 +22,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day09 (
-    -- day09a
-  -- , day09b
+    day09a
+  , day09b
   ) where
 
 import           AOC.Prelude
@@ -44,17 +44,29 @@ import qualified Linear                         as L
 import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
+import Linear
+import Control.Lens
 
-day09a :: _ :~> _
+biggestRectangle xs = PSQ.fromList [((x,y), negate $ manhattan x y, size x y) | (x:ys) <- tails xs, y <- ys]
+    where
+        size a b = product . (1+) . abs $ a - b
+
+biggestRGRectangle xs = PSQ.fromList [((x,y), negate $ manhattan x y, size x y) | (x:ys) <- tails xs, y <- ys]
+    where
+        size a b = product . (1+) . abs $ a - b
+
+createFloor = S.fromList . concat . pairwise ((lineTo .) . V2)
+
+day09a :: [Point] :~> Int
 day09a = MkSol
-    { sParse = Just . lines
+    { sParse = traverse (fmap (uncurry V2) . listTup <=< traverse readMaybe . splitOn ",") . lines
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = preview (_Just . _3) . PSQ.minView . biggestRectangle
     }
 
 day09b :: _ :~> _
 day09b = MkSol
     { sParse = sParse day09a
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = Just . createFloor
     }
