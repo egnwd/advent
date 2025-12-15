@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module      : AOC.Challenge.Day10
@@ -22,8 +23,8 @@
 --     will recommend what should go in place of the underscores.
 
 module AOC.Challenge.Day10 (
-    -- day10a
-  -- , day10b
+    day10a
+  , day10b
   ) where
 
 import           AOC.Prelude
@@ -45,16 +46,55 @@ import qualified Text.Megaparsec                as P
 import qualified Text.Megaparsec.Char           as P
 import qualified Text.Megaparsec.Char.Lexer     as PP
 
+type Machine = Map Int Bool
+type Button = [Int]
+type Joltage = Map Int Int
+
+parseMachine :: CharParser (Machine, [Button], Joltage)
+parseMachine = do
+    lights <- pTok $ P.between "[" "]" $ P.many (False <$ P.char '.' <|> True <$ P.char '#')
+    wirings <- P.many $ do
+        pTok $ P.between "(" ")" $ P.sepBy1 pDecimal ","
+    joltage <- P.between "{" "}" $ P.sepBy1 pDecimal ","
+    return (M.fromList (zip [0..] lights), wirings, M.fromList (zip [0..] joltage))
+
+fewestPresses :: Machine -> [Button] -> Maybe _
+fewestPresses goal options = go (False <$ goal)
+    where
+        go :: Machine -> Maybe _
+        go = dijkstra neighbors (==goal)
+        neighbors :: Machine -> Map Machine Int
+        neighbors curr = M.fromList [ (toggle curr option, 1) | option <- options ]
+
+fewestPressesJ :: (Machine, Joltage) -> [Button] -> Maybe _
+fewestPressesJ goal options = go (bimap (False <$) (0 <$) goal)
+    where
+        go :: (Machine, Joltage) -> Maybe _
+        go = dijkstra neighbors (==goal)
+        neighbors :: (Machine, Joltage) -> Map (Machine,Joltage) Int
+        neighbors curr = M.fromList [ (next, 1) | option <- options, let next = pushButton curr option, isValid next ]
+        isValid :: (Machine, Joltage) -> Bool
+        isValid (_, j) = or $ M.mapWithKey (\k v -> j M.! k <= v) (snd goal)
+
+pushButton :: (Machine, Joltage) -> Button -> (Machine, Joltage)
+pushButton (m,j) b = (toggle m b, ramp j b)
+
+toggle :: Machine -> Button -> Machine
+toggle = foldr' (M.adjust not)
+
+ramp :: Joltage -> Button -> Joltage
+ramp = foldr' (M.adjust succ)
+
 day10a :: _ :~> _
 day10a = MkSol
-    { sParse = Just . lines
+    { sParse = parseLines parseMachine
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = fromDist . sum <=< traverse (\(m,b,_) -> fst <$> fewestPresses m b)
     }
 
 day10b :: _ :~> _
 day10b = MkSol
     { sParse = sParse day10a
     , sShow  = show
-    , sSolve = Just . id
+    , sSolve = traverse (\(m,b,j) -> fst <$> fewestPressesJ (m, j) b)
     }
